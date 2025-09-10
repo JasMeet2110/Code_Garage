@@ -1,17 +1,14 @@
-import Navbar from "../components/Navbar";
 import Image from "next/image";
-import Footer from "../components/Footer";
 
 export default function Home() {
   return (
     <div>
-      <Navbar />
 
       {/* Page Intro with quick welcome and image */}
 
         {/* Background image section */}
         <section className="relative bg-cover bg-center h-[800px] flex items-center justify-center text-center pt-35">
-          <Image className="absolute inset-0 bg-cover bg-center brightness-50 pt-15" src="/MustangRTR.png" alt="Mustang RTR" layout="fill" objectFit="cover" />
+          <Image className="absolute inset-0 bg-cover object-cover bg-center brightness-50 pt-15" src="/MustangRTR.png" alt="Mustang RTR" fill />
 
           {/* welcome text */}
           <div className="relative z-10 text-white px-6">
@@ -149,7 +146,6 @@ export default function Home() {
             </div>
           </div>
         </section>
-        <Footer />
     </div>
   );
 }
