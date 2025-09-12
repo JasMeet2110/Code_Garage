@@ -11,16 +11,16 @@ const Signup = () => {
   };
 
   const handleSignUp = () => {
-    alert('Sign up button clicked!');
+    router.push('/signin');
   };
 
   const handleTermsClick = () => {
-    router.push('/Tearmscondition');
+    router.push('/Termscondition');
   };
 
   return (
     <div style={{ 
-      backgroundImage: 'url("https://www.cortecvci.com/wp-content/uploads/auto-repair-shop-mci-2061.jpg")',
+      backgroundImage: 'url("ZR1.png")',
       backgroundSize: 'cover',
       backgroundPosition: 'center',
       minHeight: '100vh', 
@@ -43,7 +43,7 @@ const Signup = () => {
       <div style={{ 
         position: 'relative', 
         zIndex: 1,
-        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+        backgroundColor: 'rgba(243, 244, 246, 0.8)',
         padding: '40px',
         borderRadius: '15px',
         width: '100%',
@@ -53,17 +53,15 @@ const Signup = () => {
           fontSize: '2.5rem', 
           fontWeight: 'bold', 
           marginBottom: '20px',
-          color: 'orange',
+          color: 'black',
           textAlign: 'center',
-          fontFamily: 'Arial, sans-serif'
         }}>
-          CREATE ACCOUNT
+          Create Account
         </h1>
 
         <div style={{ textAlign: 'left' }}>
-          {/* Full Name */}
           <div style={{ marginBottom: '15px' }}>
-            <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+            <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', color: 'black'}}>
               Full Name
             </label>
             <input 
@@ -83,7 +81,7 @@ const Signup = () => {
 
           {/* Email */}
           <div style={{ marginBottom: '15px' }}>
-            <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+            <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', color: 'black' }}>
               Email
             </label>
             <input 
@@ -103,7 +101,7 @@ const Signup = () => {
 
           {/* Password */}
           <div style={{ marginBottom: '15px' }}>
-            <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+            <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', color: 'black' }}>
               Password
             </label>
             <input 
@@ -123,7 +121,7 @@ const Signup = () => {
 
           {/* Confirm Password */}
           <div style={{ marginBottom: '20px' }}>
-            <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+            <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', color: 'black' }}>
               Confirm Password
             </label>
             <input 
@@ -147,10 +145,10 @@ const Signup = () => {
             textAlign: 'center',
             fontSize: '0.9rem'
           }}>
-            <span style={{ marginRight: '5px' }}>By creating an account, you agree to our</span>
+            <span style={{ marginRight: '5px', color: 'black' }}>By creating an account, you agree to our</span>
             <span 
               style={{ 
-                color: 'orange', 
+                color: '#f97316', 
                 cursor: 'pointer', 
                 textDecoration: 'underline',
                 fontWeight: 'bold'
@@ -165,8 +163,8 @@ const Signup = () => {
           <button 
             onClick={handleSignUp}
             style={{
-              backgroundColor: 'orange',
-              color: 'black',
+              backgroundColor: '#f97316',
+              color: 'white',
               padding: '15px',
               border: 'none',
               borderRadius: '8px',
@@ -177,7 +175,7 @@ const Signup = () => {
               marginBottom: '20px'
             }}
           >
-            CREATE ACCOUNT
+            Create Account
           </button>
         </div>
 
@@ -186,8 +184,8 @@ const Signup = () => {
           onClick={handleBackToHome}
           style={{
             backgroundColor: 'transparent',
-            color: 'orange',
-            border: '2px solid orange',
+            color: 'black',
+            border: '2px solid black',
             padding: '10px 20px',
             borderRadius: '8px',
             cursor: 'pointer',

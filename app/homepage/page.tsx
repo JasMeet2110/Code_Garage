@@ -5,8 +5,6 @@ import Footer from "../../components/Footer";
 export default function Home() {
   return (
     <div>
-      <Navbar />
-
       {/* Page Intro with quick welcome and image */}
 
         {/* Background image section */}
@@ -149,7 +147,6 @@ export default function Home() {
             </div>
           </div>
         </section>
-        <Footer />
     </div>
   );
 }
