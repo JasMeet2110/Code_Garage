@@ -16,7 +16,7 @@ export default function Home() {
             <h1 className="text-5xl md:text-6xl font-extrabold leading-tight">
               Full-Service <br /> Auto Repair <br /> For All Makes & Models
             </h1>
-            <a href="/book" className="mt-6 inline-block bg-orange-500 text-white px-8 py-3 rounded-full font-semibold text-lg hover:scale-105 transition-transform duration-200">
+            <a href="/book-appointment" className="mt-6 inline-block bg-orange-500 text-white px-8 py-3 rounded-full font-semibold text-lg hover:scale-105 transition-transform duration-200">
               Book Appointment
             </a>
           </div>
