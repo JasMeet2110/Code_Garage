@@ -1,53 +1,17 @@
-<<<<<<< HEAD
+import Navbar from "../../components/Navbar";
 import Image from "next/image";
-=======
-"use client";
+import Footer from "../../components/Footer";
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
-
-const HomePage = () => {
-  const [hoveredButton, setHoveredButton] = useState<string | null>(null);
-  const router = useRouter();
-
-  const buttonStyle = (buttonName: string) => ({
-    backgroundColor: hoveredButton === buttonName ? '#ff8c00' : 'orange',
-    color: 'black',
-    padding: '15px 25px',
-    border: 'none',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    fontSize: '1.1rem',
-    fontWeight: 'bold',
-    boxShadow: '0 4px 8px rgba(0,0,0,0.3)',
-    transform: hoveredButton === buttonName ? 'scale(1.05)' : 'scale(1)',
-    transition: 'transform 0.2s, background-color 0.2s',
-    width: '100%'
-  });
-  
-  const handleSignIn = () => {
-    router.push('/signin');
-  };
-
-  const handleSignUp = () => {
-    router.push('/signup');
-  };
-
-  const handleAdminSignIn = () => {
-    router.push('/AdminSignIn');
-  
-  };
->>>>>>> dddc30bb784f85d1cb826ede2e96a43e9af7cb30
-
+export default function Home() {
   return (
-<<<<<<< HEAD
     <div>
+      <Navbar />
 
       {/* Page Intro with quick welcome and image */}
 
         {/* Background image section */}
         <section className="relative bg-cover bg-center h-[800px] flex items-center justify-center text-center pt-35">
-          <Image className="absolute inset-0 bg-cover object-cover bg-center brightness-50 pt-15" src="/MustangRTR.png" alt="Mustang RTR" fill />
+          <Image className="absolute inset-0 bg-cover bg-center brightness-50 pt-15" src="/MustangRTR.png" alt="Mustang RTR" layout="fill" objectFit="cover" />
 
           {/* welcome text */}
           <div className="relative z-10 text-white px-6">
@@ -84,88 +48,54 @@ const HomePage = () => {
           </b>
 
           We’ve proudly serviced thousands of vehicles and built lasting relationships with Ontario drivers who rely on us to keep their cars running smoothly. Whether you need emergency repairs, seasonal maintenance, or just a quick inspection before a road trip, SunRise Car Mechanic is your go-to shop for trusted automotive care.<br /><br />
-=======
-    <div style={{ 
-      backgroundImage: 'url("https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1974&q=80")',
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      height: '100vh', 
-      display: 'flex', 
-      flexDirection: 'column', 
-      justifyContent: 'center', 
-      alignItems: 'center',
-      color: 'white',
-      textAlign: 'center',
-      position: 'relative'
-    }}>
-
-      <div style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '100%',
-        backgroundColor: 'rgba(0, 0, 0, 0.7)'
-      }}></div>
-      
-      <div style={{ position: 'relative', zIndex: 1 }}>
-        <h1 style={{ 
-          fontSize: '4rem', 
-          fontWeight: 'bold', 
-          marginBottom: '10px',
-          textShadow: '2px 2px 4px rgba(0,0,0,0.8)',
-          color: 'orange',
-          fontFamily: 'Arial, sans-serif',
-          letterSpacing: '2px'
-        }}>
-          SUNNY AUTO
-        </h1>
-        
-        <p style={{ 
-          fontSize: '1.5rem', 
-          marginBottom: '40px',
-          textShadow: '1px 1px 2px rgba(0,0,0,0.8)',
-          fontWeight: 'bold'
-        }}>
-          Premium Auto Repair & Service
->>>>>>> dddc30bb784f85d1cb826ede2e96a43e9af7cb30
         </p>
-        
-        <div style={{ 
-          display: 'flex', 
-          flexDirection: 'column',
-          gap: '15px',
-          width: '250px'
-        }}>
-          <button 
-            style={buttonStyle('signin')}
-            onMouseEnter={() => setHoveredButton('signin')}
-            onMouseLeave={() => setHoveredButton(null)}
-            onClick={handleSignIn}
-          >
-            Sign in
-          </button>
-          
-          <button 
-            style={buttonStyle('signup')}
-            onMouseEnter={() => setHoveredButton('signup')}
-            onMouseLeave={() => setHoveredButton(null)}
-            onClick={handleSignUp}
-          >
-            Sign Up
-          </button>
-          
-          <button 
-            style={buttonStyle('admin')}
-            onMouseEnter={() => setHoveredButton('admin')}
-            onMouseLeave={() => setHoveredButton(null)}
-            onClick={handleAdminSignIn}
-          >
-            Sign in as admin
-          </button>
+      </section>
+
+      {/* Services Preview */}
+      <section className="py-10 px-6 bg-gray-100 text-center">
+      <h2 className="text-4xl font-bold mb-6 text-center">Our Popular Services</h2>
+
+      {/* Service Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 px-50">
+        {/* Card 1 */}
+        <div className="bg-white shadow-md rounded-lg overflow-hidden hover:shadow-lg transition">
+          <div className="h-50 w-full relative">
+            <Image src="/OilChange.png" alt="Oil Change" fill className="object-cover"/>
+          </div>
+          <div className="p-6">
+            <h3 className="text-xl font-semibold mb-2">Oil Change</h3>
+            <p className="text-gray-600 text-sm">
+              Keep your engine running smoothly with our quick and reliable oil change service.
+            </p>
+          </div>
+        </div>
+
+        {/* Card 2 */}
+        <div className="bg-white shadow-md rounded-lg overflow-hidden hover:shadow-lg transition">
+          <div className="h-50 w-full relative">
+            <Image src="/BrakeService.png" alt="Brake Service" fill className="object-cover"/>
+          </div>
+          <div className="p-6">
+            <h3 className="text-xl font-semibold mb-2">Brake Service</h3>
+            <p className="text-gray-600 text-sm">
+              Ensure your safety with expert brake inspection and maintenance.
+            </p>
+          </div>
+        </div>
+
+        {/* Card 3 */}
+        <div className="bg-white shadow-md rounded-lg overflow-hidden hover:shadow-lg transition">
+          <div className="h-50 w-full relative">
+            <Image src="/TireChange.png" alt="Tire Change" fill className="object-cover"/>
+          </div>
+          <div className="p-6">
+            <h3 className="text-xl font-semibold mb-2">Tire Replacement</h3>
+            <p className="text-gray-600 text-sm">
+              Stay safe on the road with our professional tire replacement services.
+            </p>
+          </div>
         </div>
       </div>
-<<<<<<< HEAD
 
       {/* Show More Button */}
       <div className="mt-10 mb-10">
@@ -219,10 +149,7 @@ const HomePage = () => {
             </div>
           </div>
         </section>
-=======
->>>>>>> dddc30bb784f85d1cb826ede2e96a43e9af7cb30
+        <Footer />
     </div>
   );
-};
-
-export default HomePage;
+}
