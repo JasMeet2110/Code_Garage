@@ -15,7 +15,7 @@ const handleSignIn = () => {
 
   return (
     <div style={{ 
-      backgroundImage: 'url("https://martinsupply.com/wp-content/uploads/2023/02/Best-Inventory-Practices-for-a-Tool-Crib-or-Storeroom.jpg")',
+      backgroundImage: 'url("/Admin.png")',
       backgroundSize: 'cover',
       backgroundPosition: 'center',
       minHeight: '100vh', 
@@ -38,7 +38,7 @@ const handleSignIn = () => {
       <div style={{ 
         position: 'relative', 
         zIndex: 1,
-        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+        backgroundColor: 'rgba(243, 244, 246, 0.8)',
         padding: '40px',
         borderRadius: '15px',
         width: '100%',
@@ -48,11 +48,10 @@ const handleSignIn = () => {
           fontSize: '2.5rem', 
           fontWeight: 'bold', 
           marginBottom: '30px',
-          color: 'orange',
+          color: 'black',
           textAlign: 'center',
-          fontFamily: 'Arial, sans-serif'
         }}>
-          ADMIN LOGIN
+          Admin Login
         </h1>
 
         <div style={{ marginBottom: '20px' }}>
@@ -91,8 +90,8 @@ const handleSignIn = () => {
         <button 
           onClick={handleSignIn}
           style={{
-            backgroundColor: 'orange',
-            color: 'black',
+            backgroundColor: '#f97316',
+            color: 'white',
             padding: '15px',
             border: 'none',
             borderRadius: '8px',
@@ -103,15 +102,15 @@ const handleSignIn = () => {
             marginBottom: '20px'
           }}
         >
-          SIGN IN
+          Sign In
         </button>
 
         <button 
           onClick={handleBackToHome}
           style={{
             backgroundColor: 'transparent',
-            color: 'orange',
-            border: '2px solid orange',
+            color: 'black',
+            border: '2px solid black',
             padding: '10px 20px',
             borderRadius: '8px',
             cursor: 'pointer',
