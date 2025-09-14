@@ -1,7 +1,8 @@
 "use client"; // tells next.js that the components is a client component refernce next.js Docs- Client Components
 import { useMemo, useState } from "react"; //lets you store and update values and memoizes values to avoid recalculating them unnecessarily
 import Link from "next/link"; //This imports Next.js’s <Link> component, which allows navigation between pages without reloading the browser Reference: Next.js Docs – Link Component
-
+import { useRouter } from "next/navigation"; //gives access to Next.js’s router object, which lets you navigate programmatically between pages. Reference: Next.js Docs – useRouter
+// Define types for services and fuel options
 type ServiceKey = "basic_oil" | "full_maint"; //It restricts ServiceKey to only two possible string values: "basic_oil" or "full_maint". This ensures type safety when referring to services.Reference: TypeScript Docs – Union Types
 type FuelType = "Petrol" | "Diesel" | "Electric"; //restricting FuelType to only "Petrol", "Diesel", or "Electric". This avoids invalid inputs like “Water” or “Banana” being used for fuel type.
 
@@ -40,6 +41,7 @@ export default function BookAppointmentPage() {//Declares the booking page compo
   const [towing, setTowing] = useState(false);//Tracks whether the user checked “Need Towing?” and starts false means not requested
   const [pickup, setPickup] = useState("");//Stores the pickup location if towing is needed and starts blank
   const slots = useMemo(() => generateSlots(date), [date]);//Calls generateSlots(date) whenever the date changes/ seMemo makes sure slots are only recalculated when date updates, which improves performance
+  const router = useRouter();//gives access to Next.js’s router object, which lets you navigate programmatically between pages.
 //References React Docs – useState and React Docs – useMemo
   const readyToConfirm =
     !!service &&//Checks if a service was selected
@@ -65,14 +67,14 @@ export default function BookAppointmentPage() {//Declares the booking page compo
     };
 
      console.log("BOOKING_PAYLOAD", payload);//Prints the booking data to the browser console
-    alert("Booking captured on the front-end ✅ (check console).");//Shows a pop-up to the user confirming that their booking was captured
+    router.push('/book-appointment/payment'); // Redirect to payment page
   }//Reference MDN Docs – Functions MDN Docs – console.log() and MDN Docs – window.alert()
 
   return (
     <main className="booking section">
         
         {/* Page header with title and description */}
-      <header className="section-header">
+      <header className="section-header text-center mb-8">
         <h2>Book Your Appointment</h2>
         <p>Choose a service, fill your vehicle info, pick a time, and confirm.</p>
       </header>
@@ -272,11 +274,6 @@ export default function BookAppointmentPage() {//Declares the booking page compo
           
         </p>
       </section>
-
-      {/* Back navigation link */}
-      <p className="muted" style={{ textAlign: "center", marginTop: 16 }}>
-        <Link href="/services">← Back to Services</Link>
-      </p>
     </main>
   );
 }
