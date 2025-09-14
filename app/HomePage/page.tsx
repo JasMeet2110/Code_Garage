@@ -3,19 +3,18 @@ import Image from "next/image";
 export default function Home() {
   return (
     <div>
-
       {/* Page Intro with quick welcome and image */}
 
         {/* Background image section */}
-        <section className="relative bg-cover bg-center h-[800px] flex items-center justify-center text-center pt-35">
-          <Image className="absolute inset-0 bg-cover object-cover bg-center brightness-50 pt-15" src="/MustangRTR.png" alt="Mustang RTR" fill />
+        <section className="relative bg-cover bg-center h-[800px] flex items-center justify-center text-center">
+          <Image className="absolute inset-0 bg-cover bg-center brightness-50" src="/MustangRTR.png" alt="Mustang RTR" layout="fill" objectFit="cover" />
 
           {/* welcome text */}
           <div className="relative z-10 text-white px-6">
             <h1 className="text-5xl md:text-6xl font-extrabold leading-tight">
               Full-Service <br /> Auto Repair <br /> For All Makes & Models
             </h1>
-            <a href="/book" className="mt-6 inline-block bg-orange-500 text-white px-8 py-3 rounded-full font-semibold text-lg hover:scale-105 transition-transform duration-200">
+            <a href="/book-appointment" className="mt-6 inline-block bg-orange-500 text-white px-8 py-3 rounded-full font-semibold text-lg hover:scale-105 transition-transform duration-200">
               Book Appointment
             </a>
           </div>
