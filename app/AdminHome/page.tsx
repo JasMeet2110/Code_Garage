@@ -32,7 +32,6 @@ const AdminHome = () => {
         zIndex: 1,
         padding: '40px 20px',
         minHeight: 'calc(100vh - 100px)',
-        marginTop: '125px',
       }}>
         <div style={{ 
           backgroundColor: 'rgba(0, 0, 0, 0.8)',
@@ -40,7 +39,8 @@ const AdminHome = () => {
           borderRadius: '15px',
           maxWidth: '1200px',
           margin: '0 auto',
-          textAlign: 'center'
+          textAlign: 'center',
+          marginTop: '50px'
         }}>
           <h2 style={{ 
             fontSize: '2.5rem', 
