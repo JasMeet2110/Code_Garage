@@ -5,7 +5,7 @@ export default function Contact() {
   return (
     <div>
       {/* Hero Section with Background Image */}
-      <section className="relative bg-cover bg-center h-[900px] flex items-center justify-center">
+      <section className="relative bg-cover bg-center h-[800px] flex items-center justify-center">
         <Image
           className="absolute inset-0 object-cover brightness-50"
           src="/MustangGT.jpg"
@@ -14,7 +14,7 @@ export default function Contact() {
         />
 
         {/* Overlay Container */}
-        <div className="relative z-10 w-full max-w-6xl px-6 pt-35">
+        <div className="relative z-10 w-full max-w-6xl px-6">
           {/* Heading */}
           <div className="text-center mb-12 text-white">
             <h1 className="text-4xl font-bold">Contact Us & Location</h1>
@@ -29,7 +29,7 @@ export default function Contact() {
                 <Phone className="text-orange-400 w-6 h-6" />
                 <div>
                   <h3 className="font-semibold">Phone</h3>
-                  <p>+1 (604) 710-3226</p>
+                  <p>+1 (403) 123-4567</p>
                 </div>
               </div>
 
@@ -37,7 +37,7 @@ export default function Contact() {
                 <Mail className="text-orange-400 w-6 h-6" />
                 <div>
                   <h3 className="font-semibold">Email</h3>
-                  <p>sunriseautomechanic@gmail.com</p>
+                  <p>sunrisecarmechanic@gmail.com</p>
                 </div>
               </div>
 
@@ -83,7 +83,7 @@ export default function Contact() {
       <div className="h-10 bg-gradient-to-b from-black/80 to-white/20"></div>
 
       {/* Map Section */}
-      <section className="pb-16 px-6 bg-white">
+      <section className="pb-16 pt-5 bg-white">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-4xl font-bold mb-6 text-center">Find Us Here</h2>
           <div className="w-full h-72 bg-gray-300 flex items-center justify-center rounded-lg shadow-md">
