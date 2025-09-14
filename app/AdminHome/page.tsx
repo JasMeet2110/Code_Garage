@@ -1,5 +1,6 @@
 "use client";
 
+
 import React from 'react';
 import { useRouter } from 'next/navigation';
 
@@ -7,6 +8,7 @@ const AdminHome = () => {
   const handleSection = (section: string) => {
     alert(`Opening ${section} section`);
   };
+const router = useRouter();
 
   return (
     <div style={{ 
@@ -77,7 +79,7 @@ const AdminHome = () => {
                 transition: 'transform 0.2s',
                 textAlign: 'center'
               }}
-              onClick={() => handleSection('Inventory')}
+              onClick={() => router.push('/AdminInventory')}
               onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
               onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
             >
