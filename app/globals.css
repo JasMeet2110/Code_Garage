@@ -29,3 +29,186 @@ body {
   @apply bg-white text-black px-4 py-2 rounded-lg font-medium 
          hover:scale-105 transition-transform duration-200 shadow-sm;
 }
+
+.booking {
+  --ring: #e2e8f0;
+  --muted: #64748b;
+  --soft: #f8fafc;
+  --ink: #0f172a;
+  --brand: #1d4ed8;
+  --ok: #16a34a;
+  --badge: #f97316;
+  --card-bg: #ffffff;
+}
+
+.booking.section {
+  max-width: 1100px;
+  margin: 32px auto;
+  padding: 0 16px;
+  color: var(--ink);
+}
+
+.booking .section-header {
+  text-align: center;
+  margin-bottom: 18px;
+}
+.booking .section-header h2 {
+  font-size: 32px;
+  font-weight: 800;
+  margin: 0 0 6px;
+}
+.booking .section-header p {
+  color: var(--muted);
+  margin: 0;
+}
+/* ---------- Card grid (services list) ---------- */
+.booking .cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 18px;
+  margin: 10px 0 24px;
+}
+
+.booking .card {
+  background: var(--card-bg);
+  border: 1px solid var(--ring);
+  border-radius: 14px;
+  box-shadow: 0 8px 20px rgba(2,8,23,.06);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  cursor: pointer;
+  transition: box-shadow .2s ease, transform .06s ease;
+}
+.booking .card:hover { box-shadow: 0 10px 24px rgba(2,8,23,.09); }
+.booking .card--selected { outline: 2px solid var(--brand); }
+
+.booking .card-head {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+.booking .card-title { margin: 0; font-size: 18px; font-weight: 700; }
+.booking .card-sub { margin: 4px 0 0; color: var(--muted); font-size: 14px; }
+.booking .price-badge {
+  background: var(--badge);
+  color: #fff;
+  font-weight: 700;
+  padding: 6px 10px;
+  border-radius: 8px;
+}
+
+.booking .feature-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.booking .feature-list li {
+  background: var(--soft);
+  border: 1px solid var(--ring);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.booking .check { color: var(--ok); font-weight: 900; }
+
+.booking .btn-primary {
+  background: var(--brand);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: auto;
+}
+.booking .btn-primary:disabled { opacity: .55; cursor: not-allowed; }
+.booking .btn-primary:hover { opacity: .95; }
+/* ---------- Panels (form blocks) ---------- */
+.booking .panel {
+  border: 1px solid var(--ring);
+  border-radius: 14px;
+  padding: 16px;
+  margin: 16px 0;
+  background: #fff;
+}
+.booking .panel h3 { margin: 0 0 12px; }
+
+/* ---------- Grid utilities (scoped) ---------- */
+.booking .grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.booking .grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+@media (max-width: 900px) { .booking .grid-4 { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 640px) {
+  .booking .grid-2 { grid-template-columns: 1fr; }
+  .booking .grid-4 { grid-template-columns: 1fr; }
+}
+/* ---------- Form controls (scoped) ---------- */
+.booking .label {
+  display: block;
+  font-size: 13px;
+  color: var(--muted);
+  margin: 0 0 6px;
+}
+.booking .input {
+  width: 100%;
+  border: 1px solid var(--ring);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 14px;
+  outline: none;
+  background: #fff;
+}
+.booking .input:focus {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px rgba(29,78,216,.1);
+}
+
+/* ---------- Chips (fuel type & time slots) ---------- */
+.booking .chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.booking .chip {
+  border: 1px solid var(--ring);
+  background: #fff;
+  border-radius: 999px;
+  padding: 8px 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.booking .chip--active {
+  border-color: var(--brand);
+  background: rgba(29,78,216,.08);
+}
+
+/* ---------- Extra bits ---------- */
+.booking .towing .row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.booking .muted { color: var(--muted); }
+.booking .summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
