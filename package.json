@@ -17,13 +17,8 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
-<<<<<<< HEAD
-    "@types/node": "^20.19.13",
-    "@types/react": "^19.1.12",
-=======
     "@types/node": "^20",
     "@types/react": "^19.1.13",
->>>>>>> origin/Samiurai
     "@types/react-dom": "^19.1.9",
     "eslint": "^9",
     "eslint-config-next": "15.5.2",
