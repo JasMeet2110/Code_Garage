@@ -1,21 +1,23 @@
 "use client";
-
+import AdminFooter from '@/components/AdminFooter';
+import AdminNavbar from '@/components/AdminNavbar';
 import React from 'react';
 import { useRouter } from 'next/navigation';
 
 const AdminHome = () => {
-  const handleSection = (section: string) => {
-    alert(`Opening ${section} section`);
-  };
+const router = useRouter();
 
   return (
+  <div>
+    <AdminNavbar />
     <div style={{ 
       backgroundImage: 'url("Admin.png")',
       backgroundSize: 'cover',
       backgroundPosition: 'center',
       minHeight: '100vh', 
       color: 'white',
-      position: 'relative'
+      position: 'relative',
+      marginTop: '140px'
     }}>
       <div style={{
         position: 'absolute',
@@ -77,7 +79,7 @@ const AdminHome = () => {
                 transition: 'transform 0.2s',
                 textAlign: 'center'
               }}
-              onClick={() => handleSection('Inventory')}
+              onClick={() => router.push('/AdminInventory')}
               onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
               onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
             >
@@ -97,7 +99,7 @@ const AdminHome = () => {
                 transition: 'transform 0.2s',
                 textAlign: 'center'
               }}
-              onClick={() => handleSection('Appointments')}
+              onClick={() => router.push('/AdminAppointments')}
               onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
               onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
             >
@@ -117,7 +119,7 @@ const AdminHome = () => {
                 transition: 'transform 0.2s',
                 textAlign: 'center'
               }}
-              onClick={() => handleSection('Employees')}
+              onClick={() => router.push('/AdminEmployees')}
               onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
               onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
             >
@@ -137,7 +139,7 @@ const AdminHome = () => {
                 transition: 'transform 0.2s',
                 textAlign: 'center'
               }}
-              onClick={() => handleSection('Customers')}
+              onClick={() => router.push('/AdminCustomers')}
               onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
               onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
             >
@@ -157,7 +159,7 @@ const AdminHome = () => {
                 transition: 'transform 0.2s',
                 textAlign: 'center'
               }}
-              onClick={() => handleSection('Reports')}
+              onClick={() => router.push('/AdminReports')}
               onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
               onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
             >
@@ -177,7 +179,7 @@ const AdminHome = () => {
                 transition: 'transform 0.2s',
                 textAlign: 'center'
               }}
-              onClick={() => handleSection('Finance')}
+              onClick={() => router.push('/AdminFinance')}
               onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
               onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
             >
@@ -189,6 +191,8 @@ const AdminHome = () => {
         </div>
       </div>
     </div>
+    <AdminFooter />
+  </div>
   );
 };
 
