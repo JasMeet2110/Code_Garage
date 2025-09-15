@@ -1,5 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import AdminNavbar from "@/components/AdminNavbar";
+import AdminFooter from "@/components/AdminFooter";
 
 interface NewItemData {
   name: string;
@@ -195,7 +197,9 @@ const InventoryPage = () => {
 );
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-8 pt-45">
+  <div>
+    <AdminNavbar />
+    <div className="min-h-screen bg-gray-900 text-white p-8 pt-[180px]">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-4xl font-bold text-orange-500 mb-8">
           Inventory Management
@@ -359,6 +363,8 @@ const InventoryPage = () => {
         )}
       </div>
     </div>
+    <AdminFooter />
+  </div>
   );
 };
 
