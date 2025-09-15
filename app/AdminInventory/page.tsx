@@ -59,6 +59,7 @@ const InventoryPage = () => {
   const [editItemPartNumber, setEditItemPartNumber] = useState("");
   const [editItemQuantity, setEditItemQuantity] = useState("");
   const [editItemPrice, setEditItemPrice] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
 
   const handleDeleteItem = (itemId: number) => {
     if (window.confirm("Are you sure you want to delete this item?")) {
@@ -78,42 +79,47 @@ const InventoryPage = () => {
   };
   const handleSubmitNewItem = () => {
     // Validation - check if any field is empty
-    if (!newItemName.trim() || !newItemPartNumber.trim() || !newItemQuantity.trim() || !newItemPrice.trim()) {
-        alert("Please fill in all fields before adding an item.");
-        return; // Stop the function if validation fails
+    if (
+      !newItemName.trim() ||
+      !newItemPartNumber.trim() ||
+      !newItemQuantity.trim() ||
+      !newItemPrice.trim()
+    ) {
+      alert("Please fill in all fields before adding an item.");
+      return; // Stop the function if validation fails
     }
-    
+
     // Additional validation - check if quantity and price are valid numbers
     if (parseInt(newItemQuantity) <= 0) {
-        alert("Quantity must be a positive number.");
-        return;
+      alert("Quantity must be a positive number.");
+      return;
     }
-    
+
     if (parseFloat(newItemPrice) <= 0) {
-        alert("Price must be a positive number.");
-        return;
+      alert("Price must be a positive number.");
+      return;
     }
-    
+
     // Create the new item data object (only if validation passes)
     const newItemData = {
-        name: newItemName,
-        partNumber: newItemPartNumber,
-        quantity: parseInt(newItemQuantity),
-        price: parseFloat(newItemPrice)
+      name: newItemName,
+      partNumber: newItemPartNumber,
+      quantity: parseInt(newItemQuantity),
+      price: parseFloat(newItemPrice),
     };
-    
+
     // Add the item to inventory
     handleAddItem(newItemData);
-    
+
     // Clear the form
     setNewItemName("");
     setNewItemPartNumber("");
     setNewItemQuantity("");
     setNewItemPrice("");
-    
+
     // Hide the form
     setShowAddForm(false);
-};
+  };
   const handleEditItem = (item: InventoryItem) => {
     // Fill the edit form with the current item's data
     setEditItemName(item.name);
@@ -128,36 +134,65 @@ const InventoryPage = () => {
     setShowEditForm(true);
   };
 
-const handleSaveChanges = () => {
+  const handleSaveChanges = () => {
     // Safety check - make sure we have an item ID
     if (editingItemId === null) {
-        return; // Exit if no item is being edited
+      return;
     }
-    
-    // Create the updated item
+
+    // Validation - check if any field is empty
+    if (
+      !editItemName.trim() ||
+      !editItemPartNumber.trim() ||
+      !editItemQuantity.trim() ||
+      !editItemPrice.trim()
+    ) {
+      alert("Please fill in all fields before saving changes.");
+      return;
+    }
+
+    // Additional validation - check if quantity and price are valid numbers
+    if (parseInt(editItemQuantity) <= 0) {
+      alert("Quantity must be a positive number.");
+      return;
+    }
+
+    if (parseFloat(editItemPrice) <= 0) {
+      alert("Price must be a positive number.");
+      return;
+    }
+
+    // Create the updated item (only if validation passes)
     const updatedItem = {
-        id: editingItemId, // Now TypeScript knows this is a number
-        name: editItemName,
-        partNumber: editItemPartNumber,
-        quantity: parseInt(editItemQuantity),
-        price: parseFloat(editItemPrice)
+      id: editingItemId,
+      name: editItemName,
+      partNumber: editItemPartNumber,
+      quantity: parseInt(editItemQuantity),
+      price: parseFloat(editItemPrice),
     };
-    
+
     // Update the inventory array
-    setInventoryItems(inventoryItems.map(item => 
+    setInventoryItems(
+      inventoryItems.map((item) =>
         item.id === editingItemId ? updatedItem : item
-    ));
-    
+      )
+    );
+
     // Clear the edit form
     setEditItemName("");
     setEditItemPartNumber("");
     setEditItemQuantity("");
     setEditItemPrice("");
     setEditingItemId(null);
-    
+
     // Hide the edit form
     setShowEditForm(false);
-};
+  };
+
+  const filteredItems = inventoryItems.filter(item =>
+    item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    item.partNumber.toLowerCase().includes(searchTerm.toLowerCase())
+);
 
   return (
     <div className="min-h-screen bg-gray-900 text-white p-8 pt-45">
@@ -171,6 +206,8 @@ const handleSaveChanges = () => {
             <input
               type="text"
               placeholder="Search for items..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 text-white"
             />
           </div>
@@ -193,7 +230,7 @@ const handleSaveChanges = () => {
             </tr>
           </thead>
           <tbody>
-            {inventoryItems.map((item) => (
+            {filteredItems.map((item) => (
               <tr key={item.id} className="border-b border-gray-600">
                 <td className="px-6 py-4 text-white">{item.name}</td>
                 <td className="px-6 py-4 text-gray-400">{item.partNumber}</td>

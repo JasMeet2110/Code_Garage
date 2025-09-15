@@ -119,7 +119,7 @@ const router = useRouter();
                 transition: 'transform 0.2s',
                 textAlign: 'center'
               }}
-              onClick={() => handleSection('Employees')}
+              onClick={() => router.push('/AdminEmployees')}
               onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
               onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
             >
