@@ -1,5 +1,18 @@
+"use client";
+
 import { Phone, Mail, MapPin, Clock } from "lucide-react";
 import Image from "next/image";
+import { GoogleMap , LoadScript , Marker } from '@react-google-maps/api';
+
+const containerStyle = {
+  width: '100%',
+  height: '300px'
+};
+
+const center = {
+  lat: 51.0447,
+  lng: -114.0719
+};
 
 export default function Contact() {
   return (
@@ -37,7 +50,7 @@ export default function Contact() {
                 <Mail className="text-orange-400 w-6 h-6" />
                 <div>
                   <h3 className="font-semibold">Email</h3>
-                  <p>sunrisecarmechanic@gmail.com</p>
+                  <p>tracksidegarage@gmail.com</p>
                 </div>
               </div>
 
@@ -45,7 +58,7 @@ export default function Contact() {
                 <MapPin className="text-orange-400 w-6 h-6" />
                 <div>
                   <h3 className="font-semibold">Address</h3>
-                  <p>Ontario, Canada</p>
+                  <p>Alberta, Canada</p>
                 </div>
               </div>
 
@@ -87,7 +100,15 @@ export default function Contact() {
         <div className="max-w-6xl mx-auto">
           <h2 className="text-4xl font-bold mb-6 text-center">Find Us Here</h2>
           <div className="w-full h-72 bg-gray-300 flex items-center justify-center rounded-lg shadow-md">
-            <Image src="/Map.png" alt="Map showing location" width={1000} height={400} className="object-cover w-full h-full"/>
+            <LoadScript googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!}>
+            <GoogleMap
+              mapContainerStyle={containerStyle}
+              center={center}
+              zoom={14}
+            >
+              <Marker position={center} />
+            </GoogleMap>
+          </LoadScript>
           </div>
         </div>
       </section>

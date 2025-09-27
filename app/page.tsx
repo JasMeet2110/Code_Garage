@@ -38,7 +38,7 @@ const HomePage = () => {
 
   return (
     <div style={{ 
-      backgroundImage: 'url("/ZR1.png")',
+      backgroundImage: 'url("/background/ZR1.png")',
       backgroundSize: 'cover',
       backgroundPosition: 'center',
       height: '100vh', 
@@ -62,7 +62,7 @@ const HomePage = () => {
 
       <div style={{ position: 'relative', zIndex: 1, maxWidth: "900px", alignItems: "center", display: "flex", flexDirection: "column" }}>
         <div style={{ marginBottom: '30px' }}>
-          <Image src="/SunriseLogo.png" alt="Logo" width={400} height={400} className="invert brightness-0 "/>
+          <Image src="/TracksideGarage.png" alt="Logo" width={400} height={300} className="invert brightness-0" />
         </div>
         <h1 style={{ 
           fontSize: '4rem', 
@@ -72,7 +72,7 @@ const HomePage = () => {
           color: '#f97316',
           letterSpacing: '2px'
         }}>
-          SunRise Car Mechanic
+          Trackside Garage
         </h1>
         
         <p style={{ 
@@ -81,7 +81,7 @@ const HomePage = () => {
           textShadow: '1px 1px 2px rgba(0,0,0,0.8)',
           fontWeight: 'bold'
         }}>
-          Professional Auto Car Services
+          Reliable Repairs. Built with Passion.
         </p>
         
         <div style={{ 

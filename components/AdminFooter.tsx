@@ -7,9 +7,9 @@ export default function AdminFooter() {
         
         {/* Logo + Shop Info */}
         <div>
-          <h2 className="text-2xl font-bold mb-2">SunRise Car Mechanic</h2>
+          <h2 className="text-2xl font-bold mb-2">Trackside Garage</h2>
           <p className="text-gray-400 text-sm">
-            Your trusted auto repair shop in Ontario. Full-service repairs for all makes & models.
+            Your trusted auto repair shop in Alberta. Full-service repairs for all makes & models.
           </p>
         </div>
 
@@ -17,7 +17,7 @@ export default function AdminFooter() {
         <div>
           <h3 className="font-semibold mb-3">Quick Links</h3>
           <ul className="space-y-2">
-            <li><Link href="/HomePage" className="hover:text-orange-400">Home</Link></li>
+            <li><Link href="/AdminHome" className="hover:text-orange-400">Home</Link></li>
             <li><Link href="/AdminInventory" className="hover:text-orange-400">Inventory</Link></li>
             <li><Link href="/AdminAppointments" className="hover:text-orange-400">Appointment</Link></li>
             <li><Link href="/AdminEmployees" className="hover:text-orange-400">Employees</Link></li>
@@ -38,7 +38,7 @@ export default function AdminFooter() {
 
       {/* Bottom Bar */}
       <div className="mt-10 border-t border-gray-700 pt-4 text-center text-gray-500 text-sm">
-        © {new Date().getFullYear()} SunRise Car Mechanic. All Rights Reserved.
+        © {new Date().getFullYear()} Trackside Garage. All Rights Reserved.
       </div>
     </footer>
   );

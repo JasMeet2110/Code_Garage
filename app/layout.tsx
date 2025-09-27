@@ -14,8 +14,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Sunrise Mechanic Shop",
-  description: "Your one-stop shop for all your vehicle needs",
+  title: "Trackside Garage",
+  description: "Reliable Repairs. Built with Passion.",
+  icons: {icon: "/logo/TracksideGarage.png"},
 };
 
 export default function RootLayout({
