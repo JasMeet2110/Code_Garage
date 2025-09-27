@@ -10,7 +10,7 @@ export default function ConfirmationPage() {
           Booking Confirmed!
         </h2>
         <p className="text-gray-600 mb-6">
-          Thank you for booking with Sunrise Car Mechanic.  
+          Thank you for booking with Trackside Garage.  
           Your appointment details will be shared soon.
         </p>
 

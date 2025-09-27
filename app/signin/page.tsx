@@ -16,7 +16,7 @@ const Signin = () => {
 
   return (
     <div style={{ 
-      backgroundImage: 'url("/ZR1.png")',
+      backgroundImage: 'url("/background/ZR1.png")',
       backgroundSize: 'cover',
       backgroundPosition: 'center',
       minHeight: '100vh', 

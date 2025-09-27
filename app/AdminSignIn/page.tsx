@@ -15,7 +15,7 @@ const handleSignIn = () => {
 
   return (
     <div style={{ 
-      backgroundImage: 'url("/Admin.png")',
+      backgroundImage: 'url("/background/Admin.png")',
       backgroundSize: 'cover',
       backgroundPosition: 'center',
       minHeight: '100vh', 

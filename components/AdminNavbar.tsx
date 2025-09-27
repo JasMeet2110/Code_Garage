@@ -5,14 +5,14 @@ export default function AdminNavbar() {
   return (
      <nav className="fixed top-0 left-0 w-full bg-black text-white px-8 h-35 flex justify-between items-center shadow-md z-50">
       <div className="flex items-center gap-4 px-40">
-        <Image src="/SunriseLogo.png" alt="Logo" width={200} height={200} className="invert brightness-0 "/>
+        <Image src="/TracksideGarage.png" alt="Logo" width={200} height={200} className="invert brightness-0" />
           <div>
-              <h1 className="text-3xl font-bold">SunRise Car Mechanic</h1>
-              <p className="text-lg">Professional Auto Car Services</p>
+              <h1 className="text-3xl font-bold">Trackside Garage</h1>
+              <p className="text-lg">Reliable Repairs. Built with Passion.</p>
           </div>
-      </div>  
+      </div>
       <div className="flex gap-5">
-        <Link href="/HomePage" className="nav-btn">Home</Link>
+        <Link href="/AdminHome" className="nav-btn">Home</Link>
         <Link href="/AdminInventory" className="nav-btn">Inventory</Link>
         <Link href="/AdminAppointments" className="nav-btn">Appointment</Link>
         <Link href="/AdminEmployees" className="nav-btn">Employees</Link>
