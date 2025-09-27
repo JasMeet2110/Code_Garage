@@ -7,7 +7,7 @@ export default function Home() {
 
         {/* Background image section */}
         <section className="relative bg-cover bg-center h-[800px] flex items-center justify-center text-center">
-          <Image className="absolute inset-0 bg-cover bg-center brightness-50" src="/MustangRTR.png" alt="Mustang RTR" layout="fill" objectFit="cover" />
+          <Image className="absolute inset-0 bg-cover bg-center brightness-50" src="/background/MustangRTR.png" alt="Mustang RTR" layout="fill" objectFit="cover" />
 
           {/* welcome text */}
           <div className="relative z-10 text-white px-6">
@@ -24,13 +24,13 @@ export default function Home() {
 
       {/*About us Information*/}
       <section className="px-50 pt-5">
-        <h3 className="text-4xl font-bold mb-6 text-center">Welcome to SunRise Mechanic Shop!</h3>
+        <h3 className="text-4xl font-bold mb-6 text-center">Welcome to Trackside Garage!</h3>
         <p className="text-lg text-gray-700 px-5">
-          Located in the heart of Ontario, SunRise Car Mechanic has been serving the community with reliable and affordable auto repair services for years. We pride ourselves on being more than just a repair shop — we’re a team of passionate, certified mechanics dedicated to keeping your car safe, efficient, and performing at its best.<br /><br />
+          Located in the heart of Alberta, Trackside Garage has been serving the community with reliable and affordable auto repair services for years. We pride ourselves on being more than just a repair shop — we’re a team of passionate, certified mechanics dedicated to keeping your car safe, efficient, and performing at its best.<br /><br />
 
-          At SunRise, we believe every customer deserves honest advice, transparent pricing, and top-quality workmanship. Whether you’re driving a domestic, import, or luxury vehicle, our full-service facility is equipped to handle all makes and models. From routine maintenance like oil changes and tire rotations to advanced diagnostics and major repairs, we’ve got you covered.<br /><br />
+          At Trackside Garage, we believe every customer deserves honest advice, transparent pricing, and top-quality workmanship. Whether you’re driving a domestic, import, or luxury vehicle, our full-service facility is equipped to handle all makes and models. From routine maintenance like oil changes and tire rotations to advanced diagnostics and major repairs, we’ve got you covered.<br /><br />
 
-          Our shop combines modern technology with old-fashioned customer care. We use the latest diagnostic tools and high-quality parts, but we never lose sight of what matters most — building trust with our customers. That’s why drivers across Ontario choose SunRise Car Mechanic for:<br /><br />
+          Our shop combines modern technology with old-fashioned customer care. We use the latest diagnostic tools and high-quality parts, but we never lose sight of what matters most — building trust with our customers. That’s why drivers across Alberta choose Trackside Garage for:<br /><br />
           <b>
           • Experienced Technicians – Licensed mechanics with years of hands-on experience.<br />
 
@@ -43,20 +43,20 @@ export default function Home() {
           • Customer Comfort – Friendly staff and a clean, welcoming shop environment.<br /><br />
           </b>
 
-          We’ve proudly serviced thousands of vehicles and built lasting relationships with Ontario drivers who rely on us to keep their cars running smoothly. Whether you need emergency repairs, seasonal maintenance, or just a quick inspection before a road trip, SunRise Car Mechanic is your go-to shop for trusted automotive care.<br /><br />
+          We’ve proudly serviced thousands of vehicles and built lasting relationships with Alberta drivers who rely on us to keep their cars running smoothly. Whether you need emergency repairs, seasonal maintenance, or just a quick inspection before a road trip, Trackside Garage is your go-to shop for trusted automotive care.<br /><br />
         </p>
       </section>
 
-      {/* Services Preview */}
+      {/* services text */}
       <section className="py-10 px-6 bg-gray-100 text-center">
       <h2 className="text-4xl font-bold mb-6 text-center">Our Popular Services</h2>
 
-      {/* Service Cards */}
+      {/* service cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 px-50">
-        {/* Card 1 */}
+        {/* card 1 */}
         <div className="bg-white shadow-md rounded-lg overflow-hidden hover:shadow-lg transition">
           <div className="h-50 w-full relative">
-            <Image src="/OilChange.png" alt="Oil Change" fill className="object-cover"/>
+            <Image src="/services/OilChange.png" alt="Oil Change" fill className="object-cover"/>
           </div>
           <div className="p-6">
             <h3 className="text-xl font-semibold mb-2">Oil Change</h3>
@@ -66,10 +66,10 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Card 2 */}
+        {/* card 2 */}
         <div className="bg-white shadow-md rounded-lg overflow-hidden hover:shadow-lg transition">
           <div className="h-50 w-full relative">
-            <Image src="/BrakeService.png" alt="Brake Service" fill className="object-cover"/>
+            <Image src="/services/BrakeService.png" alt="Brake Service" fill className="object-cover"/>
           </div>
           <div className="p-6">
             <h3 className="text-xl font-semibold mb-2">Brake Service</h3>
@@ -79,10 +79,10 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Card 3 */}
+        {/* card 3 */}
         <div className="bg-white shadow-md rounded-lg overflow-hidden hover:shadow-lg transition">
           <div className="h-50 w-full relative">
-            <Image src="/TireChange.png" alt="Tire Change" fill className="object-cover"/>
+            <Image src="/services/TireChange.png" alt="Tire Change" fill className="object-cover"/>
           </div>
           <div className="p-6">
             <h3 className="text-xl font-semibold mb-2">Tire Replacement</h3>
@@ -93,7 +93,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Show More Button */}
+      {/* show more button */}
       <div className="mt-10 mb-10">
         <a
           href="/services"
@@ -104,29 +104,28 @@ export default function Home() {
       </div>
       </section>
 
-      {/* Reviews Section */}
+      {/* reviews section */}
         <section className="relative py-10 px-6 text-center bg-cover bg-gray-100 bg-center">
-          <Image src="/ReviewsBackground.png" alt="Reviews Background" fill className="object-cover object-top brightness-70 blur-xs"/>
+          <Image src="/background/ReviewsBackground.png" alt="Reviews Background" fill className="object-cover object-top brightness-70 blur-xs"/>
             <div className="relative z-10">
             <h2 className="text-4xl font-bold mb-6 text-center">What Our Customers Say</h2>
 
-            {/* Reviews Grid */}
             <div className="flex flex-col md:flex-row justify-center gap-6">
-              {/* Review 1 */}
+              {/* review 1 */}
               <div className="bg-white shadow-md rounded-lg p-4 w-72 hover:shadow-lg transition">
                 <p className="text-gray-700 text-sm">"Amazing service, quick and affordable! My car feels brand new."</p>
                 <p className="mt-2 font-semibold text-sm">- John D.</p>
                 <p className="text-yellow-500 text-sm">⭐⭐⭐⭐⭐</p>
               </div>
 
-              {/* Review 2 */}
+              {/* review 2 */}
               <div className="bg-white shadow-md rounded-lg p-4 w-72 hover:shadow-lg transition">
                 <p className="text-gray-700 text-sm">"They really care about your car like it's their own. Highly recommend!"</p>
                 <p className="mt-2 font-semibold text-sm">- Sarah K.</p>
                 <p className="text-yellow-500 text-sm">⭐⭐⭐⭐⭐</p>
               </div>
 
-              {/* Review 3 */}
+              {/* review 3 */}
               <div className="bg-white shadow-md rounded-lg p-4 w-72 hover:shadow-lg transition hidden md:block">
                 <p className="text-gray-700 text-sm">"Great customer service and fast turnaround. Will be back for sure."</p>
                 <p className="mt-2 font-semibold text-sm">- Michael T.</p>
@@ -134,7 +133,7 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Write Review Button */}
+            {/* write review button */}
             <div className="mt-10">
               <a
                 href="/reviews"
