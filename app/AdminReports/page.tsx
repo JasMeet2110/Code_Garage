@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
-import AdminNavbar from "@/components/AdminNavbar";
-import AdminFooter from "@/components/AdminFooter";
+import AdminNavbar from "@/components/AdminSidebar";
+import AdminFooter from "@/components/AdminShell";
 
 const ReportsAnalyticsPage = () => {
   return (
