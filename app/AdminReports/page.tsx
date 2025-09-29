@@ -1,20 +1,17 @@
 "use client";
 import React from "react";
-import AdminSidebar from "@/components/AdminSidebar";
-;
+import AdminNavbar from "@/components/AdminNavbar";
+import AdminFooter from "@/components/AdminFooter";
 
 const ReportsAnalyticsPage = () => {
   return (
-    <div className="min-h-screen bg-gray-900 text-white flex">
-      {/* Left admin sidebar */}
-      <AdminSidebar />
-
-      {/* Right content area */}
-      <div className="flex-1 min-w-0 p-8">
+    <div>
+      <AdminNavbar />
+      <div className="min-h-screen bg-gray-900 text-white p-8 pt-[180px]">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-4xl font-bold text-orange-500 mb-8">
-            Reports and Analytics
-          </h1>
+        <h1 className="text-4xl font-bold text-orange-500 mb-8">
+          Reports & Analytics
+        </h1>
 
         {/* Summary Cards */}
         <div className="grid grid-cols-4 gap-6 mb-8">
@@ -81,7 +78,7 @@ const ReportsAnalyticsPage = () => {
         </div>
       </div>
     </div>
-    
+    <AdminFooter />
   </div>
   );
 };

@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
-import AdminSidebar from "@/components/AdminSidebar";
-
+import AdminNavbar from "@/components/AdminNavbar";
+import AdminFooter from "@/components/AdminFooter";
 
 // Interface for new employee data (without ID)
 interface NewEmployeeData {
@@ -220,16 +220,13 @@ const EmployeePage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white flex">
-    {/* Left admin sidebar */}
-    <AdminSidebar />
-
-    {/* Right content area */}
-    <div className="flex-1 min-w-0 p-8">
-      <div className="max-w-7xl mx-auto">
-        <h1 className="text-4xl font-bold text-orange-500 mb-8">
-          Employee Management
-        </h1>
+    <div>
+      <AdminNavbar />
+      <div className="min-h-screen bg-gray-900 text-white p-8 pt-[180px]">
+        <div className="max-w-7xl mx-auto">
+          <h1 className="text-4xl font-bold text-orange-500 mb-8">
+            Employee Management
+          </h1>
         <div className="flex justify-between items-center mb-6">
           <div className="flex-1 max-w-md">
             <input
@@ -420,7 +417,7 @@ const EmployeePage = () => {
         )}
       </div>
     </div>
-    
+    <AdminFooter />
   </div>
   );
 };
