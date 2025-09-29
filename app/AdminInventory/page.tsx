@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import AdminNavbar from "@/components/AdminNavbar";
-import AdminFooter from "@/components/AdminFooter";
+import AdminNavbar from "@/components/AdminSidebar";
+import AdminFooter from "@/components/AdminShell";
 
 interface NewItemData {
   name: string;
