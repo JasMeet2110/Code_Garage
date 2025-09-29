@@ -2,19 +2,24 @@
 
 import { Phone, Mail, MapPin, Clock } from "lucide-react";
 import Image from "next/image";
-import { GoogleMap , LoadScript , Marker } from '@react-google-maps/api';
+import { GoogleMap, useJsApiLoader, Marker } from "@react-google-maps/api";
 
 const containerStyle = {
-  width: '100%',
-  height: '300px'
+  width: "100%",
+  height: "300px",
 };
 
 const center = {
   lat: 51.0447,
-  lng: -114.0719
+  lng: -114.0719,
 };
 
 export default function Contact() {
+  const { isLoaded } = useJsApiLoader({
+    id: "google-map-script",
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!,
+  });
+
   return (
     <div>
       {/* Hero Section with Background Image */}
@@ -77,13 +82,37 @@ export default function Contact() {
             <form className="bg-black bg-opacity-50 backdrop-blur-sm rounded-lg p-6 space-y-4 text-white">
               <h3 className="font-semibold text-lg">Send Us a Message</h3>
               <div className="grid grid-cols-2 gap-4">
-                <input type="text" placeholder="First Name" className="border p-3 rounded bg-white text-black w-full" />
-                <input type="text" placeholder="Last Name" className="border p-3 rounded bg-white text-black w-full" />
+                <input
+                  type="text"
+                  placeholder="First Name"
+                  className="border p-3 rounded bg-white text-black w-full"
+                />
+                <input
+                  type="text"
+                  placeholder="Last Name"
+                  className="border p-3 rounded bg-white text-black w-full"
+                />
               </div>
-              <input type="email" placeholder="Email" className="w-full border p-3 rounded bg-white text-black" />
-              <input type="text" placeholder="Phone" className="w-full border p-3 rounded bg-white text-black" />
-              <input type="text" placeholder="Subject" className="w-full border p-3 rounded bg-white text-black" />
-              <textarea placeholder="Message" rows={5} className="w-full border p-3 rounded bg-white text-black"></textarea>
+              <input
+                type="email"
+                placeholder="Email"
+                className="w-full border p-3 rounded bg-white text-black"
+              />
+              <input
+                type="text"
+                placeholder="Phone"
+                className="w-full border p-3 rounded bg-white text-black"
+              />
+              <input
+                type="text"
+                placeholder="Subject"
+                className="w-full border p-3 rounded bg-white text-black"
+              />
+              <textarea
+                placeholder="Message"
+                rows={5}
+                className="w-full border p-3 rounded bg-white text-black"
+              ></textarea>
               <button className="w-full bg-orange-500 text-white py-3 rounded-lg font-medium hover:scale-102 transition-transform duration-200">
                 Send Message
               </button>
@@ -99,16 +128,18 @@ export default function Contact() {
       <section className="pb-16 pt-5 bg-white">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-4xl font-bold mb-6 text-center">Find Us Here</h2>
-          <div className="w-full h-72 bg-gray-300 flex items-center justify-center rounded-lg shadow-md">
-            <LoadScript googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!}>
-            <GoogleMap
-              mapContainerStyle={containerStyle}
-              center={center}
-              zoom={14}
-            >
-              <Marker position={center} />
-            </GoogleMap>
-          </LoadScript>
+          <div className="w-full h-72 bg-gray-300 rounded-lg shadow-md overflow-hidden">
+            {isLoaded ? (
+              <GoogleMap
+                mapContainerStyle={containerStyle}
+                center={center}
+                zoom={9}
+              >
+                <Marker position={center} />
+              </GoogleMap>
+            ) : (
+              <p className="text-center py-10">Loading map...</p>
+            )}
           </div>
         </div>
       </section>
