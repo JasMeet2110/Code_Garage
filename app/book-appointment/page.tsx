@@ -1,7 +1,10 @@
 "use client"; // tells next.js that the components is a client component refernce next.js Docs- Client Components
 import { useMemo, useState } from "react"; //lets you store and update values and memoizes values to avoid recalculating them unnecessarily
 import Link from "next/link"; //This imports Next.js’s <Link> component, which allows navigation between pages without reloading the browser Reference: Next.js Docs – Link Component
+import { useRouter } from "next/navigation"; //gives access to Next.js’s router object, which lets you navigate programmatically between pages. Reference: Next.js Docs – useRouter
+import Image from "next/image"; // added
 
+// Define types for services and fuel options
 type ServiceKey = "basic_oil" | "full_maint"; //It restricts ServiceKey to only two possible string values: "basic_oil" or "full_maint". This ensures type safety when referring to services.Reference: TypeScript Docs – Union Types
 type FuelType = "Petrol" | "Diesel" | "Electric"; //restricting FuelType to only "Petrol", "Diesel", or "Electric". This avoids invalid inputs like “Water” or “Banana” being used for fuel type.
 
@@ -40,6 +43,7 @@ export default function BookAppointmentPage() {//Declares the booking page compo
   const [towing, setTowing] = useState(false);//Tracks whether the user checked “Need Towing?” and starts false means not requested
   const [pickup, setPickup] = useState("");//Stores the pickup location if towing is needed and starts blank
   const slots = useMemo(() => generateSlots(date), [date]);//Calls generateSlots(date) whenever the date changes/ seMemo makes sure slots are only recalculated when date updates, which improves performance
+  const router = useRouter();//gives access to Next.js’s router object, which lets you navigate programmatically between pages.
 //References React Docs – useState and React Docs – useMemo
   const readyToConfirm =
     !!service &&//Checks if a service was selected
@@ -65,220 +69,251 @@ export default function BookAppointmentPage() {//Declares the booking page compo
     };
 
      console.log("BOOKING_PAYLOAD", payload);//Prints the booking data to the browser console
-    alert("Booking captured on the front-end ✅ (check console).");//Shows a pop-up to the user confirming that their booking was captured
+    router.push('/book-appointment/payment'); // Redirect to payment page
   }//Reference MDN Docs – Functions MDN Docs – console.log() and MDN Docs – window.alert()
 
+  // build clean vehicle summary (no parentheses unless a plate exists)
+  const vehicleSummary =
+    [vehicle.make, vehicle.model, vehicle.year].filter(Boolean).join(" ") || "—";
+  const platePart = vehicle.plate ? ` (${vehicle.plate})` : "";
+
   return (
-    <main className="booking section">
-        
-        {/* Page header with title and description */}
-      <header className="section-header">
-        <h2>Book Your Appointment</h2>
-        <p>Choose a service, fill your vehicle info, pick a time, and confirm.</p>
-      </header>
-
-      {/* Services */}
-      <div className="cards-grid">
-        {/* Loop through the SERVICES object using Object.keys */}
-        {(Object.keys(SERVICES) as ServiceKey[]).map((key) => {
-          const s = SERVICES[key];
-          const selected = service === key;
-          return (
+    <div className="relative min-h-[900px] flex flex-col justify-center items-center text-center text-white">
+      <Image
+        src="/appointmentBackground.JPG"
+        alt="Background"
+        fill
+        className="absolute inset-0 object-cover brightness-30"
+        priority
+      />
+      <div className="relative z-10 w-full">
+        <main className="booking section">
             
-            <article
-              key={key}
-              className={`card ${selected ? "card--selected" : ""}`}
-              onClick={() => setService(key)}
-              role="button"
-              tabIndex={0}
-            >
-                {/* Card header with name, duration, and price */}
-              <header className="card-head">
-                <div>
-                  <h4 className="card-title">{s.name}</h4>
-                  <p className="card-sub">Duration: {s.duration}</p>
+            {/* Page header with title and description */}
+          <header className="section-header text-center mb-8">
+            <h2 className="text-4xl font-bold mb-4 text-orange-400 drop-shadow-lg">Book Your Appointment</h2>
+            <p className="text-lg text-white drop-shadow-md" style={{ color: "#fff" }}>Choose a service, fill your vehicle info, pick a time, and confirm.</p>
+          </header>
+
+          {/* Services */}
+          <div className="cards-grid">
+            {/* Loop through the SERVICES object using Object.keys */}
+            {(Object.keys(SERVICES) as ServiceKey[]).map((key) => {
+              const s = SERVICES[key];
+              const selected = service === key;
+              return (
+                
+                <article
+                  key={key}
+                  className={`card bg-white text-black rounded-xl shadow-lg hover:shadow-2xl transition ${selected ? "ring-2 ring-orange-500" : ""}`}
+                  onClick={() => setService(key)}
+                  role="button"
+                  tabIndex={0}
+                >
+                    {/* Card header with name, duration, and price */}
+                  <header className="card-head">
+                    <div>
+                      <h4 className="card-title">{s.name}</h4>
+                      <p className="card-sub">Duration: {s.duration}</p>
+                    </div>
+                    <span className="price-badge">{s.price}</span>
+                  </header>
+                  
+                  <ul className="feature-list">
+                    {s.features.map((f) => (
+                      <li key={f}><span className="check">✔</span> {f}</li>
+                    ))}
+                  </ul>
+                  
+                  <button className="w-full bg-orange-500 text-white py-2 rounded-lg font-medium hover:bg-orange-600 transition" type="button">
+                    Select {s.name}
+                  </button>
+                </article>
+              );
+            })}
+          </div>
+
+          {/* Fuel & Vehicle */}
+          <section className="panel bg-white text-black rounded-xl shadow-lg p-6 mt-10">
+            <h3 className="text-xl font-bold mb-4">Vehicle & Fuel</h3>
+            <div className="grid-2">
+                {/* Column 1: Fuel type options */}
+              <div>
+                <label className="label">Fuel Type</label>
+                <div className="chip-row">
+                  {FUEL_TYPES.map((t) => (
+                    <button
+                      key={t}
+                      className={`chip ${fuel === t ? "chip--active" : ""}`}
+                      onClick={() => setFuel(t)}
+                      type="button"
+                    >
+                      {t}
+                    </button>
+                  ))}
                 </div>
-                <span className="price-badge">{s.price}</span>
-              </header>
-              
-              <ul className="feature-list">
-                {s.features.map((f) => (
-                  <li key={f}><span className="check">✔</span> {f}</li>
-                ))}
-              </ul>
-              
-              <button className="btn-primary" type="button">
-                Select {s.name}
+              </div>
+
+               {/* Column 2: Towing option */}
+
+              <div className="towing">
+                <label className="label">Need Towing?</label>
+                <div className="row">
+                    {/* Checkbox to request towing */}
+                  <input
+                    id="towing"
+                    type="checkbox"
+                    checked={towing}
+                    onChange={(e) => setTowing(e.target.checked)} // update state when checked/unchecked
+                  />
+                  <label htmlFor="towing">Request towing (front-end only)</label>
+                </div>
+
+                {/* Conditional rendering: only show input if towing is true */}
+                {towing && (
+                  <input
+                    placeholder="Pickup location (e.g., 123 Main St, Calgary)"
+                    className="input"
+                    value={pickup}
+                    onChange={(e) => setPickup(e.target.value)}
+                  />
+                )}
+              </div>
+            </div>
+
+            
+           {/* Vehicle Details (Make, Model, Year, Plate) */}
+            <div className="grid-4">
+              <div>
+                <label className="label">Make</label>
+                <input
+                  className="input"
+                  placeholder="Toyota"// example placeholder
+                  value={vehicle.make}// bind to vehicle.make state
+                  onChange={(e) => setVehicle({ ...vehicle, make: e.target.value })}// update state when user types
+                />
+              </div>
+              <div>
+                 {/* Car Model */}
+                <label className="label">Model</label>
+                <input
+                  className="input"
+                  placeholder="Camry"
+                  value={vehicle.model}
+                  onChange={(e) => setVehicle({ ...vehicle, model: e.target.value })}
+                />
+              </div>
+              <div>
+                {/* Car Year */}
+                <label className="label">Year</label>
+                <input
+                  className="input"
+                  placeholder="2018"
+                  value={vehicle.year}
+                  onChange={(e) => setVehicle({ ...vehicle, year: e.target.value })}
+                />
+              </div>
+              <div>
+                {/* License Plate */}
+                <label className="label">License Plate</label>
+                <input
+                  className="input"
+                  placeholder="ABC-1234"
+                  value={vehicle.plate}
+                  onChange={(e) => setVehicle({ ...vehicle, plate: e.target.value })}
+                />
+              </div>
+            </div>
+          </section>
+
+          {/* Date & Slots */}
+          <section className="panel bg-white text-black rounded-xl shadow-lg p-6 mt-10">
+            <h3 className="text-xl font-bold mb-4">Pick Date & Time</h3>
+            {/* Grid layout: 2 columns (one for Date, one for Slots) */}
+            <div className="grid-2">
+                 {/* Column 1: Date picker */}
+              <div>
+                <label className="label">Date</label>
+                <input className="input"
+                 type="date"// HTML5 date picker
+                 value={date} // controlled input, bound to state
+                 onChange={(e) => setDate(e.target.value)}// updates state when user selects date
+                  />
+              </div>
+               {/* Column 2: Time slots */}
+              <div>
+                <label className="label">Available Slots</label>
+                <div className="chip-row">
+                    {/* If no date is chosen, show this message */}
+                  {slots.length === 0 && <span className="muted">Choose a date to view slots</span>}
+                  {slots.map((s) => (
+                    <button
+                      key={s}// unique key for React list
+                      className={`chip ${slot === s ? "chip--active" : ""}`}// update selected slot
+                      onClick={() => setSlot(s)}
+                      type="button"
+                    >
+                      {s}{/* Display slot time (e.g., 09:00, 10:30) */}
+                    </button>//References MDN Docs – HTML <input type="date"> /MDN Docs – Array.prototype.map()/React Docs – Conditional Rendering
+                  ))}
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Summary & Confirm */}
+          <section className="panel bg-white text-black rounded-xl shadow-lg p-6 mt-10">
+            <h3 className="text-xl font-bold mb-4">Summary</h3>
+            <div className="summary">
+              <div>
+                 {/* Show the selected service or a dash if none chosen */}
+                <table className="w-full text-left">
+                  <tbody>
+                    <tr>
+                      <th className="pr-4 align-top font-semibold w-28">Service:</th>
+                      <td>{service ? SERVICES[service].name : "—"}</td>
+                    </tr>
+                    {/* Show fuel type or a dash */}
+                    <tr>
+                      <th className="pr-4 align-top font-semibold w-28">Fuel:</th>
+                      <td>{fuel || "—"}</td>
+                    </tr>
+                    {/* Show date and slot (time) or dashes */}
+                    <tr>
+                      <th className="pr-4 align-top font-semibold w-28">Date:</th>
+                      <td>{date || "—"}</td>
+                    </tr>
+                    <tr>
+                      <th className="pr-4 align-top font-semibold w-28">Time:</th>
+                      <td>{slot || "—"}</td>
+                    </tr>
+                    <tr>
+                      <th className="pr-4 align-top font-semibold w-28">Vehicle:</th>
+                      <td>{vehicleSummary}{platePart}</td>
+                    </tr>
+                    {/* Conditionally show towing info if towing is true */}
+                    {towing && (
+                      <tr>
+                        <th className="pr-4 align-top font-semibold w-28">Towing pickup:</th>
+                        <td>{pickup || "—"}</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+              {/* Confirm button: only enabled if readyToConfirm is true */}
+              <button className="w-full bg-orange-500 text-white py-2 rounded-lg font-medium hover:bg-orange-600 transition mt-4" disabled={!readyToConfirm} onClick={handleConfirm}  >
+                Confirm Booking
               </button>
-            </article>
-          );
-        })}
+            </div>
+             {/* Note for the user (reminder this is front-end only) */}
+            <p className="muted" style={{ marginTop: 8 }}
+            >
+              
+            </p>
+          </section>
+        </main>
       </div>
-
-      {/* Fuel & Vehicle */}
-      <section className="panel">
-        <h3>Vehicle & Fuel</h3>
-        <div className="grid-2">
-            {/* Column 1: Fuel type options */}
-          <div>
-            <label className="label">Fuel Type</label>
-            <div className="chip-row">
-              {FUEL_TYPES.map((t) => (
-                <button
-                  key={t}
-                  className={`chip ${fuel === t ? "chip--active" : ""}`}
-                  onClick={() => setFuel(t)}
-                  type="button"
-                >
-                  {t}
-                </button>
-              ))}
-            </div>
-          </div>
-
-           {/* Column 2: Towing option */}
-
-          <div className="towing">
-            <label className="label">Need Towing?</label>
-            <div className="row">
-                {/* Checkbox to request towing */}
-              <input
-                id="towing"
-                type="checkbox"
-                checked={towing}
-                onChange={(e) => setTowing(e.target.checked)} // update state when checked/unchecked
-              />
-              <label htmlFor="towing">Request towing (front-end only)</label>
-            </div>
-
-            {/* Conditional rendering: only show input if towing is true */}
-            {towing && (
-              <input
-                placeholder="Pickup location (e.g., 123 Main St, Calgary)"
-                className="input"
-                value={pickup}
-                onChange={(e) => setPickup(e.target.value)}
-              />
-            )}
-          </div>
-        </div>
-
-        
-       {/* Vehicle Details (Make, Model, Year, Plate) */}
-        <div className="grid-4">
-          <div>
-            <label className="label">Make</label>
-            <input
-              className="input"
-              placeholder="Toyota"// example placeholder
-              value={vehicle.make}// bind to vehicle.make state
-              onChange={(e) => setVehicle({ ...vehicle, make: e.target.value })}// update state when user types
-            />
-          </div>
-          <div>
-             {/* Car Model */}
-            <label className="label">Model</label>
-            <input
-              className="input"
-              placeholder="Camry"
-              value={vehicle.model}
-              onChange={(e) => setVehicle({ ...vehicle, model: e.target.value })}
-            />
-          </div>
-          <div>
-            {/* Car Year */}
-            <label className="label">Year</label>
-            <input
-              className="input"
-              placeholder="2018"
-              value={vehicle.year}
-              onChange={(e) => setVehicle({ ...vehicle, year: e.target.value })}
-            />
-          </div>
-          <div>
-            {/* License Plate */}
-            <label className="label">License Plate</label>
-            <input
-              className="input"
-              placeholder="ABC-1234"
-              value={vehicle.plate}
-              onChange={(e) => setVehicle({ ...vehicle, plate: e.target.value })}
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* Date & Slots */}
-      <section className="panel">
-        <h3>Pick Date & Time</h3>
-        {/* Grid layout: 2 columns (one for Date, one for Slots) */}
-        <div className="grid-2">
-             {/* Column 1: Date picker */}
-          <div>
-            <label className="label">Date</label>
-            <input className="input"
-             type="date"// HTML5 date picker
-             value={date} // controlled input, bound to state
-             onChange={(e) => setDate(e.target.value)}// updates state when user selects date
-              />
-          </div>
-           {/* Column 2: Time slots */}
-          <div>
-            <label className="label">Available Slots</label>
-            <div className="chip-row">
-                {/* If no date is chosen, show this message */}
-              {slots.length === 0 && <span className="muted">Choose a date to view slots</span>}
-              {slots.map((s) => (
-                <button
-                  key={s}// unique key for React list
-                  className={`chip ${slot === s ? "chip--active" : ""}`}// update selected slot
-                  onClick={() => setSlot(s)}
-                  type="button"
-                >
-                  {s}{/* Display slot time (e.g., 09:00, 10:30) */}
-                </button>//References MDN Docs – HTML <input type="date"> /MDN Docs – Array.prototype.map()/React Docs – Conditional Rendering
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Summary & Confirm */}
-      <section className="panel">
-        <h3>Summary</h3>
-        <div className="summary">
-          <div>
-             {/* Show the selected service or a dash if none chosen */}
-            <div><strong>Service:</strong> {service ? SERVICES[service].name : "—"}</div>
-            {/* Show fuel type or a dash */}
-            <div><strong>Fuel:</strong> {fuel || "—"}</div>
-             {/* Show date and slot (time) or dashes */}
-            <div><strong>Date:</strong> {date || "—"} <strong>Time:</strong> {slot || "—"}</div>
-            <div>
-              {/* Show vehicle details: make, model, year, plate */}
-              <strong>Vehicle:</strong> {vehicle.make || "—"} {vehicle.model || ""} {vehicle.year || ""} ({vehicle.plate || "—"})
-            </div>
-            {/* Conditionally show towing info if towing is true */}
-            {towing && <div><strong>Towing pickup:</strong> {pickup || "—"}</div>}
-          </div>
-          {/* Confirm button: only enabled if readyToConfirm is true */}
-          <button className="btn-primary" disabled={!readyToConfirm} onClick={handleConfirm}  >
-            Confirm Booking
-          </button>
-        </div>
-         {/* Note for the user (reminder this is front-end only) */}
-        <p className="muted" style={{ marginTop: 8 }}
-        >
-          
-        </p>
-      </section>
-
-      {/* Back navigation link */}
-      <p className="muted" style={{ textAlign: "center", marginTop: 16 }}>
-        <Link href="/services">← Back to Services</Link>
-      </p>
-    </main>
+    </div>
   );
 }
-
-

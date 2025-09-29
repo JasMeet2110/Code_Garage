@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-export default function Footer() {
+export default function AdminFooter() {
   return (
     <footer className="bg-black text-white py-3">
       <div className="max-w-6xl mx-auto px-6 my-5 grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
@@ -18,10 +18,12 @@ export default function Footer() {
           <h3 className="font-semibold mb-3">Quick Links</h3>
           <ul className="space-y-2">
             <li><Link href="/HomePage" className="hover:text-orange-400">Home</Link></li>
-            <li><Link href="/services" className="hover:text-orange-400">Services</Link></li>
-            <li><Link href="/book-appointment" className="hover:text-orange-400">Book Appointment</Link></li>
-            <li><Link href="/reviews" className="hover:text-orange-400">Reviews</Link></li>
-            <li><Link href="/contact" className="hover:text-orange-400">Contact</Link></li>
+            <li><Link href="/AdminInventory" className="hover:text-orange-400">Inventory</Link></li>
+            <li><Link href="/AdminAppointments" className="hover:text-orange-400">Appointment</Link></li>
+            <li><Link href="/AdminEmployees" className="hover:text-orange-400">Employees</Link></li>
+            <li><Link href="/AdminCustomers" className="hover:text-orange-400">Customers</Link></li>
+            <li><Link href="/AdminReports" className="hover:text-orange-400">Reports</Link></li>
+            <li><Link href="/AdminFinance" className="hover:text-orange-400">Finance</Link></li>
           </ul>
         </div>
 

@@ -3,6 +3,16 @@ import React, { useState } from "react";
 import AdminNavbar from "@/components/AdminNavbar";
 import AdminFooter from "@/components/AdminFooter";
 
+// Interface for new customer data (without ID)
+interface NewCustomerData {
+  name: string;
+  phone: string;
+  email: string;
+  carName: string;
+  carPlate: string;
+  startDate: string;
+}
+
 // Interface for complete customer (with ID)
 interface Customer {
   id: number;
