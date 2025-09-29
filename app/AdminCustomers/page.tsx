@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
-import AdminSideBar from "@/components/AdminSidebar";
-
+import AdminNavbar from "@/components/AdminNavbar";
+import AdminFooter from "@/components/AdminFooter";
 
 // Interface for complete customer (with ID)
 interface Customer {
@@ -159,17 +159,12 @@ const CustomerPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white flex">
-    {/* Left admin sidebar */}
-    <AdminSideBar />
+    <div>
+      <AdminNavbar />
+      <div className="min-h-screen bg-gray-900 text-white p-8 pt-[180px]">
+        <div className="max-w-7xl mx-auto">
+          <h1 className="text-4xl font-bold text-orange-500 mb-8">Customer Management</h1>
 
-    {/* Right content area */}
-    <div className="flex-1 min-w-0 p-8">
-      <div className="max-w-7xl mx-auto">
-        <h1 className="text-4xl font-bold text-orange-500 mb-8">
-          Customer Management
-        </h1>
-        
         <div className="flex justify-between items-center mb-6">
           <div className="flex-1 max-w-md">
             <input
@@ -358,7 +353,7 @@ const CustomerPage = () => {
         )}
       </div>
     </div>
-    
+    <AdminFooter />
   </div>
   );
 };

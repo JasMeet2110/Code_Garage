@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import AdminSidebar from "@/components/AdminSidebar";
-
+import AdminNavbar from "@/components/AdminNavbar";
+import AdminFooter from "@/components/AdminFooter";
 
 interface NewItemData {
   name: string;
@@ -197,17 +197,14 @@ const InventoryPage = () => {
 );
 
   return (
-  
-    <div className="min-h-screen bg-gray-900 text-white flex">
-      {/* Left admin sidebar */}
-      <AdminSidebar />
+  <div>
+    <AdminNavbar />
+    <div className="min-h-screen bg-gray-900 text-white p-8 pt-[180px]">
+      <div className="max-w-7xl mx-auto">
+        <h1 className="text-4xl font-bold text-orange-500 mb-8">
+          Inventory Management
+        </h1>
 
-      {/* Right content area */}
-      <div className="flex-1 min-w-0 p-8">
-        <div className="max-w-7xl mx-auto">
-          <h1 className="text-4xl font-bold text-orange-500 mb-8">
-            Inventory Management
-          </h1>
         <div className="flex justify-between items-center mb-6">
           <div className="flex-1 max-w-md">
             <input
@@ -366,7 +363,7 @@ const InventoryPage = () => {
         )}
       </div>
     </div>
-    
+    <AdminFooter />
   </div>
   );
 };
