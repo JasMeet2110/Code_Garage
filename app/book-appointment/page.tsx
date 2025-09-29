@@ -174,6 +174,18 @@ export default function BookAppointmentPage() {
             </div>
           </section>
 
+          {/*More info*/}
+          <section className="panel bg-white text-black rounded-xl shadow-lg p-6 mb-10">
+            <h3 className="text-xl font-bold mb-4">Additional Vehicle Info</h3>
+            <p className="mb-4 text-gray-700">
+              Please provide any additional information about your vehicle or the service needed.
+            </p>
+            <textarea
+              className="w-full border p-3 rounded h-24"
+              placeholder="E.g., Any specific issues, recent repairs, etc."
+            ></textarea>
+          </section>
+
           {/* Summary & Confirm */}
           <section className="panel bg-white text-black rounded-xl shadow-lg p-6">
             <h3 className="text-xl font-bold mb-4">Summary</h3>
