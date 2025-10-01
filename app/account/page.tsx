@@ -1,322 +1,268 @@
-'use client'
+"use client";
 
-import React, { useState } from 'react'
-import Image from 'next/image'
+import { useState } from "react";
+import Image from "next/image";
+
+type FormData = {
+  firstName: string;
+  lastName: string;
+  phone: string;
+  email: string;
+  address: string;
+  city: string;
+  province: string;
+  postalCode: string;
+  make: string;
+  model: string;
+  year: string;
+  mileage: string;
+  color: string;
+  vin: string;
+  licensePlate: string;
+};
 
 export default function AccountPage() {
-  const [customer, setCustomer] = useState({
-    firstName: 'John',
-    lastName: 'Doe',
-    phone: '(403) 555-1234',
-    email: 'john.doe@email.com',
-    address: '123 Main Street',
-    city: 'Calgary',
-    province: 'Alberta',
-    postalCode: 'T2X 1A1',
-  })
+  const [formData, setFormData] = useState<FormData>({
+    firstName: "",
+    lastName: "",
+    phone: "",
+    email: "",
+    address: "",
+    city: "",
+    province: "",
+    postalCode: "",
+    make: "",
+    model: "",
+    year: "",
+    mileage: "",
+    color: "",
+    vin: "",
+    licensePlate: "",
+  });
 
-  const [vehicle, setVehicle] = useState({
-    make: 'Honda',
-    model: 'Civic',
-    year: '2020',
-    vin: '2HGFC2F59LH000000',
-    plate: 'ABC-1234',
-    color: 'Black',
-    mileage: '45,000 km',
-  })
+  const [carImage, setCarImage] = useState<string | null>(null);
+  const [editCustomer, setEditCustomer] = useState(false);
+  const [editCar, setEditCar] = useState(false);
 
-  const [editCustomer, setEditCustomer] = useState(false)
-  const [editVehicle, setEditVehicle] = useState(false)
+  const handleChange = (name: keyof FormData, value: string) => {
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
-  const [draftCustomer, setDraftCustomer] = useState({ ...customer })
-  const [draftVehicle, setDraftVehicle] = useState({ ...vehicle })
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const url = URL.createObjectURL(file);
+      setCarImage(url);
+    }
+  };
 
-  const onCust = (k: keyof typeof draftCustomer, v: string) =>
-    setDraftCustomer({ ...draftCustomer, [k]: v })
-  const onVeh = (k: keyof typeof draftVehicle, v: string) =>
-    setDraftVehicle({ ...draftVehicle, [k]: v })
+  const validateCustomer = () => {
+    if (!formData.firstName || !formData.lastName || !formData.phone || !formData.email || !formData.address || !formData.city || !formData.province || !formData.postalCode) {
+      alert("All customer fields are required");
+      return false;
+    }
+    if (!/^\S+@\S+\.\S+$/.test(formData.email)) {
+      alert("Invalid email format");
+      return false;
+    }
+    if (!/^[0-9]{10}$/.test(formData.phone)) {
+      alert("Phone must be 10 digits");
+      return false;
+    }
+    return true;
+  };
 
-  // simple inline validation (email + postal code + phone + VIN + year)
-  const validEmail = (s: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s)
-  const validPostal = (s: string) => /^[A-Za-z]\d[A-Za-z][ -]?\d[A-Za-z]\d$/.test(s.trim())
-  const validPhone = (s: string) => /^\+?[\d ()-]{7,}$/.test(s.trim())
-  const validYear = (s: string) =>
-    /^\d{4}$/.test(s) && Number(s) >= 1980 && Number(s) <= new Date().getFullYear() + 1
-  const validVIN = (s: string) => /^[A-HJ-NPR-Z0-9]{11,17}$/i.test(s.trim())
+  const validateCar = () => {
+    if (!formData.make || !formData.model || !formData.year || !formData.mileage || !formData.color || !formData.vin || !formData.licensePlate) {
+      alert("All vehicle fields are required");
+      return false;
+    }
+    if (isNaN(Number(formData.year)) || Number(formData.year) < 1900) {
+      alert("Year must be valid");
+      return false;
+    }
+    if (isNaN(Number(formData.mileage))) {
+      alert("Mileage must be numeric");
+      return false;
+    }
+    return true;
+  };
 
   const saveCustomer = () => {
-    if (!validEmail(draftCustomer.email)) {
-      alert('Please enter a valid email.')
-      return
+    if (validateCustomer()) {
+      setEditCustomer(false);
+      alert("Customer info saved!");
     }
-    if (!validPostal(draftCustomer.postalCode)) {
-      alert('Please enter a valid Canadian postal code (e.g., T2X 1A1).')
-      return
-    }
-    if (!validPhone(draftCustomer.phone)) {
-      alert('Please enter a valid phone number.')
-      return
-    }
-    setCustomer(draftCustomer)
-    setEditCustomer(false)
-    alert('Customer info saved')
-  }
-  const cancelCustomer = () => {
-    setDraftCustomer(customer)
-    setEditCustomer(false)
-  }
+  };
 
-  const saveVehicle = () => {
-    if (!validYear(draftVehicle.year)) {
-      alert('Please enter a valid 4-digit year.')
-      return
+  const saveCar = () => {
+    if (validateCar()) {
+      setEditCar(false);
+      alert("Vehicle info saved!");
     }
-    if (!validVIN(draftVehicle.vin)) {
-      alert('Please enter a valid VIN (11–17 characters, no I/O/Q).')
-      return
-    }
-    setVehicle(draftVehicle)
-    setEditVehicle(false)
-    alert('Vehicle info saved')
-  }
-  const cancelVehicle = () => {
-    setDraftVehicle(vehicle)
-    setEditVehicle(false)
-  }
+  };
 
-  const TextInput = (props: React.InputHTMLAttributes<HTMLInputElement>) => (
-    <input
-      {...props}
-      className={`border px-3 py-2 rounded-md w-full bg-white/90 focus:outline-none focus:ring-2 focus:ring-orange-500 ${props.className ?? ''}`}
-    />
-  )
+  const renderField = (
+  label: string,
+  name: keyof FormData,
+  editing: boolean
+) => (
+  <div className="flex flex-col">
+    <label className="text-sm font-medium">{label}</label>
+    {editing ? (
+      <input
+        value={formData[name]}
+        onChange={(e) => handleChange(name, e.target.value)}
+        placeholder={`Enter ${label}`}
+        className="border p-2 rounded"
+      />
+    ) : (
+      <input
+        value={formData[name]}
+        disabled
+        placeholder={`Enter ${label}`}
+        className="border p-2 rounded bg-gray-100 text-gray-500"
+      />
+    )}
+  </div>
+);
 
-  const Field = ({ label, value }: { label: string; value: string }) => (
-    <div className="text-left">
-      <p className="font-semibold text-gray-600">{label}</p>
-      <p className="text-gray-900">{value}</p>
-    </div>
-  )
 
   return (
-    <div className="relative min-h-[900px] flex flex-col justify-center items-center text-center text-white">
+    <div className="relative min-h-screen">
+      {/* Background */}
       <Image
-        src="/account.JPG"
+        src="/background/Mustang.jpg"
         alt="Background"
         fill
-        className="absolute inset-0 object-cover brightness-30"
+        className="object-cover -z-10"
         priority
       />
-      <div className="relative z-10 w-full">
-        <div className="mt-24 md:mt-28 px-6 md:px-10 mb-40">
-          {/* Hero header */}
-          <header className="text-center mb-8">
-            <h1 className="text-4xl font-bold mb-2 text-orange-400 drop-shadow-lg">My Account</h1>
-            <p className="text-lg text-white/95 drop-shadow-md">
-              Manage your profile and vehicle details.
-            </p>
-          </header>
 
-          {/* Content cards */}
-          <div className="w-full max-w-6xl mx-auto flex flex-col gap-8">
-            {/* Customer */}
-            <section className="bg-white text-black rounded-xl shadow-lg p-6 w-full">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-2xl font-bold">Customer Information</h2>
-                {!editCustomer ? (
-                  <button className="px-4 py-2 rounded-lg font-medium bg-orange-500 text-white hover:bg-orange-600 transition">
-                    <span onClick={() => setEditCustomer(true)}>Edit</span>
-                  </button>
-                ) : (
-                  <div className="flex gap-2">
-                    <button className="nav-btn" onClick={cancelCustomer}>Cancel</button>
-                    <button
-                      className="px-4 py-2 rounded-lg font-medium bg-orange-500 text-white hover:bg-orange-600 transition"
-                      onClick={saveCustomer}
-                    >
-                      Save
-                    </button>
-                  </div>
-                )}
+      <h1 className="text-4xl font-bold text-center text-orange-500 pt-12 drop-shadow-lg">
+        My Account
+      </h1>
+      <p className="text-center text-gray-600 pb-5">
+        Manage your account settings and vehicle information.
+      </p>
+
+      <div className="max-w-6xl mx-auto p-6 space-y-10">
+        {/* Customer Info Section */}
+        <div className="bg-white/90 rounded-lg shadow-lg p-6 relative">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-lg font-semibold">Customer Information</h2>
+            {!editCustomer ? (
+              <button
+                onClick={() => setEditCustomer(true)}
+                className="px-3 py-1 text-sm bg-blue-600 text-white rounded"
+              >
+                Edit
+              </button>
+            ) : null}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {renderField("First Name", "firstName", editCustomer)}
+            {renderField("Last Name", "lastName", editCustomer)}
+            {renderField("Phone", "phone", editCustomer)}
+            {renderField("Email", "email", editCustomer)}
+            {renderField("Address", "address", editCustomer)}
+            {renderField("City", "city", editCustomer)}
+            {renderField("Province", "province", editCustomer)}
+            {renderField("Postal Code", "postalCode", editCustomer)}
+          </div>
+
+          {editCustomer && (
+            <div className="mt-4 flex gap-2">
+              <button
+                onClick={saveCustomer}
+                className="px-4 py-2 bg-green-600 text-white rounded"
+              >
+                Save
+              </button>
+              <button
+                onClick={() => setEditCustomer(false)}
+                className="px-4 py-2 bg-gray-500 text-white rounded"
+              >
+                Cancel
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Car Info Section */}
+        <div className="bg-white/90 rounded-lg shadow-lg p-6 relative grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+          <div>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-semibold">Your Vehicle</h2>
+            </div>
+            
+            <div className="flex flex-col items-center">
+              <Image
+                src={carImage || "/logo/Car.png"}
+                alt="Car"
+                width={600}
+                height={500}
+                className="object-contain"
+              />
+
+              {/* Upload Button */}
+              <label className="mt-4">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  className="hidden"
+                />
+                <span className="cursor-pointer px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700">
+                  Upload Your Car Image
+                </span>
+              </label>
+            </div>
+          </div>
+
+          <div>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-semibold">Vehicle Information</h2>
+              {!editCar ? (
+                <button
+                  onClick={() => setEditCar(true)}
+                  className="px-3 py-1 text-sm bg-blue-600 text-white rounded"
+                >
+                  Edit
+                </button>
+              ) : null}
+            </div>
+
+            <div className="grid grid-cols-1 gap-4">
+              {renderField("Make", "make", editCar)}
+              {renderField("Model", "model", editCar)}
+              {renderField("Year", "year", editCar)}
+              {renderField("Mileage", "mileage", editCar)}
+              {renderField("Color", "color", editCar)}
+              {renderField("VIN", "vin", editCar)}
+              {renderField("License Plate", "licensePlate", editCar)}
+            </div>
+
+            {editCar && (
+              <div className="mt-4 flex gap-2">
+                <button
+                  onClick={saveCar}
+                  className="px-4 py-2 bg-green-600 text-white rounded"
+                >
+                  Save
+                </button>
+                <button
+                  onClick={() => setEditCar(false)}
+                  className="px-4 py-2 bg-gray-500 text-white rounded"
+                >
+                  Cancel
+                </button>
               </div>
-
-              {!editCustomer ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6 text-left">
-                  <Field label="First Name:" value={customer.firstName} />
-                  <Field label="Province:" value={customer.province} />
-                  <Field label="Last Name:" value={customer.lastName} />
-                  <Field label="City:" value={customer.city} />
-                  <Field label="Phone Number:" value={customer.phone} />
-                  <Field label="Address:" value={customer.address} />
-                  <Field label="Email:" value={customer.email} />
-                  <Field label="Postal Code:" value={customer.postalCode} />
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6 text-left">
-                  <div>
-                    <p className="font-semibold mb-1">First Name</p>
-                    <TextInput
-                      value={draftCustomer.firstName}
-                      onChange={(e) => onCust('firstName', e.target.value)}
-                      placeholder="First name"
-                    />
-                  </div>
-                  <div>
-                    <p className="font-semibold mb-1">Province</p>
-                    <TextInput
-                      value={draftCustomer.province}
-                      onChange={(e) => onCust('province', e.target.value)}
-                      placeholder="Province"
-                    />
-                  </div>
-                  <div>
-                    <p className="font-semibold mb-1">Last Name</p>
-                    <TextInput
-                      value={draftCustomer.lastName}
-                      onChange={(e) => onCust('lastName', e.target.value)}
-                      placeholder="Last name"
-                    />
-                  </div>
-                  <div>
-                    <p className="font-semibold mb-1">City</p>
-                    <TextInput
-                      value={draftCustomer.city}
-                      onChange={(e) => onCust('city', e.target.value)}
-                      placeholder="City"
-                    />
-                  </div>
-                  <div>
-                    <p className="font-semibold mb-1">Phone Number</p>
-                    <TextInput
-                      value={draftCustomer.phone}
-                      onChange={(e) => onCust('phone', e.target.value)}
-                      placeholder="(403) 555-1234"
-                    />
-                  </div>
-                  <div>
-                    <p className="font-semibold mb-1">Address</p>
-                    <TextInput
-                      value={draftCustomer.address}
-                      onChange={(e) => onCust('address', e.target.value)}
-                      placeholder="Street address"
-                    />
-                  </div>
-                  <div>
-                    <p className="font-semibold mb-1">Email</p>
-                    <TextInput
-                      type="email"
-                      value={draftCustomer.email}
-                      onChange={(e) => onCust('email', e.target.value)}
-                      placeholder="name@example.com"
-                    />
-                  </div>
-                  <div>
-                    <p className="font-semibold mb-1">Postal Code</p>
-                    <TextInput
-                      value={draftCustomer.postalCode}
-                      onChange={(e) => onCust('postalCode', e.target.value)}
-                      placeholder="T2X 1A1"
-                    />
-                  </div>
-                </div>
-              )}
-            </section>
-
-            {/* Vehicle */}
-            <section className="bg-white text-black rounded-xl shadow-lg p-6 w-full">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-2xl font-bold">Vehicle Information</h2>
-                {!editVehicle ? (
-                  <button className="px-4 py-2 rounded-lg font-medium bg-orange-500 text-white hover:bg-orange-600 transition">
-                    <span onClick={() => setEditVehicle(true)}>Edit</span>
-                  </button>
-                ) : (
-                  <div className="flex gap-2">
-                    <button className="nav-btn" onClick={cancelVehicle}>Cancel</button>
-                    <button
-                      className="px-4 py-2 rounded-lg font-medium bg-orange-500 text-white hover:bg-orange-600 transition"
-                      onClick={saveVehicle}
-                    >
-                      Save
-                    </button>
-                  </div>
-                )}
-              </div>
-
-              {!editVehicle ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6 text-left">
-                  <Field label="Make:" value={vehicle.make} />
-                  <Field label="Year:" value={vehicle.year} />
-                  <Field label="Model:" value={vehicle.model} />
-                  <Field label="Mileage:" value={vehicle.mileage} />
-                  <Field label="Color:" value={vehicle.color} />
-                  <Field label="VIN:" value={vehicle.vin} />
-                  <Field label="License Plate:" value={vehicle.plate} />
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6 text-left">
-                  <div>
-                    <p className="font-semibold mb-1">Make</p>
-                    <TextInput
-                      value={draftVehicle.make}
-                      onChange={(e) => onVeh('make', e.target.value)}
-                      placeholder="Make"
-                    />
-                  </div>
-                  <div>
-                    <p className="font-semibold mb-1">Year</p>
-                    <TextInput
-                      value={draftVehicle.year}
-                      onChange={(e) => onVeh('year', e.target.value)}
-                      placeholder="YYYY"
-                    />
-                  </div>
-                  <div>
-                    <p className="font-semibold mb-1">Model</p>
-                    <TextInput
-                      value={draftVehicle.model}
-                      onChange={(e) => onVeh('model', e.target.value)}
-                      placeholder="Model"
-                    />
-                  </div>
-                  <div>
-                    <p className="font-semibold mb-1">Mileage</p>
-                    <TextInput
-                      value={draftVehicle.mileage}
-                      onChange={(e) => onVeh('mileage', e.target.value)}
-                      placeholder="e.g., 45,000 km"
-                    />
-                  </div>
-                  <div>
-                    <p className="font-semibold mb-1">Color</p>
-                    <TextInput
-                      value={draftVehicle.color}
-                      onChange={(e) => onVeh('color', e.target.value)}
-                      placeholder="Color"
-                    />
-                  </div>
-                  <div>
-                    <p className="font-semibold mb-1">VIN</p>
-                    <TextInput
-                      value={draftVehicle.vin}
-                      onChange={(e) => onVeh('vin', e.target.value)}
-                      placeholder="VIN"
-                    />
-                  </div>
-                  <div>
-                    <p className="font-semibold mb-1">License Plate</p>
-                    <TextInput
-                      value={draftVehicle.plate}
-                      onChange={(e) => onVeh('plate', e.target.value)}
-                      placeholder="Plate"
-                    />
-                  </div>
-                </div>
-              )}
-            </section>
+            )}
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }

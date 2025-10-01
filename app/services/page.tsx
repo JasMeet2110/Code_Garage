@@ -14,8 +14,8 @@ export default function ServicesPage() {
         className="absolute inset-0 object-cover brightness-30"
       />
 
-      <div className="relative z-10 max-w-7xl px-6 py-16">
-        <h1 className="text-4xl font-bold mb-4 text-orange-400 drop-shadow-lg">
+      <div className="relative z-10 max-w-7xl px-6 py-14">
+        <h1 className="text-4xl font-bold text-orange-400 drop-shadow-lg">
           Our Services
         </h1>
         <p className="text-lg text-gray-200 mb-12 drop-shadow-md">
