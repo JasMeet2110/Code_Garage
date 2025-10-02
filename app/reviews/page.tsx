@@ -45,16 +45,18 @@ export default function ReviewsPage() {
   }
 
   return (
-    <div className="relative min-h-[900px] flex flex-col justify-center items-center text-center text-white">
+    <div className="flex flex-col justify-center items-center text-center text-white">
       <Image
         src="/reviews.png"
         alt="Background"
         fill
-        className="absolute inset-0 object-cover brightness-30"
-        priority
+        className="absolute inset-0 object-top brightness-30"
       />
+
+      <div className="h-10 bg-gradient-to-b to-white/100 absolute bottom-0 left-0 w-full z-0"></div>
+
       <div className="relative z-10 w-full">
-        <div className="mt-20 px-6 md:px-10 mb-40">
+        <div className="mt-15 px-6 md:px-10 mb-40">
           <div className="w-full max-w-6xl mx-auto flex flex-col gap-8">
             <header className="section-header text-center mb-8">
               <h1 className="text-4xl font-bold mb-4 text-orange-400 drop-shadow-lg">Reviews</h1>

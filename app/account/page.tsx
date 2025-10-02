@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 
+/* define the structure of the form data types */
 type FormData = {
   firstName: string;
   lastName: string;
@@ -40,14 +41,19 @@ export default function AccountPage() {
     licensePlate: "",
   });
 
+  /* holds car image or default if none uploaded */
   const [carImage, setCarImage] = useState<string | null>(null);
+
+  /* states to toggle edit mode */
   const [editCustomer, setEditCustomer] = useState(false);
   const [editCar, setEditCar] = useState(false);
 
+  /* handle form changes */
   const handleChange = (name: keyof FormData, value: string) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  /* handle image upload */
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -56,6 +62,7 @@ export default function AccountPage() {
     }
   };
 
+  /* validation functions */
   const validateCustomer = () => {
     if (!formData.firstName || !formData.lastName || !formData.phone || !formData.email || !formData.address || !formData.city || !formData.province || !formData.postalCode) {
       alert("All customer fields are required");
@@ -106,7 +113,7 @@ export default function AccountPage() {
   label: string,
   name: keyof FormData,
   editing: boolean
-) => (
+  ) => (
   <div className="flex flex-col">
     <label className="text-sm font-medium">{label}</label>
     {editing ? (
@@ -129,15 +136,17 @@ export default function AccountPage() {
 
 
   return (
-    <div className="relative min-h-screen">
-      {/* Background */}
+    <div>
+      {/* background */}
+      
       <Image
         src="/background/Mustang.jpg"
         alt="Background"
         fill
-        className="object-cover -z-10"
-        priority
+        className="object-cover min-h-[600px] -z-10"
       />
+
+      <div className="h-10 bg-gradient-to-b from-brown-900 to-white/100 absolute bottom-0 left-0 w-full z-0"></div>
 
       <h1 className="text-4xl font-bold text-center text-orange-500 pt-12 drop-shadow-lg">
         My Account
@@ -147,14 +156,14 @@ export default function AccountPage() {
       </p>
 
       <div className="max-w-6xl mx-auto p-6 space-y-10">
-        {/* Customer Info Section */}
+        {/* customer info section */}
         <div className="bg-white/90 rounded-lg shadow-lg p-6 relative">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-lg font-semibold">Customer Information</h2>
             {!editCustomer ? (
               <button
                 onClick={() => setEditCustomer(true)}
-                className="px-3 py-1 text-sm bg-blue-600 text-white rounded"
+                className="px-3 py-1 text-sm bg-orange-500 hover:bg-orange-600 text-white rounded"
               >
                 Edit
               </button>
@@ -190,7 +199,7 @@ export default function AccountPage() {
           )}
         </div>
 
-        {/* Car Info Section */}
+        {/* car info section */}
         <div className="bg-white/90 rounded-lg shadow-lg p-6 relative grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
           <div>
             <div className="flex justify-between items-center mb-4">
@@ -206,7 +215,7 @@ export default function AccountPage() {
                 className="object-contain"
               />
 
-              {/* Upload Button */}
+              {/* upload button */}
               <label className="mt-4">
                 <input
                   type="file"
@@ -214,7 +223,7 @@ export default function AccountPage() {
                   onChange={handleFileChange}
                   className="hidden"
                 />
-                <span className="cursor-pointer px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700">
+                <span className="cursor-pointer px-2 py-1 bg-orange-500 text-white rounded hover:bg-orange-600">
                   Upload Your Car Image
                 </span>
               </label>
@@ -227,7 +236,7 @@ export default function AccountPage() {
               {!editCar ? (
                 <button
                   onClick={() => setEditCar(true)}
-                  className="px-3 py-1 text-sm bg-blue-600 text-white rounded"
+                  className="px-3 py-1 text-sm  bg-orange-500 hover:bg-orange-600 text-white rounded"
                 >
                   Edit
                 </button>
@@ -261,6 +270,12 @@ export default function AccountPage() {
               </div>
             )}
           </div>
+        </div>
+
+        {/* user appointments section */}
+        <div className="bg-gray-100 rounded-lg shadow-lg p-6 relative">
+          <h2 className="text-lg font-semibold mb-4">Your Appointments</h2>
+          <p className="text-gray-600">No appointments scheduled.</p>
         </div>
       </div>
     </div>

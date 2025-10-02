@@ -6,13 +6,15 @@ import { SERVICES } from "@/data/services";
 
 export default function ServicesPage() {
   return (
-    <div className="relative min-h-screen flex flex-col justify-center items-center text-center text-white">
+    <div className="flex flex-col justify-center items-center text-center text-white">
       <Image
         src="/ServiceShop.png"
         alt="Background"
         fill
-        className="absolute inset-0 object-cover brightness-30"
+        className="object-cover min-h-[600px] -z-10 brightness-30"
       />
+
+      <div className="h-10 bg-gradient-to-b from-brown-900 to-white/100 absolute bottom-0 left-0 w-full z-0"></div>
 
       <div className="relative z-10 max-w-7xl px-6 py-14">
         <h1 className="text-4xl font-bold text-orange-400 drop-shadow-lg">
@@ -26,7 +28,7 @@ export default function ServicesPage() {
           {SERVICES.map((service) => (
             <div
               key={service.slug}
-              className="bg-white text-black rounded-xl shadow-lg hover:shadow-2xl transition transform hover:scale-105 p-6 flex flex-col"
+              className="bg-gray-200 text-black rounded-xl shadow-lg hover:shadow-2xl transition transform hover:scale-105 p-6 flex flex-col"
             >
               <div className="flex flex-col items-center mb-4">
                 <h2 className="text-xl font-bold mb-2">{service.name}</h2>
