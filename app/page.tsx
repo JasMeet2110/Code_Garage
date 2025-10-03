@@ -1,5 +1,7 @@
+/*its a client side page so we are using "use client" */
 "use client";
 
+/*imports*/
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -23,6 +25,7 @@ const HomePage = () => {
     width: '100%'
   });
   
+  /* routers */
   const handleSignIn = () => {
     router.push('/signin');
   };
@@ -36,8 +39,10 @@ const HomePage = () => {
   
   };
 
+  /* rendered screen for users */
   return (
-    <div style={{ 
+    <div style={{
+      /* background image and layout */ 
       backgroundImage: 'url("/background/ZR1.png")',
       backgroundSize: 'cover',
       backgroundPosition: 'center',
@@ -60,6 +65,7 @@ const HomePage = () => {
         backgroundColor: 'rgba(0, 0, 0, 0.7)'
       }}></div>
 
+      {/* logo and heading with description */}
       <div style={{ position: 'relative', zIndex: 1, maxWidth: "900px", alignItems: "center", display: "flex", flexDirection: "column" }}>
         <div style={{ marginBottom: '30px' }}>
           <Image src="/TracksideGarage.png" alt="Logo" width={400} height={300} className="invert brightness-0" />
@@ -84,6 +90,7 @@ const HomePage = () => {
           Reliable Repairs. Built with Passion.
         </p>
         
+        {/* buttons to navigate to different pages */}
         <div style={{ 
           display: 'flex', 
           flexDirection: 'column',

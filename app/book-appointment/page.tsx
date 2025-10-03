@@ -62,23 +62,22 @@ export default function BookAppointmentPage() {
     router.push("/book-appointment/confirmation");
   };
 
-  const vehicleSummary =
-    [vehicle.make, vehicle.model, vehicle.year].filter(Boolean).join(" ") || "—";
-  const platePart = vehicle.plate ? ` (${vehicle.plate})` : "";
-
   return (
-    <div className="relative min-h-[900px] flex flex-col justify-center items-center text-center text-white">
+    <div className="flex flex-col justify-center items-center text-center text-white">
       <Image
         src="/appointmentBackground.JPG"
         alt="Background"
         fill
-        className="absolute inset-0 object-cover brightness-30"
+        className="object-cover min-h-[900px] -z-10 brightness-30"
         priority
       />
+
+      <div className="h-10 bg-gradient-to-b from-brown-900 to-white/100 absolute bottom-0 left-0 w-full z-0"></div>
+
       <div className="relative z-10 w-full">
         <main className="booking section">
-          <header className="section-header text-center mb-8">
-            <h2 className="text-4xl font-bold mb-4 text-orange-400 drop-shadow-lg">Book Your Appointment</h2>
+          <header className="section-header text-center pt-8 pb-7">
+            <h2 className="text-4xl font-bold text-orange-400 drop-shadow-lg">Book Your Appointment</h2>
             <p className="text-lg text-white drop-shadow-md">Choose a service, fill your vehicle info, pick a time, and confirm.</p>
           </header>
 
@@ -151,7 +150,7 @@ export default function BookAppointmentPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block mb-2 font-semibold">Date</label>
-                <input type="date" className="input border p-2 rounded w-full" value={date} onChange={(e) => setDate(e.target.value)} />
+                <input type="date" className="input border p-2 rounded w-full" placeholder="Select date" value={date} onChange={(e) => setDate(e.target.value)} />
               </div>
               <div>
                 <label className="block mb-2 font-semibold">Available Slots</label>
