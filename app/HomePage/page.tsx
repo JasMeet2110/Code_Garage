@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -94,13 +95,13 @@ export default function Home() {
       </div>
 
       {/* show more button */}
-      <div className="mt-10 mb-10">
-        <a
+      <div className="pt-5">
+        <Link
           href="/services"
           className="inline-block bg-orange-500 text-white px-6 py-3 rounded-full font-medium hover:scale-105 transition-transform duration-200"
         >
           Show More Services
-        </a>
+        </Link>
       </div>
       </section>
 
