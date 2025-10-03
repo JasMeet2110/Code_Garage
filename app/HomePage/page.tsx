@@ -113,21 +113,21 @@ export default function Home() {
             <div className="flex flex-col md:flex-row justify-center gap-6">
               {/* review 1 */}
               <div className="bg-white shadow-md rounded-lg p-4 w-72 hover:shadow-lg transition">
-                <p className="text-gray-700 text-sm">"Amazing service, quick and affordable! My car feels brand new."</p>
+                <p className="text-gray-700 text-sm">Amazing service, quick and affordable! My car feels brand new.</p>
                 <p className="mt-2 font-semibold text-sm">- John D.</p>
                 <p className="text-yellow-500 text-sm">⭐⭐⭐⭐⭐</p>
               </div>
 
               {/* review 2 */}
               <div className="bg-white shadow-md rounded-lg p-4 w-72 hover:shadow-lg transition">
-                <p className="text-gray-700 text-sm">"They really care about your car like it's their own. Highly recommend!"</p>
+                <p className="text-gray-700 text-sm">They really care about your car like its their own. Highly recommend!</p>
                 <p className="mt-2 font-semibold text-sm">- Sarah K.</p>
                 <p className="text-yellow-500 text-sm">⭐⭐⭐⭐⭐</p>
               </div>
 
               {/* review 3 */}
               <div className="bg-white shadow-md rounded-lg p-4 w-72 hover:shadow-lg transition hidden md:block">
-                <p className="text-gray-700 text-sm">"Great customer service and fast turnaround. Will be back for sure."</p>
+                <p className="text-gray-700 text-sm">Great customer service and fast turnaround. Will be back for sure.</p>
                 <p className="mt-2 font-semibold text-sm">- Michael T.</p>
                 <p className="text-yellow-500 text-sm">⭐⭐⭐⭐⭐</p>
               </div>
