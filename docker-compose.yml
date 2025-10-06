@@ -1,0 +1,27 @@
+version: '3.8'
+
+services: 
+  mysql:
+    image: mysql:8.0
+    container_name: code_garage_mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: code_garage_db
+      MYSQL_USER: garage_user
+      MYSQL_PASSWORD: garage_password
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./database/migrations:/docker-entrypoint-initdb.d
+    networks:
+      - garage_network
+
+volumes:
+  mysql_data:
+    driver: local
+
+networks:
+  garage_network:
+    driver: bridge

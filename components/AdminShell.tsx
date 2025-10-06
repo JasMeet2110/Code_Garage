@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { ReactNode } from "react";
 import AdminSidebar from "./AdminSidebar";
 import AdminTopbar from "./AdminTopbar";
 
@@ -9,7 +9,7 @@ export default function AdminShell({
   children,
 }: {
   title?: string;
-  children: React.ReactNode;
+  children?: ReactNode;
 }) {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100">

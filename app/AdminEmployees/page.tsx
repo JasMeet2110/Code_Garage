@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import AdminNavbar from "@/components/AdminSidebar";
 import AdminFooter from "@/components/AdminShell";
 
@@ -13,7 +13,7 @@ interface NewEmployeeData {
   startDate: string;
 }
 
-// Interface for complete employee (with ID)
+// Interface for complete employee (with ID) - Frontend format
 interface Employee {
   id: number;
   name: string;
@@ -24,38 +24,60 @@ interface Employee {
   startDate: string;
 }
 
-const EmployeePage = () => {
-  // Employee data state
-  const [employees, setEmployees] = useState<Employee[]>([
-    {
-      id: 1,
-      name: "John Smith",
-      position: "Senior Mechanic",
-      phone: "(555) 123-4567",
-      email: "john.smith@sunrise.com",
-      salary: 55000,
-      startDate: "2022-03-15",
-    },
-    {
-      id: 2,
-      name: "Sarah Johnson",
-      position: "Shop Manager",
-      phone: "(555) 234-5678",
-      email: "sarah.johnson@sunrise.com",
-      salary: 65000,
-      startDate: "2021-08-10",
-    },
-    {
-      id: 3,
-      name: "Mike Davis",
-      position: "Junior Mechanic",
-      phone: "(555) 345-6789",
-      email: "mike.davis@sunrise.com",
-      salary: 42000,
-      startDate: "2023-01-20",
-    },
-  ]);
+// Database format (snake_case)
+interface EmployeeDB {
+  id: number;
+  name: string;
+  position: string;
+  phone: string;
+  email: string;
+  salary: string;
+  start_date: string;
+  created_at?: string;
+  updated_at?: string;
+}
 
+const EmployeePage = () => {
+  // Helper function to format date for input[type="date"]
+  const formatDateForInput = (dateString: string): string => {
+    if (!dateString) return '';
+    return dateString.split('T')[0];
+  };
+
+  // Employee data state
+  const [employees, setEmployees] = useState<Employee[]>([]);
+  const [loading, setLoading] = useState(true);
+  
+  useEffect(() => {
+    fetchEmployees();
+  }, []);
+
+  const fetchEmployees = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('/api/employees');
+      const result = await response.json();
+      
+      if (result.success) {
+        const transformedData = result.data.map((emp: EmployeeDB) => ({
+          id: emp.id,
+          name: emp.name,
+          position: emp.position,
+          phone: emp.phone,
+          email: emp.email,
+          salary: parseFloat(emp.salary),
+          startDate: formatDateForInput(emp.start_date),
+        }));
+        setEmployees(transformedData);
+      }
+    } catch (error) {
+      console.error('Error fetching employees:', error);
+      alert('Failed to load employees');
+    } finally {
+      setLoading(false);
+    }
+  };
+ 
   // Search state
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -70,9 +92,7 @@ const EmployeePage = () => {
 
   // Edit form state
   const [showEditForm, setShowEditForm] = useState(false);
-  const [editingEmployeeId, setEditingEmployeeId] = useState<number | null>(
-    null
-  );
+  const [editingEmployeeId, setEditingEmployeeId] = useState<number | null>(null);
   const [editEmployeeName, setEditEmployeeName] = useState("");
   const [editEmployeePosition, setEditEmployeePosition] = useState("");
   const [editEmployeePhone, setEditEmployeePhone] = useState("");
@@ -81,9 +101,27 @@ const EmployeePage = () => {
   const [editEmployeeStartDate, setEditEmployeeStartDate] = useState("");
 
   // Delete employee function
-  const handleDeleteEmployee = (employeeId: number) => {
-    if (window.confirm("Are you sure you want to delete this employee?")) {
-      setEmployees(employees.filter((employee) => employee.id !== employeeId));
+  const handleDeleteEmployee = async (employeeId: number) => {
+    if (!window.confirm("Are you sure you want to delete this employee?")) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/employees?id=${employeeId}`, {
+        method: 'DELETE',
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setEmployees(employees.filter((employee) => employee.id !== employeeId));
+        alert('Employee deleted successfully');
+      } else {
+        alert(result.error || 'Failed to delete employee');
+      }
+    } catch (error) {
+      console.error('Error deleting employee:', error);
+      alert('Failed to delete employee');
     }
   };
 
@@ -95,32 +133,40 @@ const EmployeePage = () => {
       employee.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Add employee function
-  const handleAddEmployee = (newEmployeeData: NewEmployeeData) => {
-    const newEmployee = {
-      id: employees.length + 1,
-      name: newEmployeeData.name,
-      position: newEmployeeData.position,
-      phone: newEmployeeData.phone,
-      email: newEmployeeData.email,
-      salary: newEmployeeData.salary,
-      startDate: newEmployeeData.startDate,
-    };
-    setEmployees([...employees, newEmployee]);
-  };
-
   // Submit new employee function
-  const handleSubmitNewEmployee = () => {
-    // Validation
-    if (
-      !newEmployeeName.trim() ||
-      !newEmployeePosition.trim() ||
-      !newEmployeePhone.trim() ||
-      !newEmployeeEmail.trim() ||
-      !newEmployeeSalary.trim() ||
-      !newEmployeeStartDate.trim()
-    ) {
-      alert("Please fill in all fields before adding an employee.");
+  const handleSubmitNewEmployee = async () => {
+    console.log('Form values:', {
+      name: newEmployeeName,
+      position: newEmployeePosition,
+      phone: newEmployeePhone,
+      email: newEmployeeEmail,
+      salary: newEmployeeSalary,
+      startDate: newEmployeeStartDate,
+    });
+
+    // Check each field individually
+    if (!newEmployeeName || !newEmployeeName.trim()) {
+      alert("Name is required");
+      return;
+    }
+    if (!newEmployeePosition || !newEmployeePosition.trim()) {
+      alert("Position is required");
+      return;
+    }
+    if (!newEmployeePhone || !newEmployeePhone.trim()) {
+      alert("Phone is required");
+      return;
+    }
+    if (!newEmployeeEmail || !newEmployeeEmail.trim()) {
+      alert("Email is required");
+      return;
+    }
+    if (!newEmployeeSalary || !newEmployeeSalary.trim()) {
+      alert("Salary is required");
+      return;
+    }
+    if (!newEmployeeStartDate || !newEmployeeStartDate.trim()) {
+      alert("Start date is required");
       return;
     }
 
@@ -129,59 +175,95 @@ const EmployeePage = () => {
       return;
     }
 
-    // Create new employee
-    const newEmployee = {
-      id: employees.length + 1,
-      name: newEmployeeName,
-      position: newEmployeePosition,
-      phone: newEmployeePhone,
-      email: newEmployeeEmail,
-      salary: parseFloat(newEmployeeSalary),
-      startDate: newEmployeeStartDate,
-    };
+    try {
+      const response = await fetch('/api/employees', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: newEmployeeName,
+          position: newEmployeePosition,
+          phone: newEmployeePhone,
+          email: newEmployeeEmail,
+          salary: parseFloat(newEmployeeSalary),
+          start_date: newEmployeeStartDate,
+        }),
+      });
 
-    setEmployees([...employees, newEmployee]);
+      const result = await response.json();
 
-    // Clear form
-    setNewEmployeeName("");
-    setNewEmployeePosition("");
-    setNewEmployeePhone("");
-    setNewEmployeeEmail("");
-    setNewEmployeeSalary("");
-    setNewEmployeeStartDate("");
-    setShowAddForm(false);
+      if (result.success) {
+        await fetchEmployees();
+        
+        setNewEmployeeName("");
+        setNewEmployeePosition("");
+        setNewEmployeePhone("");
+        setNewEmployeeEmail("");
+        setNewEmployeeSalary("");
+        setNewEmployeeStartDate("");
+        setShowAddForm(false);
+        
+        alert('Employee added successfully');
+      } else {
+        alert(result.error || 'Failed to add employee');
+      }
+    } catch (error) {
+      console.error('Error adding employee:', error);
+      alert('Failed to add employee');
+    }
   };
 
   const handleEditEmployee = (employee: Employee) => {
-    // Fill the edit form with current employee data
     setEditEmployeeName(employee.name);
     setEditEmployeePosition(employee.position);
     setEditEmployeePhone(employee.phone);
     setEditEmployeeEmail(employee.email);
     setEditEmployeeSalary(employee.salary.toString());
-    setEditEmployeeStartDate(employee.startDate);
+    setEditEmployeeStartDate(formatDateForInput(employee.startDate));
 
-    // Remember which employee we're editing
     setEditingEmployeeId(employee.id);
-
-    // Show the edit form
     setShowEditForm(true);
   };
-  const handleSaveChanges = () => {
+
+  const handleSaveChanges = async () => {
     if (editingEmployeeId === null) {
       return;
     }
 
-    // Validation
-    if (
-      !editEmployeeName.trim() ||
-      !editEmployeePosition.trim() ||
-      !editEmployeePhone.trim() ||
-      !editEmployeeEmail.trim() ||
-      !editEmployeeSalary.trim() ||
-      !editEmployeeStartDate.trim()
-    ) {
-      alert("Please fill in all fields before saving changes.");
+    console.log('Edit form values:', {
+      id: editingEmployeeId,
+      name: editEmployeeName,
+      position: editEmployeePosition,
+      phone: editEmployeePhone,
+      email: editEmployeeEmail,
+      salary: editEmployeeSalary,
+      startDate: editEmployeeStartDate,
+    });
+
+    // Check each field individually
+    if (!editEmployeeName || !editEmployeeName.trim()) {
+      alert("Name is required");
+      return;
+    }
+    if (!editEmployeePosition || !editEmployeePosition.trim()) {
+      alert("Position is required");
+      return;
+    }
+    if (!editEmployeePhone || !editEmployeePhone.trim()) {
+      alert("Phone is required");
+      return;
+    }
+    if (!editEmployeeEmail || !editEmployeeEmail.trim()) {
+      alert("Email is required");
+      return;
+    }
+    if (!editEmployeeSalary || !editEmployeeSalary.trim()) {
+      alert("Salary is required");
+      return;
+    }
+    if (!editEmployeeStartDate || !editEmployeeStartDate.trim()) {
+      alert("Start date is required");
       return;
     }
 
@@ -190,33 +272,45 @@ const EmployeePage = () => {
       return;
     }
 
-    // Create updated employee
-    const updatedEmployee = {
-      id: editingEmployeeId,
-      name: editEmployeeName,
-      position: editEmployeePosition,
-      phone: editEmployeePhone,
-      email: editEmployeeEmail,
-      salary: parseFloat(editEmployeeSalary),
-      startDate: editEmployeeStartDate,
-    };
+    try {
+      const response = await fetch('/api/employees', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: editingEmployeeId,
+          name: editEmployeeName,
+          position: editEmployeePosition,
+          phone: editEmployeePhone,
+          email: editEmployeeEmail,
+          salary: parseFloat(editEmployeeSalary),
+          start_date: editEmployeeStartDate,
+        }),
+      });
 
-    // Update the employee in the list
-    setEmployees(
-      employees.map((employee) =>
-        employee.id === editingEmployeeId ? updatedEmployee : employee
-      )
-    );
+      const result = await response.json();
 
-    // Clear edit form
-    setEditEmployeeName("");
-    setEditEmployeePosition("");
-    setEditEmployeePhone("");
-    setEditEmployeeEmail("");
-    setEditEmployeeSalary("");
-    setEditEmployeeStartDate("");
-    setEditingEmployeeId(null);
-    setShowEditForm(false);
+      if (result.success) {
+        await fetchEmployees();
+        
+        setEditEmployeeName("");
+        setEditEmployeePosition("");
+        setEditEmployeePhone("");
+        setEditEmployeeEmail("");
+        setEditEmployeeSalary("");
+        setEditEmployeeStartDate("");
+        setEditingEmployeeId(null);
+        setShowEditForm(false);
+        
+        alert('Employee updated successfully');
+      } else {
+        alert(result.error || 'Failed to update employee');
+      }
+    } catch (error) {
+      console.error('Error updating employee:', error);
+      alert('Failed to update employee');
+    }
   };
 
   return (
@@ -227,198 +321,206 @@ const EmployeePage = () => {
           <h1 className="text-4xl font-bold text-orange-500 mb-8">
             Employee Management
           </h1>
-        <div className="flex justify-between items-center mb-6">
-          <div className="flex-1 max-w-md">
-            <input
-              type="text"
-              placeholder="Search employees..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 text-white"
-            />
-          </div>
-          <button
-            onClick={() => setShowAddForm(true)}
-            className="bg-orange-500 text-white px-6 py-2 rounded-lg font-semibold hover:bg-orange-600"
-          >
-            Add New Employee
-          </button>
-        </div>
-
-        <table className="min-w-full bg-gray-800 rounded-lg">
-          <thead className="bg-gray-700">
-            <tr>
-              <th className="px-6 py-3 text-left text-white">Name</th>
-              <th className="px-6 py-3 text-left text-white">Position</th>
-              <th className="px-6 py-3 text-left text-white">Phone</th>
-              <th className="px-6 py-3 text-left text-white">Email</th>
-              <th className="px-6 py-3 text-left text-white">Salary</th>
-              <th className="px-6 py-3 text-right text-white">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredEmployees.map((employee) => (
-              <tr key={employee.id} className="border-b border-gray-600">
-                <td className="px-6 py-4 text-white">{employee.name}</td>
-                <td className="px-6 py-4 text-gray-400">{employee.position}</td>
-                <td className="px-6 py-4 text-gray-400">{employee.phone}</td>
-                <td className="px-6 py-4 text-gray-400">{employee.email}</td>
-                <td className="px-6 py-4 text-gray-400">
-                  ${employee.salary.toLocaleString()}
-                </td>
-                <td className="px-6 py-4 text-right">
-                  <button
-                    onClick={() => handleEditEmployee(employee)}
-                    className="text-blue-400 hover:text-blue-300 mr-4"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDeleteEmployee(employee.id)}
-                    className="text-red-400 hover:text-red-300"
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-
-        {showAddForm && (
-          <div className="mt-8 bg-gray-800 p-6 rounded-lg">
-            <h2 className="text-2xl font-bold text-orange-500 mb-4">
+          <div className="flex justify-between items-center mb-6">
+            <div className="flex-1 max-w-md">
+              <input
+                type="text"
+                placeholder="Search employees..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 text-white"
+              />
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowAddForm(true)}
+              className="bg-orange-500 text-white px-6 py-2 rounded-lg font-semibold hover:bg-orange-600"
+            >
               Add New Employee
-            </h2>
-            <div className="grid grid-cols-2 gap-4">
-              <input
-                type="text"
-                placeholder="Full Name"
-                value={newEmployeeName}
-                onChange={(e) => setNewEmployeeName(e.target.value)}
-                className="px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 text-white"
-              />
-              <input
-                type="text"
-                placeholder="Position"
-                value={newEmployeePosition}
-                onChange={(e) => setNewEmployeePosition(e.target.value)}
-                className="px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 text-white"
-              />
-              <input
-                type="tel"
-                placeholder="Phone Number"
-                value={newEmployeePhone}
-                onChange={(e) => setNewEmployeePhone(e.target.value)}
-                className="px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 text-white"
-              />
-              <input
-                type="email"
-                placeholder="Email Address"
-                value={newEmployeeEmail}
-                onChange={(e) => setNewEmployeeEmail(e.target.value)}
-                className="px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 text-white"
-              />
-              <input
-                type="number"
-                placeholder="Annual Salary"
-                value={newEmployeeSalary}
-                onChange={(e) => setNewEmployeeSalary(e.target.value)}
-                className="px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 text-white"
-              />
-              <input
-                type="date"
-                placeholder="Start Date"
-                value={newEmployeeStartDate}
-                onChange={(e) => setNewEmployeeStartDate(e.target.value)}
-                className="px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 text-white"
-              />
-            </div>
-            <div className="mt-4 flex gap-4">
-              <button
-                onClick={handleSubmitNewEmployee}
-                className="bg-orange-500 text-white px-6 py-2 rounded-lg hover:bg-orange-600"
-              >
-                Add Employee
-              </button>
-              <button
-                onClick={() => setShowAddForm(false)}
-                className="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-500"
-              >
-                Cancel
-              </button>
-            </div>
+            </button>
           </div>
-        )}
-        {showEditForm && (
-          <div className="mt-8 bg-gray-800 p-6 rounded-lg">
-            <h2 className="text-2xl font-bold text-orange-500 mb-4">
-              Edit Employee
-            </h2>
-            <div className="grid grid-cols-2 gap-4">
-              <input
-                type="text"
-                placeholder="Full Name"
-                value={editEmployeeName}
-                onChange={(e) => setEditEmployeeName(e.target.value)}
-                className="px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 text-white"
-              />
-              <input
-                type="text"
-                placeholder="Position"
-                value={editEmployeePosition}
-                onChange={(e) => setEditEmployeePosition(e.target.value)}
-                className="px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 text-white"
-              />
-              <input
-                type="number"
-                placeholder="Phone Number"
-                value={editEmployeePhone}
-                onChange={(e) => setEditEmployeePhone(e.target.value)}
-                className="px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 text-white"
-              />
-              <input
-                type="text"
-                placeholder="Email"
-                value={editEmployeeEmail}
-                onChange={(e) => setEditEmployeeEmail(e.target.value)}
-                className="px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 text-white"
-              />
-              <input
-                type="number"
-                placeholder="Income"
-                value={editEmployeeSalary}
-                onChange={(e) => setEditEmployeeSalary(e.target.value)}
-                className="px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 text-white"
-              />
-              <input
-                type="number"
-                placeholder="Starting Date"
-                value={editEmployeeStartDate}
-                onChange={(e) => setEditEmployeeStartDate(e.target.value)}
-                className="px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 text-white"
-              />
+
+          <table className="min-w-full bg-gray-800 rounded-lg">
+            <thead className="bg-gray-700">
+              <tr>
+                <th className="px-6 py-3 text-left text-white">Name</th>
+                <th className="px-6 py-3 text-left text-white">Position</th>
+                <th className="px-6 py-3 text-left text-white">Phone</th>
+                <th className="px-6 py-3 text-left text-white">Email</th>
+                <th className="px-6 py-3 text-left text-white">Salary</th>
+                <th className="px-6 py-3 text-right text-white">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredEmployees.map((employee) => (
+                <tr key={employee.id} className="border-b border-gray-600">
+                  <td className="px-6 py-4 text-white">{employee.name}</td>
+                  <td className="px-6 py-4 text-gray-400">{employee.position}</td>
+                  <td className="px-6 py-4 text-gray-400">{employee.phone}</td>
+                  <td className="px-6 py-4 text-gray-400">{employee.email}</td>
+                  <td className="px-6 py-4 text-gray-400">
+                    ${employee.salary.toLocaleString()}
+                  </td>
+                  <td className="px-6 py-4 text-right">
+                    <button
+                      type="button"
+                      onClick={() => handleEditEmployee(employee)}
+                      className="text-blue-400 hover:text-blue-300 mr-4"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteEmployee(employee.id)}
+                      className="text-red-400 hover:text-red-300"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          {showAddForm && (
+            <div className="mt-8 bg-gray-800 p-6 rounded-lg">
+              <h2 className="text-2xl font-bold text-orange-500 mb-4">
+                Add New Employee
+              </h2>
+              <div className="grid grid-cols-2 gap-4">
+                <input
+                  type="text"
+                  placeholder="Full Name"
+                  value={newEmployeeName}
+                  onChange={(e) => setNewEmployeeName(e.target.value)}
+                  className="px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 text-white"
+                />
+                <input
+                  type="text"
+                  placeholder="Position"
+                  value={newEmployeePosition}
+                  onChange={(e) => setNewEmployeePosition(e.target.value)}
+                  className="px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 text-white"
+                />
+                <input
+                  type="number"
+                  placeholder="Phone Number"
+                  value={newEmployeePhone}
+                  onChange={(e) => setNewEmployeePhone(e.target.value)}
+                  className="px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 text-white"
+                />
+                <input
+                  type="email"
+                  placeholder="Email Address"
+                  value={newEmployeeEmail}
+                  onChange={(e) => setNewEmployeeEmail(e.target.value)}
+                  className="px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 text-white"
+                />
+                <input
+                  type="number"
+                  placeholder="Annual Salary"
+                  value={newEmployeeSalary}
+                  onChange={(e) => setNewEmployeeSalary(e.target.value)}
+                  className="px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 text-white"
+                />
+                <input
+                  type="date"
+                  placeholder="Start Date"
+                  value={newEmployeeStartDate}
+                  onChange={(e) => setNewEmployeeStartDate(e.target.value)}
+                  className="px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 text-white"
+                />
+              </div>
+              <div className="mt-4 flex gap-4">
+                <button
+                  type="button"
+                  onClick={handleSubmitNewEmployee}
+                  className="bg-orange-500 text-white px-6 py-2 rounded-lg hover:bg-orange-600"
+                >
+                  Add Employee
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowAddForm(false)}
+                  className="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-500"
+                >
+                  Cancel
+                </button>
+              </div>
             </div>
-            <div className="mt-4 flex gap-4">
-              <button
-                onClick={handleSaveChanges}
-                className="bg-orange-500 text-white px-6 py-2 rounded-lg hover:bg-orange-600"
-              >
-                Save Changes
-              </button>
-              <button
-                onClick={() => setShowEditForm(false)}
-                className="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-500"
-              >
-                Cancel
-              </button>
+          )}
+
+          {showEditForm && (
+            <div className="mt-8 bg-gray-800 p-6 rounded-lg">
+              <h2 className="text-2xl font-bold text-orange-500 mb-4">
+                Edit Employee
+              </h2>
+              <div className="grid grid-cols-2 gap-4">
+                <input
+                  type="text"
+                  placeholder="Full Name"
+                  value={editEmployeeName}
+                  onChange={(e) => setEditEmployeeName(e.target.value)}
+                  className="px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 text-white"
+                />
+                <input
+                  type="text"
+                  placeholder="Position"
+                  value={editEmployeePosition}
+                  onChange={(e) => setEditEmployeePosition(e.target.value)}
+                  className="px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 text-white"
+                />
+                <input
+                  type="number"
+                  placeholder="Phone Number"
+                  value={editEmployeePhone}
+                  onChange={(e) => setEditEmployeePhone(e.target.value)}
+                  className="px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 text-white"
+                />
+                <input
+                  type="email"
+                  placeholder="Email"
+                  value={editEmployeeEmail}
+                  onChange={(e) => setEditEmployeeEmail(e.target.value)}
+                  className="px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 text-white"
+                />
+                <input
+                  type="number"
+                  placeholder="Salary"
+                  value={editEmployeeSalary}
+                  onChange={(e) => setEditEmployeeSalary(e.target.value)}
+                  className="px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 text-white"
+                />
+                <input
+                  type="date"
+                  placeholder="Start Date"
+                  value={editEmployeeStartDate}
+                  onChange={(e) => setEditEmployeeStartDate(e.target.value)}
+                  className="px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 text-white"
+                />
+              </div>
+              <div className="mt-4 flex gap-4">
+                <button
+                  type="button"
+                  onClick={handleSaveChanges}
+                  className="bg-orange-500 text-white px-6 py-2 rounded-lg hover:bg-orange-600"
+                >
+                  Save Changes
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowEditForm(false)}
+                  className="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-500"
+                >
+                  Cancel
+                </button>
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
+      <AdminFooter>{null}</AdminFooter>
     </div>
-    <AdminFooter />
-  </div>
   );
 };
 
