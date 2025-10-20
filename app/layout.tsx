@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import ClientLayout from "@/components/ClientLayout";
 import "./globals.css";
+import AssistantWidget from "@/components/AssistantWidget";
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,6 +33,9 @@ export default function RootLayout({
           <ClientLayout>
             <main className="flex-grow">{children}</main>
           </ClientLayout>
+
+          {/* related to the assistant widget */}
+          <AssistantWidget />
       </body>
     </html>
   );
