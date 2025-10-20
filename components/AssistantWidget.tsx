@@ -317,7 +317,7 @@ export default function AssistantWidget() {
                       <button
                         key={t.h}
                         className="rounded-full border px-3 py-2 text-sm hover:bg-gray-50"
-                        onClick={() => confirmDone(t.h, t.label)}
+                        onClick={() => confirmDone(t.label, t.h)}
                       >
                         {t.label}
                       </button>
