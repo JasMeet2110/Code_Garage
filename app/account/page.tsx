@@ -57,7 +57,16 @@ export default function AccountPage() {
   };
 
   const validateCustomer = () => {
-    if (!formData.firstName || !formData.lastName || !formData.phone || !formData.email || !formData.address || !formData.city || !formData.province || !formData.postalCode) {
+    if (
+      !formData.firstName ||
+      !formData.lastName ||
+      !formData.phone ||
+      !formData.email ||
+      !formData.address ||
+      !formData.city ||
+      !formData.province ||
+      !formData.postalCode
+    ) {
       alert("All customer fields are required");
       return false;
     }
@@ -73,7 +82,15 @@ export default function AccountPage() {
   };
 
   const validateCar = () => {
-    if (!formData.make || !formData.model || !formData.year || !formData.mileage || !formData.color || !formData.vin || !formData.licensePlate) {
+    if (
+      !formData.make ||
+      !formData.model ||
+      !formData.year ||
+      !formData.mileage ||
+      !formData.color ||
+      !formData.vin ||
+      !formData.licensePlate
+    ) {
       alert("All vehicle fields are required");
       return false;
     }
@@ -103,110 +120,115 @@ export default function AccountPage() {
   };
 
   const renderField = (
-  label: string,
-  name: keyof FormData,
-  editing: boolean
-) => (
-  <div className="flex flex-col">
-    <label className="text-sm font-medium">{label}</label>
-    {editing ? (
-      <input
-        value={formData[name]}
-        onChange={(e) => handleChange(name, e.target.value)}
-        placeholder={`Enter ${label}`}
-        className="border p-2 rounded"
-      />
-    ) : (
-      <input
-        value={formData[name]}
-        disabled
-        placeholder={`Enter ${label}`}
-        className="border p-2 rounded bg-gray-100 text-gray-500"
-      />
-    )}
-  </div>
-);
-
+    label: string,
+    name: keyof FormData,
+    editing: boolean
+  ) => (
+    <div className="flex flex-col">
+      <label className="text-sm font-medium mb-1">{label}</label>
+      {editing ? (
+        <input
+          value={formData[name]}
+          onChange={(e) => handleChange(name, e.target.value)}
+          placeholder={`Enter ${label}`}
+          className="border p-2 rounded focus:outline-none focus:ring-2 focus:ring-orange-400"
+        />
+      ) : (
+        <input
+          value={formData[name]}
+          disabled
+          placeholder={`Enter ${label}`}
+          className="border p-2 rounded bg-gray-100 text-gray-500"
+        />
+      )}
+    </div>
+  );
 
   return (
-    <div className="relative min-h-screen">
-      {/* Background */}
-      <Image
-        src="/background/Mustang.jpg"
-        alt="Background"
-        fill
-        className="object-cover -z-10"
-        priority
-      />
+    <div className="relative min-h-screen text-white overflow-y-auto">
+      {/* ✅ Fixed background */}
+      <div className="fixed inset-0 -z-10">
+        <Image
+          src="/background/Mustang.jpg"
+          alt="Garage Background"
+          fill
+          priority
+          className="object-cover brightness-50"
+        />
+        <div className="absolute inset-0 bg-black/60" />
+      </div>
 
-      <h1 className="text-4xl font-bold text-center text-orange-500 pt-12 drop-shadow-lg">
-        My Account
-      </h1>
-      <p className="text-center text-gray-600 pb-5">
-        Manage your account settings and vehicle information.
-      </p>
+      {/* ✅ Scrollable content */}
+      <div className="relative z-10 flex flex-col items-center justify-start min-h-screen py-16 px-6">
+        {/* Header */}
+        <header className="text-center mb-12">
+          <h1 className="text-5xl font-bold text-orange-400 drop-shadow-lg mb-4">
+            My Account
+          </h1>
+          <p className="text-lg text-gray-200 drop-shadow-md max-w-2xl mx-auto">
+            Manage your account settings, personal details, and vehicle
+            information all in one place.
+          </p>
+        </header>
 
-      <div className="max-w-6xl mx-auto p-6 space-y-10">
-        {/* Customer Info Section */}
-        <div className="bg-white/90 rounded-lg shadow-lg p-6 relative">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-semibold">Customer Information</h2>
-            {!editCustomer ? (
-              <button
-                onClick={() => setEditCustomer(true)}
-                className="px-3 py-1 text-sm bg-blue-600 text-white rounded"
-              >
-                Edit
-              </button>
-            ) : null}
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {renderField("First Name", "firstName", editCustomer)}
-            {renderField("Last Name", "lastName", editCustomer)}
-            {renderField("Phone", "phone", editCustomer)}
-            {renderField("Email", "email", editCustomer)}
-            {renderField("Address", "address", editCustomer)}
-            {renderField("City", "city", editCustomer)}
-            {renderField("Province", "province", editCustomer)}
-            {renderField("Postal Code", "postalCode", editCustomer)}
-          </div>
-
-          {editCustomer && (
-            <div className="mt-4 flex gap-2">
-              <button
-                onClick={saveCustomer}
-                className="px-4 py-2 bg-green-600 text-white rounded"
-              >
-                Save
-              </button>
-              <button
-                onClick={() => setEditCustomer(false)}
-                className="px-4 py-2 bg-gray-500 text-white rounded"
-              >
-                Cancel
-              </button>
+        {/* ✅ Main Content */}
+        <div className="w-full max-w-6xl space-y-10">
+          {/* Customer Info */}
+          <section className="bg-white/90 text-black rounded-xl shadow-xl p-8 backdrop-blur-sm">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-extrabold text-orange-500 drop-shadow">
+                Customer Information
+              </h2>
+              {!editCustomer && (
+                <button
+                  onClick={() => setEditCustomer(true)}
+                  className="px-3 py-1 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded transition"
+                >
+                  Edit
+                </button>
+              )}
             </div>
-          )}
-        </div>
 
-        {/* Car Info Section */}
-        <div className="bg-white/90 rounded-lg shadow-lg p-6 relative grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
-          <div>
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold">Your Vehicle</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {renderField("First Name", "firstName", editCustomer)}
+              {renderField("Last Name", "lastName", editCustomer)}
+              {renderField("Phone", "phone", editCustomer)}
+              {renderField("Email", "email", editCustomer)}
+              {renderField("Address", "address", editCustomer)}
+              {renderField("City", "city", editCustomer)}
+              {renderField("Province", "province", editCustomer)}
+              {renderField("Postal Code", "postalCode", editCustomer)}
             </div>
-            
-            <div className="flex flex-col items-center">
+
+            {editCustomer && (
+              <div className="mt-6 flex gap-3">
+                <button
+                  onClick={saveCustomer}
+                  className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded transition"
+                >
+                  Save
+                </button>
+                <button
+                  onClick={() => setEditCustomer(false)}
+                  className="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded transition"
+                >
+                  Cancel
+                </button>
+              </div>
+            )}
+          </section>
+
+          {/* Vehicle Info */}
+          <section className="bg-white/90 text-black rounded-xl shadow-xl p-8 backdrop-blur-sm grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+            {/* Left - Car Image */}
+            <div className="flex flex-col items-center justify-center">
               <Image
                 src={carImage || "/logo/Car.png"}
                 alt="Car"
-                width={600}
-                height={500}
-                className="object-contain"
+                width={500}
+                height={400}
+                className="object-contain rounded-lg shadow-md"
               />
-
-              {/* Upload Button */}
               <label className="mt-4">
                 <input
                   type="file"
@@ -214,53 +236,56 @@ export default function AccountPage() {
                   onChange={handleFileChange}
                   className="hidden"
                 />
-                <span className="cursor-pointer px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700">
-                  Upload Your Car Image
+                <span className="cursor-pointer px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition">
+                  Upload Vehicle Image
                 </span>
               </label>
             </div>
-          </div>
 
-          <div>
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold">Vehicle Information</h2>
-              {!editCar ? (
-                <button
-                  onClick={() => setEditCar(true)}
-                  className="px-3 py-1 text-sm bg-blue-600 text-white rounded"
-                >
-                  Edit
-                </button>
-              ) : null}
-            </div>
-
-            <div className="grid grid-cols-1 gap-4">
-              {renderField("Make", "make", editCar)}
-              {renderField("Model", "model", editCar)}
-              {renderField("Year", "year", editCar)}
-              {renderField("Mileage", "mileage", editCar)}
-              {renderField("Color", "color", editCar)}
-              {renderField("VIN", "vin", editCar)}
-              {renderField("License Plate", "licensePlate", editCar)}
-            </div>
-
-            {editCar && (
-              <div className="mt-4 flex gap-2">
-                <button
-                  onClick={saveCar}
-                  className="px-4 py-2 bg-green-600 text-white rounded"
-                >
-                  Save
-                </button>
-                <button
-                  onClick={() => setEditCar(false)}
-                  className="px-4 py-2 bg-gray-500 text-white rounded"
-                >
-                  Cancel
-                </button>
+            {/* Right - Car Info */}
+            <div>
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-extrabold text-orange-500 drop-shadow">
+                  Vehicle Information
+                </h2>
+                {!editCar && (
+                  <button
+                    onClick={() => setEditCar(true)}
+                    className="px-3 py-1 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded transition"
+                  >
+                    Edit
+                  </button>
+                )}
               </div>
-            )}
-          </div>
+
+              <div className="grid grid-cols-1 gap-4">
+                {renderField("Make", "make", editCar)}
+                {renderField("Model", "model", editCar)}
+                {renderField("Year", "year", editCar)}
+                {renderField("Mileage", "mileage", editCar)}
+                {renderField("Color", "color", editCar)}
+                {renderField("VIN", "vin", editCar)}
+                {renderField("License Plate", "licensePlate", editCar)}
+              </div>
+
+              {editCar && (
+                <div className="mt-6 flex gap-3">
+                  <button
+                    onClick={saveCar}
+                    className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded transition"
+                  >
+                    Save
+                  </button>
+                  <button
+                    onClick={() => setEditCar(false)}
+                    className="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded transition"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              )}
+            </div>
+          </section>
         </div>
       </div>
     </div>

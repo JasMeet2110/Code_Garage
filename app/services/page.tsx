@@ -6,27 +6,30 @@ import { SERVICES } from "@/data/services";
 
 export default function ServicesPage() {
   return (
-    <div className="relative min-h-screen flex flex-col justify-center items-center text-center text-white">
-      <Image
-        src="/ServiceShop.png"
-        alt="Background"
-        fill
-        className="absolute inset-0 object-cover brightness-30"
-      />
+    <div className="relative min-h-screen text-white">
+      <div className="fixed inset-0 -z-10">
+        <Image
+          src="/ServiceShop.png"
+          alt="Background"
+          fill
+          priority
+          className="object-cover brightness-50"
+        />
+      </div>
 
-      <div className="relative z-10 max-w-7xl px-6 py-14">
-        <h1 className="text-4xl font-bold text-orange-400 drop-shadow-lg">
+      <div className="relative z-10 flex flex-col items-center text-center px-6 py-16 backdrop-blur-sm">
+        <h1 className="text-5xl font-bold text-orange-400 drop-shadow-lg mb-4">
           Our Services
         </h1>
-        <p className="text-lg text-gray-200 mb-12 drop-shadow-md">
+        <p className="text-lg text-gray-200 mb-12 drop-shadow-md max-w-2xl">
           Professional car care solutions tailored for you.
         </p>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl">
           {SERVICES.map((service) => (
             <div
               key={service.slug}
-              className="bg-white text-black rounded-xl shadow-lg hover:shadow-2xl transition transform hover:scale-105 p-6 flex flex-col"
+              className="bg-gray-100/90 text-black rounded-xl shadow-lg hover:shadow-2xl transition transform hover:scale-105 p-6 flex flex-col backdrop-blur-md"
             >
               <div className="flex flex-col items-center mb-4">
                 <h2 className="text-xl font-bold mb-2">{service.name}</h2>
@@ -35,15 +38,17 @@ export default function ServicesPage() {
                   alt={service.name}
                   width={200}
                   height={200}
-                  className="object-contain"
+                  className="object-contain rounded-lg"
                 />
               </div>
 
-              <p className="text-gray-500 mb-4 line-clamp-3">{service.description}</p>
+              <p className="text-gray-600 mb-4 line-clamp-3">{service.description}</p>
 
               <p className="mt-auto mb-2">
                 Starting at:{" "}
-                <span className="font-semibold">${service.price}</span>
+                <span className="font-semibold text-orange-600">
+                  ${service.price}
+                </span>
               </p>
 
               <div className="mt-auto">
