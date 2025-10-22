@@ -1,131 +1,134 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import AdminSidebar from "@/components/AdminSidebar";
 
 interface Appointment {
   id: number;
-  customerName: string;
-  vehicle: string;
-  service: string;
-  date: string;
-  status: "Pending" | "In Progress" | "Completed";
+  name: string;
+  service_type: string;
+  car_make: string;
+  car_model: string;
+  car_year: string;
+  plate_number: string;
+  fuel_type: string;
+  appointment_date: string;
+  slot: string;
+  request_towing: boolean;
+  message?: string;
+  status: "Pending" | "In Progress" | "Completed" | "Cancelled";
 }
 
-const AdminAppointments = () => {
-  const [appointments, setAppointments] = useState<Appointment[]>([
-    {
-      id: 1,
-      customerName: "John Doe",
-      vehicle: "Honda Civic 2018",
-      service: "Oil Change",
-      date: "2025-10-21",
-      status: "Completed",
-    },
-    {
-      id: 2,
-      customerName: "Sarah Johnson",
-      vehicle: "Ford F-150 2020",
-      service: "Brake Inspection",
-      date: "2025-10-23",
-      status: "Pending",
-    },
-    {
-      id: 3,
-      customerName: "Raj Singh",
-      vehicle: "Toyota Corolla 2017",
-      service: "Engine Diagnostics",
-      date: "2025-10-25",
-      status: "In Progress",
-    },
-  ]);
-
+export default function AdminAppointments() {
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [showAddForm, setShowAddForm] = useState(false);
-  const [showEditForm, setShowEditForm] = useState(false);
   const [editingAppointment, setEditingAppointment] = useState<Appointment | null>(null);
 
-  // Add new appointment
-  const handleAddAppointment = (newAppt: Omit<Appointment, "id">) => {
-    setAppointments((prev) => [
-      ...prev,
-      { id: prev.length + 1, ...newAppt },
-    ]);
-  };
+  // ✅ Fetch appointments on mount
+  useEffect(() => {
+    fetchAppointments();
+  }, []);
 
-  const handleSubmitNewAppt = (e: React.FormEvent<HTMLFormElement>) => {
+  const fetchAppointments = async () => {
+  try {
+    const res = await fetch("/api/appointments");
+    const data = await res.json();
+
+    // ✅ Ensure it's an array
+    if (Array.isArray(data)) {
+      setAppointments(data);
+    } else {
+      console.error("Unexpected data format:", data);
+      setAppointments([]); // fallback
+    }
+  } catch (err) {
+    console.error("Fetch failed:", err);
+    setAppointments([]);
+  }
+};
+
+
+  // ✅ Add appointment
+  const handleAdd = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const form = e.currentTarget;
-    const formData = new FormData(form);
+    const data = Object.fromEntries(new FormData(form));
 
-    const customerName = formData.get("customerName")?.toString().trim() || "";
-    const vehicle = formData.get("vehicle")?.toString().trim() || "";
-    const service = formData.get("service")?.toString().trim() || "";
-    const date = formData.get("date")?.toString().trim() || "";
-    const status = formData.get("status")?.toString().trim() as
-      | "Pending"
-      | "In Progress"
-      | "Completed";
+    const res = await fetch("/api/appointments", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: data.name,
+        service_type: data.service_type,
+        car_make: data.car_make,
+        car_model: data.car_model,
+        car_year: data.car_year,
+        plate_number: data.plate_number,
+        fuel_type: data.fuel_type,
+        appointment_date: data.appointment_date,
+        slot: data.slot,
+        request_towing: data.request_towing === "on",
+        message: data.message,
+        status: data.status,
+      }),
+    });
 
-    if (!customerName || !vehicle || !service || !date) {
-      alert("Please fill all fields.");
-      return;
-    }
-
-    handleAddAppointment({ customerName, vehicle, service, date, status });
-    setShowAddForm(false);
-    form.reset();
+    if (res.ok) {
+      await fetchAppointments();
+      setShowAddForm(false);
+      form.reset();
+    } else alert("Failed to add appointment");
   };
 
-  // Edit appointment
-  const handleEditAppt = (appt: Appointment) => {
-    setEditingAppointment(appt);
-    setShowEditForm(true);
-  };
+  // ✅ Edit appointment
+  const handleEdit = (appt: Appointment) => setEditingAppointment(appt);
 
-  const handleSaveChanges = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSaveEdit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!editingAppointment) return;
 
     const form = e.currentTarget;
-    const formData = new FormData(form);
+    const data = Object.fromEntries(new FormData(form));
 
-    const updated = {
-      ...editingAppointment,
-      customerName: formData.get("customerName")?.toString().trim() || "",
-      vehicle: formData.get("vehicle")?.toString().trim() || "",
-      service: formData.get("service")?.toString().trim() || "",
-      date: formData.get("date")?.toString().trim() || "",
-      status: formData.get("status")?.toString() as
-        | "Pending"
-        | "In Progress"
-        | "Completed",
-    };
+    const res = await fetch("/api/appointments", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        id: editingAppointment.id,
+        ...data,
+        request_towing: data.request_towing === "on",
+      }),
+    });
 
-    setAppointments((prev) =>
-      prev.map((a) => (a.id === editingAppointment.id ? updated : a))
-    );
-    setShowEditForm(false);
-    setEditingAppointment(null);
+    if (res.ok) {
+      await fetchAppointments();
+      setEditingAppointment(null);
+    } else alert("Failed to update appointment");
   };
 
-  const handleDeleteAppt = (id: number) => {
-    if (confirm("Are you sure you want to delete this appointment?")) {
-      setAppointments((prev) => prev.filter((a) => a.id !== id));
-    }
+  // ✅ Delete appointment
+  const handleDelete = async (id: number) => {
+    if (!confirm("Delete this appointment?")) return;
+    const res = await fetch("/api/appointments", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id }),
+    });
+    if (res.ok) fetchAppointments();
   };
 
-  const filteredAppointments = appointments.filter(
+  // ✅ Filter search
+  const filtered = appointments.filter(
     (a) =>
-      a.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      a.vehicle.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      a.service.toLowerCase().includes(searchTerm.toLowerCase())
+      a.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      a.service_type?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      a.car_make?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
     <div className="flex min-h-screen relative text-white overflow-hidden">
-      {/* Background Image */}
       <div className="absolute inset-0 -z-10">
         <Image
           src="/background/Admin.png"
@@ -137,10 +140,8 @@ const AdminAppointments = () => {
         <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px]" />
       </div>
 
-      {/* Sidebar */}
       <AdminSidebar />
 
-      {/* Main Content */}
       <main className="ml-72 flex-1 p-10 relative z-10">
         <div className="backdrop-blur-lg bg-white/5 rounded-2xl p-8 shadow-lg border border-white/20">
           <h1 className="text-4xl font-bold text-orange-400 mb-8 drop-shadow-md">
@@ -151,38 +152,45 @@ const AdminAppointments = () => {
           <div className="flex justify-between items-center mb-8">
             <input
               type="text"
-              placeholder="Search by name, vehicle, or service..."
+              placeholder="Search by name, service, or vehicle..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full max-w-md px-4 py-2 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400"
+              className="w-full max-w-md px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400"
             />
             <button
               onClick={() => setShowAddForm(true)}
-              className="ml-4 bg-orange-500 hover:bg-orange-600 px-6 py-2 rounded-lg font-semibold shadow-md transition-all"
+              className="ml-4 bg-orange-500 hover:bg-orange-600 px-6 py-2 rounded-lg font-semibold"
             >
               + Add Appointment
             </button>
           </div>
 
-          {/* Add Appointment Form */}
+          {/* Add Form */}
           {showAddForm && (
             <form
-              onSubmit={handleSubmitNewAppt}
-              className="mb-8 p-6 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 shadow-md animate-fadeIn"
+              onSubmit={handleAdd}
+              className="mb-8 p-6 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 shadow-md"
             >
               <h2 className="text-2xl font-bold text-orange-400 mb-4">
                 Add New Appointment
               </h2>
               <div className="grid md:grid-cols-2 gap-4">
-                <input name="customerName" placeholder="Customer Name" className="glass-input" />
-                <input name="vehicle" placeholder="Vehicle" className="glass-input" />
-                <input name="service" placeholder="Service Type" className="glass-input" />
-                <input name="date" type="date" className="glass-input" />
+                <input name="name" placeholder="Customer Name" className="glass-input" />
+                <input name="service_type" placeholder="Service Type" className="glass-input" />
+                <input name="car_make" placeholder="Car Make" className="glass-input" />
+                <input name="car_model" placeholder="Car Model" className="glass-input" />
+                <input name="car_year" placeholder="Year" className="glass-input" />
+                <input name="plate_number" placeholder="Plate Number" className="glass-input" />
+                <input name="fuel_type" placeholder="Fuel Type" className="glass-input" />
+                <input name="appointment_date" type="datetime-local" className="glass-input" />
+                <input name="slot" placeholder="Time Slot" className="glass-input" />
                 <select name="status" className="glass-input">
                   <option>Pending</option>
                   <option>In Progress</option>
                   <option>Completed</option>
+                  <option>Cancelled</option>
                 </select>
+                <textarea name="message" placeholder="Notes / Message" className="glass-input" />
               </div>
               <div className="mt-4 flex gap-4">
                 <button type="submit" className="bg-orange-500 hover:bg-orange-600 px-6 py-2 rounded-lg font-semibold">
@@ -195,82 +203,69 @@ const AdminAppointments = () => {
             </form>
           )}
 
-          {/* Edit Appointment Form */}
-          {showEditForm && editingAppointment && (
+          {/* Edit Form */}
+          {editingAppointment && (
             <form
-              onSubmit={handleSaveChanges}
-              className="mb-8 p-6 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 shadow-md animate-fadeIn"
+              onSubmit={handleSaveEdit}
+              className="mb-8 p-6 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 shadow-md"
             >
               <h2 className="text-2xl font-bold text-orange-400 mb-4">Edit Appointment</h2>
               <div className="grid md:grid-cols-2 gap-4">
-                <input
-                  name="customerName"
-                  defaultValue={editingAppointment.customerName}
-                  placeholder="Customer Name"
-                  className="glass-input"
-                />
-                <input
-                  name="vehicle"
-                  defaultValue={editingAppointment.vehicle}
-                  placeholder="Vehicle"
-                  className="glass-input"
-                />
-                <input
-                  name="service"
-                  defaultValue={editingAppointment.service}
-                  placeholder="Service Type"
-                  className="glass-input"
-                />
-                <input
-                  name="date"
-                  type="date"
-                  defaultValue={editingAppointment.date}
-                  className="glass-input"
-                />
+                <input name="name" defaultValue={editingAppointment.name} className="glass-input" />
+                <input name="service_type" defaultValue={editingAppointment.service_type} className="glass-input" />
+                <input name="car_make" defaultValue={editingAppointment.car_make} className="glass-input" />
+                <input name="car_model" defaultValue={editingAppointment.car_model} className="glass-input" />
+                <input name="car_year" defaultValue={editingAppointment.car_year} className="glass-input" />
+                <input name="plate_number" defaultValue={editingAppointment.plate_number} className="glass-input" />
+                <input name="fuel_type" defaultValue={editingAppointment.fuel_type} className="glass-input" />
+                <input name="appointment_date" type="datetime-local" defaultValue={editingAppointment.appointment_date.slice(0, 16)} className="glass-input" />
+                <input name="slot" defaultValue={editingAppointment.slot} className="glass-input" />
                 <select name="status" defaultValue={editingAppointment.status} className="glass-input">
                   <option>Pending</option>
                   <option>In Progress</option>
                   <option>Completed</option>
+                  <option>Cancelled</option>
                 </select>
+                <textarea name="message" defaultValue={editingAppointment.message || ""} className="glass-input" />
               </div>
               <div className="mt-4 flex gap-4">
-                <button type="submit" className="bg-orange-500 hover:bg-orange-600 px-6 py-2 rounded-lg font-semibold">
-                  Save Changes
-                </button>
-                <button type="button" onClick={() => setShowEditForm(false)} className="bg-gray-600 hover:bg-gray-500 px-6 py-2 rounded-lg">
-                  Cancel
-                </button>
+                <button type="submit" className="bg-orange-500 hover:bg-orange-600 px-6 py-2 rounded-lg font-semibold">Save</button>
+                <button type="button" onClick={() => setEditingAppointment(null)} className="bg-gray-600 hover:bg-gray-500 px-6 py-2 rounded-lg">Cancel</button>
               </div>
             </form>
           )}
 
-          {/* Appointments Table */}
+          {/* Table */}
           <div className="overflow-x-auto rounded-xl bg-white/10 backdrop-blur-md border border-white/20 shadow-lg">
             <table className="min-w-full text-left">
               <thead className="bg-white/10 border-b border-white/20 text-orange-400">
                 <tr>
                   <th className="px-6 py-3">Customer</th>
-                  <th className="px-6 py-3">Vehicle</th>
                   <th className="px-6 py-3">Service</th>
+                  <th className="px-6 py-3">Vehicle</th>
                   <th className="px-6 py-3">Date</th>
                   <th className="px-6 py-3">Status</th>
                   <th className="px-6 py-3 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {filteredAppointments.length === 0 ? (
+                {filtered.length === 0 ? (
                   <tr>
                     <td colSpan={6} className="px-6 py-6 text-center text-gray-400">
                       No appointments found.
                     </td>
                   </tr>
                 ) : (
-                  filteredAppointments.map((a) => (
+                  filtered.map((a) => (
                     <tr key={a.id} className="border-b border-white/10 hover:bg-white/10 transition-all">
-                      <td className="px-6 py-4">{a.customerName}</td>
-                      <td className="px-6 py-4 text-gray-300">{a.vehicle}</td>
-                      <td className="px-6 py-4 text-gray-300">{a.service}</td>
-                      <td className="px-6 py-4 text-gray-300">{a.date}</td>
+                      <td className="px-6 py-4">{a.name}</td>
+                      <td className="px-6 py-4 text-gray-300">{a.service_type}</td>
+                      <td className="px-6 py-4 text-gray-300">
+                        {a.car_make} {a.car_model} {a.car_year} ({a.plate_number})
+                      </td>
+                      <td className="px-6 py-4 text-gray-300">
+                        {new Date(a.appointment_date).toLocaleString()}
+                      </td>
                       <td className="px-6 py-4">
                         <span
                           className={`px-3 py-1 rounded-full text-sm ${
@@ -278,17 +273,19 @@ const AdminAppointments = () => {
                               ? "bg-green-500/30 text-green-300"
                               : a.status === "In Progress"
                               ? "bg-yellow-500/30 text-yellow-300"
-                              : "bg-red-500/30 text-red-300"
+                              : a.status === "Cancelled"
+                              ? "bg-red-500/30 text-red-300"
+                              : "bg-orange-500/30 text-orange-300"
                           }`}
                         >
                           {a.status}
                         </span>
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <button onClick={() => handleEditAppt(a)} className="text-blue-400 hover:text-blue-300 mr-4">
+                        <button onClick={() => handleEdit(a)} className="text-blue-400 hover:text-blue-300 mr-4">
                           Edit
                         </button>
-                        <button onClick={() => handleDeleteAppt(a.id)} className="text-red-400 hover:text-red-300">
+                        <button onClick={() => handleDelete(a.id)} className="text-red-400 hover:text-red-300">
                           Delete
                         </button>
                       </td>
@@ -301,31 +298,11 @@ const AdminAppointments = () => {
         </div>
       </main>
 
-      {/* Custom Glass Input Class */}
       <style jsx>{`
         .glass-input {
           @apply px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400;
         }
-        select.glass-input option {
-          color: black;
-          background-color: rgba(255, 255, 255, 0.9);
-        }
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(-10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        .animate-fadeIn {
-          animation: fadeIn 0.3s ease-out forwards;
-        }
       `}</style>
     </div>
   );
-};
-
-export default AdminAppointments;
+}

@@ -5,6 +5,8 @@ services:
     image: mysql:8.0
     container_name: code_garage_mysql
     restart: always
+    env_file:
+      - .env.docker
     environment:
       MYSQL_ROOT_PASSWORD: root_password
       MYSQL_DATABASE: code_garage_db
@@ -17,6 +19,28 @@ services:
       - ./database/migrations:/docker-entrypoint-initdb.d
     networks:
       - garage_network
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: code_garage_app
+    restart: always
+    env_file:
+      - .env.docker
+    environment:
+      DATABASE_URL: mysql://garage_user:garage_password@mysql:3306/code_garage_db
+      NODE_ENV: development
+    depends_on:
+      - mysql
+    volumes:
+      - .:/app
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+    networks:
+      - garage_network
+    command: npm run dev
 
 volumes:
   mysql_data:

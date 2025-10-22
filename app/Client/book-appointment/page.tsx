@@ -35,15 +35,24 @@ function generateSlots(dateISO: string) {
 }
 
 export default function BookAppointmentPage() {
+  const router = useRouter();
+
   const [service, setService] = useState("");
   const [fuel, setFuel] = useState("");
   const [date, setDate] = useState("");
   const [slot, setSlot] = useState("");
-  const [vehicle, setVehicle] = useState({ make: "", model: "", year: "", plate: "" });
+  const [vehicle, setVehicle] = useState({
+    customer_name: "",
+    make: "",
+    model: "",
+    year: "",
+    plate: "",
+  });
   const [towing, setTowing] = useState(false);
   const [pickup, setPickup] = useState("");
+  const [loading, setLoading] = useState(false);
+
   const slots = useMemo(() => generateSlots(date), [date]);
-  const router = useRouter();
 
   const readyToConfirm =
     !!service &&
@@ -54,16 +63,52 @@ export default function BookAppointmentPage() {
     vehicle.model.trim() &&
     vehicle.year.trim() &&
     vehicle.plate.trim() &&
+    vehicle.customer_name.trim() &&
     (!towing || pickup.trim());
 
-  const handleConfirm = () => {
-    const payload = { service, fuel, date, slot, vehicle, towing, pickup: towing ? pickup : undefined };
-    console.log("BOOKING_PAYLOAD", payload);
-    router.push("/Client/book-appointment/confirmation");
+  // ✅ Function: Send appointment data to backend
+  const handleConfirm = async () => {
+    if (!readyToConfirm) return;
+    setLoading(true);
+
+    try {
+      const res = await fetch("/api/appointments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: vehicle.customer_name,
+          service_type: service,
+          car_make: vehicle.make,
+          car_model: vehicle.model,
+          car_year: vehicle.year,
+          plate_number: vehicle.plate,
+          fuel_type: fuel,
+          appointment_date: date, // or `${date} ${slot}:00`
+          slot: slot,
+          request_towing: towing,
+          message: towing ? pickup : null,
+          status: "Pending",
+        }),
+      });
+
+      if (res.ok) {
+        console.log("✅ Appointment saved!");
+        router.push("/Client/book-appointment/confirmation");
+      } else {
+        const err = await res.json();
+        alert(`Failed to book appointment: ${err.error || "Unknown error"}`);
+      }
+    } catch (error) {
+      console.error("Error booking appointment:", error);
+      alert("Something went wrong while booking your appointment.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="relative min-h-screen text-white">
+      {/* Background */}
       <div className="fixed inset-0 -z-10">
         <Image
           src="/appointmentBackground.JPG"
@@ -75,20 +120,35 @@ export default function BookAppointmentPage() {
       </div>
 
       <div className="relative z-10 max-w-5xl mx-auto px-6 py-16">
+        {/* Header */}
         <header className="text-center mb-12">
           <h2 className="text-5xl font-bold text-orange-400 drop-shadow-lg mb-3">
             Book Your Appointment
           </h2>
           <p className="text-lg text-gray-200 drop-shadow-md">
-            Choose a service, fill your vehicle info, pick a time, and confirm.
+            Choose a service, fill in your details, and confirm your visit.
           </p>
         </header>
 
-        {/* Service Selection */}
+        {/* Customer Info */}
         <section className="bg-gray-100/95 text-black rounded-xl shadow-lg p-6 mb-10">
-          <h3 className="text-xl font-bold mb-4">Select a Service</h3>
+          <h3 className="text-xl font-bold mb-4">Customer Details</h3>
+          <label htmlFor="customer-name" className="block mb-2 font-semibold">
+            Customer Name
+          </label>
+          <input
+            id="customer-name"
+            type="text"
+            placeholder="Enter your name"
+            className="w-full border p-3 rounded mb-6"
+            value={vehicle.customer_name}
+            onChange={(e) =>
+              setVehicle({ ...vehicle, customer_name: e.target.value })
+            }
+          />
+
           <label htmlFor="service-select" className="block mb-2 font-semibold">
-            Service
+            Select Service
           </label>
           <select
             id="service-select"
@@ -105,13 +165,13 @@ export default function BookAppointmentPage() {
           </select>
         </section>
 
-        {/* Fuel & Vehicle */}
+        {/* Vehicle & Fuel */}
         <section className="bg-gray-100/95 text-black rounded-xl shadow-lg p-6 mb-10">
           <h3 className="text-xl font-bold mb-4">Vehicle & Fuel</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block mb-2 font-semibold">Fuel Type</label>
-              <div className="flex flex-wrap gap-3 justify-center md:justify-start">
+              <div className="flex flex-wrap gap-3">
                 {FUEL_TYPES.map((t) => (
                   <button
                     key={t}
@@ -150,6 +210,7 @@ export default function BookAppointmentPage() {
             </div>
           </div>
 
+          {/* Vehicle info */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
             <input
               className="border p-2 rounded"
@@ -178,14 +239,13 @@ export default function BookAppointmentPage() {
           </div>
         </section>
 
-        {/* Date & Slots */}
+        {/* Date & Slot */}
         <section className="bg-white/90 text-black rounded-xl shadow-lg p-6 mb-10">
           <h3 className="text-xl font-bold mb-4">Pick Date & Time</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block mb-2 font-semibold">Date</label>
               <input
-                aria-label="Select appointment date"
                 type="date"
                 className="border p-2 rounded w-full"
                 value={date}
@@ -194,9 +254,11 @@ export default function BookAppointmentPage() {
             </div>
             <div>
               <label className="block mb-2 font-semibold">Available Slots</label>
-              <div className="flex flex-wrap justify-center md:justify-start gap-2">
+              <div className="flex flex-wrap gap-2">
                 {slots.length === 0 && (
-                  <span className="text-gray-500">Choose a date to view slots</span>
+                  <span className="text-gray-500">
+                    Choose a date to view slots
+                  </span>
                 )}
                 {slots.map((s) => (
                   <button
@@ -217,20 +279,8 @@ export default function BookAppointmentPage() {
           </div>
         </section>
 
-        {/* Additional Info */}
-        <section className="bg-white/90 text-black rounded-xl shadow-lg p-6 mb-10">
-          <h3 className="text-xl font-bold mb-4">Additional Vehicle Info</h3>
-          <p className="mb-4 text-gray-700">
-            Please provide any additional information about your vehicle or the service needed.
-          </p>
-          <textarea
-            className="w-full border p-3 rounded h-24"
-            placeholder="E.g., Any specific issues, recent repairs, etc."
-          ></textarea>
-        </section>
-
         {/* Summary */}
-        <section className="bg-white/95 text-black rounded-xl shadow-lg p-6 mb-10">
+        <section className="bg-white/95 text-black rounded-xl shadow-lg p-6">
           <h3 className="text-xl font-bold mb-4">Summary</h3>
           <table className="w-full text-left">
             <tbody>
@@ -253,26 +303,31 @@ export default function BookAppointmentPage() {
               <tr>
                 <th className="pr-4 align-top font-semibold w-28">Vehicle:</th>
                 <td>
-                  {[vehicle.make, vehicle.model, vehicle.year].filter(Boolean).join(" ") || "—"}
+                  {[vehicle.make, vehicle.model, vehicle.year]
+                    .filter(Boolean)
+                    .join(" ") || "—"}
                   {vehicle.plate ? ` (${vehicle.plate})` : ""}
                 </td>
               </tr>
               {towing && (
                 <tr>
-                  <th className="pr-4 align-top font-semibold w-28">Towing pickup:</th>
+                  <th className="pr-4 align-top font-semibold w-28">
+                    Towing pickup:
+                  </th>
                   <td>{pickup || "—"}</td>
                 </tr>
               )}
             </tbody>
           </table>
+
           <button
             className={`w-full bg-orange-500 text-white py-2 rounded-lg font-medium hover:bg-orange-600 transition mt-4 ${
               !readyToConfirm && "opacity-60 cursor-not-allowed"
             }`}
-            disabled={!readyToConfirm}
+            disabled={!readyToConfirm || loading}
             onClick={handleConfirm}
           >
-            Confirm Booking
+            {loading ? "Booking..." : "Confirm Booking"}
           </button>
         </section>
       </div>
