@@ -59,7 +59,7 @@ export default function BookAppointmentPage() {
   const handleConfirm = () => {
     const payload = { service, fuel, date, slot, vehicle, towing, pickup: towing ? pickup : undefined };
     console.log("BOOKING_PAYLOAD", payload);
-    router.push("/book-appointment/confirmation");
+    router.push("/Client/book-appointment/confirmation");
   };
 
   return (
@@ -87,7 +87,11 @@ export default function BookAppointmentPage() {
         {/* Service Selection */}
         <section className="bg-gray-100/95 text-black rounded-xl shadow-lg p-6 mb-10">
           <h3 className="text-xl font-bold mb-4">Select a Service</h3>
+          <label htmlFor="service-select" className="block mb-2 font-semibold">
+            Service
+          </label>
           <select
+            id="service-select"
             value={service}
             onChange={(e) => setService(e.target.value)}
             className="w-full border p-3 rounded"
@@ -181,6 +185,7 @@ export default function BookAppointmentPage() {
             <div>
               <label className="block mb-2 font-semibold">Date</label>
               <input
+                aria-label="Select appointment date"
                 type="date"
                 className="border p-2 rounded w-full"
                 value={date}
