@@ -1,6 +1,6 @@
 -- Migration: Create inventory table
 -- Created: 2025-10-05
--- Description: PArts inventory management
+-- Description: Parts inventory management
 
 CREATE TABLE IF NOT EXISTS inventory (
     id INT PRIMARY KEY AUTO_INCREMENT,
