@@ -15,7 +15,7 @@ export default function ConfirmationPage() {
         </p>
 
         <Link
-          href="/HomePage"
+          href="/"
           className="inline-block bg-orange-500 text-white px-6 py-3 rounded-lg font-medium hover:bg-orange-600 transition"
         >
           Back to Home

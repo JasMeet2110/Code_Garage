@@ -13,11 +13,11 @@ export default function Navbar() {
       </div>  
       <div className="flex gap-5 px-10">
         <Link href="/" className="nav-btn">Home</Link>
-        <Link href="/services" className="nav-btn">Services</Link>
-        <Link href="/book-appointment" className="nav-btn">Book</Link>
-        <Link href="/reviews" className="nav-btn">Reviews</Link>
-        <Link href="/contact" className="nav-btn">Contact</Link>
-        <Link href="/account" className="nav-btn">My Account</Link>
+        <Link href="/Client/services" className="nav-btn">Services</Link>
+        <Link href="/Client/book-appointment" className="nav-btn">Book</Link>
+        <Link href="/Client/reviews" className="nav-btn">Reviews</Link>
+        <Link href="/Client/contact" className="nav-btn">Contact</Link>
+        <Link href="/Client/account" className="nav-btn">My Account</Link>
         <Link href="/AuthScreen" className="nav-btn">Sign In</Link>
       </div>
     </nav>

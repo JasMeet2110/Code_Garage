@@ -81,7 +81,7 @@ export default function AuthScreen() {
             </div>
 
             <p className="text-xs text-gray-600 mt-4">
-              By continuing, you agree to our <a href="/Termscondition" className="text-blue-500 underline">Terms</a> and acknowledge our Privacy Policy.
+              By continuing, you agree to our <a href="/Client/Termscondition" className="text-blue-500 underline">Terms</a> and acknowledge our Privacy Policy.
             </p>
           </section>
 
@@ -129,7 +129,7 @@ export default function AuthScreen() {
           <div className="mt-6 flex justify-center">
             <button
               className="px-4 py-2 rounded-lg border border-orange-500 text-orange-400 hover:bg-orange-500 hover:text-white transition"
-              onClick={() => router.push("/AdminHome")}
+              onClick={() => router.push("/Admin/AdminHome")}
               aria-label="Admin sign in"
             >
               Admin Sign In
