@@ -1,64 +1,60 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import AdminSidebar from "@/components/AdminSidebar";
 import {
-  LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, PieChart, Pie, Cell, ResponsiveContainer
+  LineChart,
+  Line,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  Tooltip,
+  PieChart,
+  Pie,
+  Cell,
+  ResponsiveContainer,
 } from "recharts";
 
 const COLORS = ["#f97316", "#22c55e", "#3b82f6", "#ef4444", "#eab308"];
 
-const ReportsAnalyticsPage = () => {
-  // Simulated data (later replace with API fetches)
-  const [summary, setSummary] = useState({
-    totalCustomers: 124,
-    totalAppointments: 87,
-    totalRevenue: 15320,
-    employees: 6,
-    salaryExpense: 24500,
-  });
+export default function ReportsAnalyticsPage() {
+  const [summary, setSummary] = useState<any>(null);
+  const [appointmentsTrend, setAppointmentsTrend] = useState<any[]>([]);
+  const [topServices, setTopServices] = useState<any[]>([]);
+  const [selectedMonth, setSelectedMonth] = useState<string>("");
 
-  const [appointmentsTrend, setAppointmentsTrend] = useState([
-    { month: "Jan", count: 12 },
-    { month: "Feb", count: 18 },
-    { month: "Mar", count: 22 },
-    { month: "Apr", count: 15 },
-    { month: "May", count: 28 },
-    { month: "Jun", count: 25 },
-    { month: "Jul", count: 30 },
-    { month: "Aug", count: 27 },
-    { month: "Sep", count: 35 },
-    { month: "Oct", count: 32 },
-  ]);
+  useEffect(() => {
+    fetchReports();
+  }, [selectedMonth]);
 
-  const [revenueTrend, setRevenueTrend] = useState([
-    { month: "Jan", revenue: 2000 },
-    { month: "Feb", revenue: 2500 },
-    { month: "Mar", revenue: 3000 },
-    { month: "Apr", revenue: 2700 },
-    { month: "May", revenue: 3500 },
-    { month: "Jun", revenue: 4200 },
-    { month: "Jul", revenue: 4800 },
-    { month: "Aug", revenue: 5100 },
-    { month: "Sep", revenue: 5300 },
-    { month: "Oct", revenue: 5800 },
-  ]);
+  const fetchReports = async () => {
+    try {
+      const queryParam = selectedMonth ? `?month=${selectedMonth}` : "";
+      const res = await fetch(`/api/reports${queryParam}`, { cache: "no-store" });
+      const data = await res.json();
+      setSummary(data.summary);
+      setAppointmentsTrend(data.appointmentsTrend || []);
+      setTopServices(data.topServices || []);
+    } catch (err) {
+      console.error("Failed to fetch reports:", err);
+    }
+  };
 
-  const [topServices, setTopServices] = useState([
-    { name: "Oil Change", count: 42 },
-    { name: "Brake Repair", count: 36 },
-    { name: "Diagnostics", count: 28 },
-    { name: "Battery Replacement", count: 20 },
-    { name: "Suspension", count: 18 },
-  ]);
-
-  const [recentActivity, setRecentActivity] = useState([
-    "Emma Wilson booked an appointment for Oil Change",
-    "New employee hired: Alex Carter (Technician)",
-    "Invoice #1023 paid: $450 (John Doe)",
-    "Customer feedback received: 5⭐ from Raj Singh",
-    "Appointment completed: Brake Repair (Oct 20)",
-  ]);
+  const months = [
+    { label: "All Year", value: "" },
+    { label: "January", value: "2025-01" },
+    { label: "February", value: "2025-02" },
+    { label: "March", value: "2025-03" },
+    { label: "April", value: "2025-04" },
+    { label: "May", value: "2025-05" },
+    { label: "June", value: "2025-06" },
+    { label: "July", value: "2025-07" },
+    { label: "August", value: "2025-08" },
+    { label: "September", value: "2025-09" },
+    { label: "October", value: "2025-10" },
+    { label: "November", value: "2025-11" },
+    { label: "December", value: "2025-12" },
+  ];
 
   return (
     <div className="flex min-h-screen relative text-white overflow-hidden">
@@ -76,40 +72,64 @@ const ReportsAnalyticsPage = () => {
 
       <AdminSidebar />
 
-      {/* Main */}
       <main className="ml-72 flex-1 p-10 relative z-10">
         <div className="backdrop-blur-lg bg-white/5 rounded-2xl p-8 shadow-lg border border-white/20">
-          <h1 className="text-4xl font-bold text-orange-400 mb-8 drop-shadow-md">
-            Reports & Analytics
-          </h1>
-
-          {/* Summary Cards */}
-          <div className="grid grid-cols-4 gap-6 mb-8">
-            <div className="glass-card">
-              <h3 className="text-lg font-semibold">Total Customers</h3>
-              <p className="text-3xl font-bold text-orange-400 mt-2">{summary.totalCustomers}</p>
-            </div>
-            <div className="glass-card">
-              <h3 className="text-lg font-semibold">Appointments</h3>
-              <p className="text-3xl font-bold text-orange-400 mt-2">{summary.totalAppointments}</p>
-            </div>
-            <div className="glass-card">
-              <h3 className="text-lg font-semibold">Revenue (CAD)</h3>
-              <p className="text-3xl font-bold text-orange-400 mt-2">${summary.totalRevenue.toLocaleString()}</p>
-            </div>
-            <div className="glass-card">
-              <h3 className="text-lg font-semibold">Employees</h3>
-              <p className="text-xl font-bold text-orange-400 mt-2">{summary.employees} Active</p>
-              <p className="text-sm text-gray-400 mt-1">Monthly Salary: ${summary.salaryExpense.toLocaleString()}</p>
-            </div>
+          <div className="flex justify-between items-center mb-8">
+            <h1 className="text-4xl font-bold text-orange-400 drop-shadow-md">
+              Reports & Analytics
+            </h1>
+            <select
+              value={selectedMonth}
+              onChange={(e) => setSelectedMonth(e.target.value)}
+              className="bg-white/10 border border-white/20 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400"
+            >
+              {months.map((m) => (
+                <option key={m.value} value={m.value}>
+                  {m.label}
+                </option>
+              ))}
+            </select>
           </div>
 
-          {/* Charts Section */}
-          <div className="grid grid-cols-2 gap-6 mb-8">
-            <div className="glass-card h-80">
-              <h2 className="text-xl font-bold text-orange-400 mb-4">
-                Appointments Trend
-              </h2>
+          {/* Summary Cards */}
+          {summary && (
+            <div className="grid grid-cols-4 gap-6 mb-8">
+              <div className="glass-card">
+                <h3 className="text-lg font-semibold">Total Customers</h3>
+                <p className="text-3xl font-bold text-orange-400 mt-2">
+                  {summary.total_customers}
+                </p>
+              </div>
+              <div className="glass-card">
+                <h3 className="text-lg font-semibold">Appointments</h3>
+                <p className="text-3xl font-bold text-orange-400 mt-2">
+                  {summary.total_appointments}
+                </p>
+              </div>
+              <div className="glass-card">
+                <h3 className="text-lg font-semibold">Employees</h3>
+                <p className="text-3xl font-bold text-orange-400 mt-2">
+                  {summary.total_employees}
+                </p>
+                <p className="text-sm text-gray-400 mt-1">
+                  Avg Salary: ${summary.avg_salary}
+                </p>
+              </div>
+              <div className="glass-card">
+                <h3 className="text-lg font-semibold">Top Service</h3>
+                <p className="text-xl font-bold text-orange-400 mt-2">
+                  {topServices[0]?.name || "N/A"}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Appointments Trend */}
+          <div className="glass-card h-80 mb-10">
+            <h2 className="text-xl font-bold text-orange-400 mb-4">
+              Appointments Trend (Monthly)
+            </h2>
+            {appointmentsTrend.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={appointmentsTrend}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#444" />
@@ -125,54 +145,50 @@ const ReportsAnalyticsPage = () => {
                   />
                 </LineChart>
               </ResponsiveContainer>
-            </div>
-
-            <div className="glass-card h-80">
-              <h2 className="text-xl font-bold text-orange-400 mb-4">
-                Revenue Trend
-              </h2>
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={revenueTrend}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#444" />
-                  <XAxis dataKey="month" stroke="#ccc" />
-                  <YAxis stroke="#ccc" />
-                  <Tooltip />
-                  <Line
-                    type="monotone"
-                    dataKey="revenue"
-                    stroke="#22c55e"
-                    strokeWidth={3}
-                    dot={{ r: 4 }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
+            ) : (
+              <p className="text-gray-400 text-center mt-12">
+                No appointment data available.
+              </p>
+            )}
           </div>
 
-          {/* Bottom Section */}
-          <div className="grid grid-cols-2 gap-6 mt-24">
-            {/* Top Services */}
+          {/* Top Services Section */}
+          <div className="grid grid-cols-2 gap-8">
+            {/* Pie Chart */}
             <div className="glass-card">
               <h2 className="text-2xl font-bold text-orange-400 mb-4">
-                Top Services This Month
+                Top Services ({selectedMonth || "All Year"})
               </h2>
-              <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                  <Pie
-                    data={topServices}
-                    dataKey="count"
-                    nameKey="name"
-                    outerRadius={100}
-                    fill="#8884d8"
-                    label
-                  >
-                    {topServices.map((_, index) => (
-                      <Cell key={index} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
+              {topServices.length > 0 ? (
+                <ResponsiveContainer width="100%" height={300}>
+                  <PieChart>
+                    <Pie
+                      data={topServices}
+                      dataKey="count"
+                      nameKey="name"
+                      outerRadius={100}
+                      fill="#8884d8"
+                      label
+                    >
+                      {topServices.map((_, i) => (
+                        <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+              ) : (
+                <p className="text-gray-400 text-center py-12">
+                  No completed services found for this month.
+                </p>
+              )}
+            </div>
+
+            {/* Table next to Pie */}
+            <div className="glass-card">
+              <h2 className="text-2xl font-bold text-orange-400 mb-4">
+                Service Breakdown
+              </h2>
               <table className="min-w-full text-sm text-gray-300 mt-4">
                 <thead>
                   <tr className="text-orange-400">
@@ -181,34 +197,33 @@ const ReportsAnalyticsPage = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {topServices.map((s, i) => (
-                    <tr key={i} className="border-t border-white/10">
-                      <td className="px-2 py-1">{s.name}</td>
-                      <td className="px-2 py-1 text-right">{s.count}</td>
+                  {topServices.length === 0 ? (
+                    <tr>
+                      <td
+                        colSpan={2}
+                        className="text-center text-gray-400 py-4"
+                      >
+                        No data available.
+                      </td>
                     </tr>
-                  ))}
+                  ) : (
+                    topServices.map((s, i) => (
+                      <tr
+                        key={i}
+                        className="border-t border-white/10 hover:bg-white/5"
+                      >
+                        <td className="px-2 py-1">{s.name}</td>
+                        <td className="px-2 py-1 text-right">{s.count}</td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
-            </div>
-
-            {/* Recent Activity */}
-            <div className="glass-card">
-              <h2 className="text-2xl font-bold text-orange-400 mb-4">
-                Recent Activity
-              </h2>
-              <ul className="space-y-3">
-                {recentActivity.map((item, index) => (
-                  <li key={index} className="text-gray-300 bg-white/5 px-4 py-2 rounded-lg">
-                    {item}
-                  </li>
-                ))}
-              </ul>
             </div>
           </div>
         </div>
       </main>
 
-      {/* Styles */}
       <style jsx>{`
         .glass-card {
           @apply bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-6 shadow-md;
@@ -216,6 +231,4 @@ const ReportsAnalyticsPage = () => {
       `}</style>
     </div>
   );
-};
-
-export default ReportsAnalyticsPage;
+}

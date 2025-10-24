@@ -6,7 +6,9 @@ import AdminSidebar from "@/components/AdminSidebar";
 
 interface Appointment {
   id: number;
-  name: string;
+  customer_name: string;
+  email: string;
+  phone: string;
   service_type: string;
   car_make: string;
   car_model: string;
@@ -14,9 +16,7 @@ interface Appointment {
   plate_number: string;
   fuel_type: string;
   appointment_date: string;
-  slot: string;
-  request_towing: boolean;
-  message?: string;
+  description: string;
   status: "Pending" | "In Progress" | "Completed" | "Cancelled";
 }
 
@@ -32,23 +32,17 @@ export default function AdminAppointments() {
   }, []);
 
   const fetchAppointments = async () => {
-  try {
-    const res = await fetch("/api/appointments");
-    const data = await res.json();
+    try {
+      const res = await fetch("/api/appointments");
+      const data = await res.json();
 
-    // ✅ Ensure it's an array
-    if (Array.isArray(data)) {
-      setAppointments(data);
-    } else {
-      console.error("Unexpected data format:", data);
-      setAppointments([]); // fallback
+      if (Array.isArray(data)) setAppointments(data);
+      else setAppointments([]);
+    } catch (err) {
+      console.error("Fetch failed:", err);
+      setAppointments([]);
     }
-  } catch (err) {
-    console.error("Fetch failed:", err);
-    setAppointments([]);
-  }
-};
-
+  };
 
   // ✅ Add appointment
   const handleAdd = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -60,17 +54,17 @@ export default function AdminAppointments() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        name: data.name,
+        customer_name: data.customer_name,
+        email: data.email,
+        phone: data.phone,
         service_type: data.service_type,
+        fuel_type: data.fuel_type,
         car_make: data.car_make,
         car_model: data.car_model,
         car_year: data.car_year,
         plate_number: data.plate_number,
-        fuel_type: data.fuel_type,
         appointment_date: data.appointment_date,
-        slot: data.slot,
-        request_towing: data.request_towing === "on",
-        message: data.message,
+        description: data.description,
         status: data.status,
       }),
     });
@@ -98,7 +92,6 @@ export default function AdminAppointments() {
       body: JSON.stringify({
         id: editingAppointment.id,
         ...data,
-        request_towing: data.request_towing === "on",
       }),
     });
 
@@ -122,14 +115,15 @@ export default function AdminAppointments() {
   // ✅ Filter search
   const filtered = appointments.filter(
     (a) =>
-      a.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      a.customer_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       a.service_type?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       a.car_make?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
     <div className="flex min-h-screen relative text-white overflow-hidden">
-      <div className="absolute inset-0 -z-10">
+      {/* Background */}
+      <div className="fixed inset-0 -z-10">
         <Image
           src="/background/Admin.png"
           alt="Garage Background"
@@ -175,28 +169,36 @@ export default function AdminAppointments() {
                 Add New Appointment
               </h2>
               <div className="grid md:grid-cols-2 gap-4">
-                <input name="name" placeholder="Customer Name" className="glass-input" />
+                <input name="customer_name" placeholder="Customer Name" className="glass-input" />
+                <input name="email" placeholder="Email" className="glass-input" />
+                <input name="phone" placeholder="Phone" className="glass-input" />
                 <input name="service_type" placeholder="Service Type" className="glass-input" />
+                <input name="fuel_type" placeholder="Fuel Type" className="glass-input" />
                 <input name="car_make" placeholder="Car Make" className="glass-input" />
                 <input name="car_model" placeholder="Car Model" className="glass-input" />
                 <input name="car_year" placeholder="Year" className="glass-input" />
                 <input name="plate_number" placeholder="Plate Number" className="glass-input" />
-                <input name="fuel_type" placeholder="Fuel Type" className="glass-input" />
-                <input name="appointment_date" type="datetime-local" className="glass-input" />
-                <input name="slot" placeholder="Time Slot" className="glass-input" />
+                <input name="appointment_date" type="date" className="glass-input" />
                 <select name="status" className="glass-input">
                   <option>Pending</option>
                   <option>In Progress</option>
                   <option>Completed</option>
                   <option>Cancelled</option>
                 </select>
-                <textarea name="message" placeholder="Notes / Message" className="glass-input" />
+                <textarea name="description" placeholder="Issue Description" className="glass-input" />
               </div>
               <div className="mt-4 flex gap-4">
-                <button type="submit" className="bg-orange-500 hover:bg-orange-600 px-6 py-2 rounded-lg font-semibold">
+                <button
+                  type="submit"
+                  className="bg-orange-500 hover:bg-orange-600 px-6 py-2 rounded-lg font-semibold"
+                >
                   Add Appointment
                 </button>
-                <button type="button" onClick={() => setShowAddForm(false)} className="bg-gray-600 hover:bg-gray-500 px-6 py-2 rounded-lg">
+                <button
+                  type="button"
+                  onClick={() => setShowAddForm(false)}
+                  className="bg-gray-600 hover:bg-gray-500 px-6 py-2 rounded-lg"
+                >
                   Cancel
                 </button>
               </div>
@@ -211,26 +213,44 @@ export default function AdminAppointments() {
             >
               <h2 className="text-2xl font-bold text-orange-400 mb-4">Edit Appointment</h2>
               <div className="grid md:grid-cols-2 gap-4">
-                <input name="name" defaultValue={editingAppointment.name} className="glass-input" />
+                <input name="customer_name" defaultValue={editingAppointment.customer_name} className="glass-input" />
+                <input name="email" defaultValue={editingAppointment.email} className="glass-input" />
+                <input name="phone" defaultValue={editingAppointment.phone} className="glass-input" />
                 <input name="service_type" defaultValue={editingAppointment.service_type} className="glass-input" />
+                <input name="fuel_type" defaultValue={editingAppointment.fuel_type} className="glass-input" />
                 <input name="car_make" defaultValue={editingAppointment.car_make} className="glass-input" />
                 <input name="car_model" defaultValue={editingAppointment.car_model} className="glass-input" />
                 <input name="car_year" defaultValue={editingAppointment.car_year} className="glass-input" />
                 <input name="plate_number" defaultValue={editingAppointment.plate_number} className="glass-input" />
-                <input name="fuel_type" defaultValue={editingAppointment.fuel_type} className="glass-input" />
-                <input name="appointment_date" type="datetime-local" defaultValue={editingAppointment.appointment_date.slice(0, 16)} className="glass-input" />
-                <input name="slot" defaultValue={editingAppointment.slot} className="glass-input" />
+                <input
+                  name="appointment_date"
+                  type="date"
+                  defaultValue={editingAppointment.appointment_date?.slice(0, 10)}
+                  className="glass-input"
+                />
                 <select name="status" defaultValue={editingAppointment.status} className="glass-input">
                   <option>Pending</option>
                   <option>In Progress</option>
                   <option>Completed</option>
                   <option>Cancelled</option>
                 </select>
-                <textarea name="message" defaultValue={editingAppointment.message || ""} className="glass-input" />
+                <textarea
+                  name="description"
+                  defaultValue={editingAppointment.description || ""}
+                  className="glass-input"
+                />
               </div>
               <div className="mt-4 flex gap-4">
-                <button type="submit" className="bg-orange-500 hover:bg-orange-600 px-6 py-2 rounded-lg font-semibold">Save</button>
-                <button type="button" onClick={() => setEditingAppointment(null)} className="bg-gray-600 hover:bg-gray-500 px-6 py-2 rounded-lg">Cancel</button>
+                <button type="submit" className="bg-orange-500 hover:bg-orange-600 px-6 py-2 rounded-lg font-semibold">
+                  Save
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setEditingAppointment(null)}
+                  className="bg-gray-600 hover:bg-gray-500 px-6 py-2 rounded-lg"
+                >
+                  Cancel
+                </button>
               </div>
             </form>
           )}
@@ -258,14 +278,17 @@ export default function AdminAppointments() {
                 ) : (
                   filtered.map((a) => (
                     <tr key={a.id} className="border-b border-white/10 hover:bg-white/10 transition-all">
-                      <td className="px-6 py-4">{a.name}</td>
+                      <td className="px-6 py-4">
+                        <div className="font-semibold text-white">{a.customer_name}</div>
+                        <div className="text-sm text-gray-300">{a.email}</div>
+                        <div className="text-sm text-gray-400">{a.phone}</div>
+                      </td>
                       <td className="px-6 py-4 text-gray-300">{a.service_type}</td>
                       <td className="px-6 py-4 text-gray-300">
                         {a.car_make} {a.car_model} {a.car_year} ({a.plate_number})
+                        <div className="text-sm text-gray-400">{a.fuel_type}</div>
                       </td>
-                      <td className="px-6 py-4 text-gray-300">
-                        {new Date(a.appointment_date).toLocaleString()}
-                      </td>
+                      <td className="px-6 py-4 text-gray-300">{new Date(a.appointment_date).toLocaleDateString()}</td>
                       <td className="px-6 py-4">
                         <span
                           className={`px-3 py-1 rounded-full text-sm ${

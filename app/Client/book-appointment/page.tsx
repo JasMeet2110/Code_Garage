@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
@@ -27,48 +27,50 @@ const SERVICES = [
 
 const FUEL_TYPES = ["Petrol", "Diesel", "Hybrid", "Electric"];
 
-function generateSlots(dateISO: string) {
-  if (!dateISO) return [];
-  const base = ["09:00", "10:30", "12:00", "13:30", "15:00", "16:30"];
-  const day = new Date(dateISO).getDate();
-  return base.filter((_, i) => (i + day) % 5 !== 0);
-}
-
 export default function BookAppointmentPage() {
   const router = useRouter();
 
-  const [service, setService] = useState("");
-  const [fuel, setFuel] = useState("");
-  const [date, setDate] = useState("");
-  const [slot, setSlot] = useState("");
-  const [vehicle, setVehicle] = useState({
+  const [form, setForm] = useState({
     customer_name: "",
+    email: "",
+    phone: "",
     make: "",
     model: "",
     year: "",
     plate: "",
+    fuel: "",
+    service: "",
+    date: "",
+    description: "",
   });
-  const [towing, setTowing] = useState(false);
-  const [pickup, setPickup] = useState("");
+
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState(false);
 
-  const slots = useMemo(() => generateSlots(date), [date]);
+  // ✅ Inline Validation
+  const validate = () => {
+    const newErrors: { [key: string]: string } = {};
+    if (!form.customer_name.trim()) newErrors.customer_name = "Customer name is required.";
+    if (!form.email.trim()) newErrors.email = "Email is required.";
+    else if (!/\S+@\S+\.\S+/.test(form.email)) newErrors.email = "Invalid email format.";
+    if (!form.phone.trim()) newErrors.phone = "Phone number is required.";
+    else if (!/^\d{10}$/.test(form.phone.replace(/\D/g, "")))
+      newErrors.phone = "Enter a valid 10-digit number.";
+    if (!form.service) newErrors.service = "Please select a service.";
+    if (!form.fuel) newErrors.fuel = "Select fuel type.";
+    if (!form.make.trim()) newErrors.make = "Car make required.";
+    if (!form.model.trim()) newErrors.model = "Car model required.";
+    if (!form.year.trim()) newErrors.year = "Car year required.";
+    if (!form.plate.trim()) newErrors.plate = "License plate required.";
+    if (!form.date) newErrors.date = "Select appointment date.";
+    if (!form.description.trim()) newErrors.description = "Please describe the issue.";
 
-  const readyToConfirm =
-    !!service &&
-    !!fuel &&
-    !!date &&
-    !!slot &&
-    vehicle.make.trim() &&
-    vehicle.model.trim() &&
-    vehicle.year.trim() &&
-    vehicle.plate.trim() &&
-    vehicle.customer_name.trim() &&
-    (!towing || pickup.trim());
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
-  // ✅ Function: Send appointment data to backend
   const handleConfirm = async () => {
-    if (!readyToConfirm) return;
+    if (!validate()) return;
     setLoading(true);
 
     try {
@@ -76,34 +78,38 @@ export default function BookAppointmentPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: vehicle.customer_name,
-          service_type: service,
-          car_make: vehicle.make,
-          car_model: vehicle.model,
-          car_year: vehicle.year,
-          plate_number: vehicle.plate,
-          fuel_type: fuel,
-          appointment_date: date, // or `${date} ${slot}:00`
-          slot: slot,
-          request_towing: towing,
-          message: towing ? pickup : null,
+          customer_name: form.customer_name,
+          email: form.email,
+          phone: form.phone,
+          service_type: form.service,
+          fuel_type: form.fuel,
+          car_make: form.make,
+          car_model: form.model,
+          car_year: form.year,
+          plate_number: form.plate,
+          appointment_date: form.date,
+          description: form.description,
           status: "Pending",
         }),
       });
 
       if (res.ok) {
-        console.log("✅ Appointment saved!");
         router.push("/Client/book-appointment/confirmation");
       } else {
         const err = await res.json();
-        alert(`Failed to book appointment: ${err.error || "Unknown error"}`);
+        setErrors({ api: err.error || "Failed to save appointment." });
       }
     } catch (error) {
       console.error("Error booking appointment:", error);
-      alert("Something went wrong while booking your appointment.");
+      setErrors({ api: "Something went wrong. Please try again." });
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleChange = (key: string, value: string) => {
+    setForm((prev) => ({ ...prev, [key]: value }));
+    if (errors[key]) setErrors((prev) => ({ ...prev, [key]: "" }));
   };
 
   return (
@@ -126,35 +132,43 @@ export default function BookAppointmentPage() {
             Book Your Appointment
           </h2>
           <p className="text-lg text-gray-200 drop-shadow-md">
-            Choose a service, fill in your details, and confirm your visit.
+            Fill in your details to confirm your visit.
           </p>
         </header>
 
         {/* Customer Info */}
         <section className="bg-gray-100/95 text-black rounded-xl shadow-lg p-6 mb-10">
           <h3 className="text-xl font-bold mb-4">Customer Details</h3>
-          <label htmlFor="customer-name" className="block mb-2 font-semibold">
-            Customer Name
-          </label>
-          <input
-            id="customer-name"
-            type="text"
-            placeholder="Enter your name"
-            className="w-full border p-3 rounded mb-6"
-            value={vehicle.customer_name}
-            onChange={(e) =>
-              setVehicle({ ...vehicle, customer_name: e.target.value })
-            }
-          />
+          {["customer_name", "email", "phone"].map((field) => (
+            <div key={field} className="mb-5">
+              <label className="block mb-1 font-semibold capitalize">
+                {field.replace("_", " ")}
+              </label>
+              <input
+                type={field === "email" ? "email" : "text"}
+                placeholder={`Enter your ${field.replace("_", " ")}`}
+                className={`w-full border p-3 rounded ${
+                  errors[field] ? "border-red-500" : ""
+                }`}
+                value={(form as any)[field]}
+                onChange={(e) => handleChange(field, e.target.value)}
+              />
+              {errors[field] && (
+                <p className="text-red-500 text-sm mt-1">{errors[field]}</p>
+              )}
+            </div>
+          ))}
 
           <label htmlFor="service-select" className="block mb-2 font-semibold">
             Select Service
           </label>
           <select
             id="service-select"
-            value={service}
-            onChange={(e) => setService(e.target.value)}
-            className="w-full border p-3 rounded"
+            value={form.service}
+            onChange={(e) => handleChange("service", e.target.value)}
+            className={`w-full border p-3 rounded ${
+              errors.service ? "border-red-500" : ""
+            }`}
           >
             <option value="">-- Choose a service --</option>
             {SERVICES.map((s) => (
@@ -163,168 +177,147 @@ export default function BookAppointmentPage() {
               </option>
             ))}
           </select>
+          {errors.service && (
+            <p className="text-red-500 text-sm mt-1">{errors.service}</p>
+          )}
         </section>
 
-        {/* Vehicle & Fuel */}
+        {/* Vehicle Info */}
         <section className="bg-gray-100/95 text-black rounded-xl shadow-lg p-6 mb-10">
-          <h3 className="text-xl font-bold mb-4">Vehicle & Fuel</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block mb-2 font-semibold">Fuel Type</label>
-              <div className="flex flex-wrap gap-3">
-                {FUEL_TYPES.map((t) => (
-                  <button
-                    key={t}
-                    className={`px-4 py-2 rounded-lg border ${
-                      fuel === t
-                        ? "bg-orange-500 text-white border-orange-500"
-                        : "bg-gray-100 text-black border-gray-300"
-                    }`}
-                    onClick={() => setFuel(t)}
-                    type="button"
-                  >
-                    {t}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div>
-              <label className="block mb-2 font-semibold">Need Towing?</label>
-              <div className="flex items-center gap-2">
+          <h3 className="text-xl font-bold mb-4">Vehicle Details</h3>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            {["make", "model", "year", "plate"].map((field) => (
+              <div key={field}>
                 <input
-                  id="towing"
-                  type="checkbox"
-                  checked={towing}
-                  onChange={(e) => setTowing(e.target.checked)}
+                  className={`border p-2 rounded w-full ${
+                    errors[field] ? "border-red-500" : ""
+                  }`}
+                  placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
+                  value={(form as any)[field]}
+                  onChange={(e) => handleChange(field, e.target.value)}
                 />
-                <label htmlFor="towing">Request towing</label>
+                {errors[field] && (
+                  <p className="text-red-500 text-sm mt-1">{errors[field]}</p>
+                )}
               </div>
-              {towing && (
-                <input
-                  placeholder="Pickup location (e.g., 123 Main St, Calgary)"
-                  className="mt-3 w-full border p-2 rounded"
-                  value={pickup}
-                  onChange={(e) => setPickup(e.target.value)}
-                />
-              )}
-            </div>
+            ))}
           </div>
 
-          {/* Vehicle info */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
-            <input
-              className="border p-2 rounded"
-              placeholder="Make"
-              value={vehicle.make}
-              onChange={(e) => setVehicle({ ...vehicle, make: e.target.value })}
-            />
-            <input
-              className="border p-2 rounded"
-              placeholder="Model"
-              value={vehicle.model}
-              onChange={(e) => setVehicle({ ...vehicle, model: e.target.value })}
-            />
-            <input
-              className="border p-2 rounded"
-              placeholder="Year"
-              value={vehicle.year}
-              onChange={(e) => setVehicle({ ...vehicle, year: e.target.value })}
-            />
-            <input
-              className="border p-2 rounded"
-              placeholder="License Plate"
-              value={vehicle.plate}
-              onChange={(e) => setVehicle({ ...vehicle, plate: e.target.value })}
-            />
+          {/* Fuel Type */}
+          <div className="mt-6">
+            <label className="block mb-2 font-semibold">Fuel Type</label>
+            <div className="flex flex-wrap gap-3">
+              {FUEL_TYPES.map((t) => (
+                <button
+                  key={t}
+                  className={`px-4 py-2 rounded-lg border ${
+                    form.fuel === t
+                      ? "bg-orange-500 text-white border-orange-500"
+                      : "bg-gray-100 text-black border-gray-300"
+                  }`}
+                  onClick={() => handleChange("fuel", t)}
+                  type="button"
+                >
+                  {t}
+                </button>
+              ))}
+            </div>
+            {errors.fuel && (
+              <p className="text-red-500 text-sm mt-1">{errors.fuel}</p>
+            )}
           </div>
         </section>
 
-        {/* Date & Slot */}
-        <section className="bg-white/90 text-black rounded-xl shadow-lg p-6 mb-10">
-          <h3 className="text-xl font-bold mb-4">Pick Date & Time</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block mb-2 font-semibold">Date</label>
-              <input
-                type="date"
-                className="border p-2 rounded w-full"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-              />
-            </div>
-            <div>
-              <label className="block mb-2 font-semibold">Available Slots</label>
-              <div className="flex flex-wrap gap-2">
-                {slots.length === 0 && (
-                  <span className="text-gray-500">
-                    Choose a date to view slots
-                  </span>
-                )}
-                {slots.map((s) => (
-                  <button
-                    key={s}
-                    className={`px-4 py-2 rounded-lg border ${
-                      slot === s
-                        ? "bg-orange-500 text-white border-orange-500"
-                        : "bg-gray-100 text-black border-gray-300"
-                    }`}
-                    onClick={() => setSlot(s)}
-                    type="button"
-                  >
-                    {s}
-                  </button>
-                ))}
-              </div>
-            </div>
+        {/* Date & Description */}
+        <section className="bg-white/95 text-black rounded-xl shadow-lg p-6 mb-10">
+          <h3 className="text-xl font-bold mb-4">Appointment Details</h3>
+          <div className="mb-5">
+            <label className="block mb-2 font-semibold">Date</label>
+            <input
+              type="date"
+              className={`border p-2 rounded w-full ${
+                errors.date ? "border-red-500" : ""
+              }`}
+              value={form.date}
+              onChange={(e) => handleChange("date", e.target.value)}
+            />
+            {errors.date && (
+              <p className="text-red-500 text-sm mt-1">{errors.date}</p>
+            )}
           </div>
+
+          <label className="block mb-2 font-semibold">
+            Description of Issue
+          </label>
+          <textarea
+            className={`w-full border p-3 rounded h-28 ${
+              errors.description ? "border-red-500" : ""
+            }`}
+            placeholder="Describe the issue briefly..."
+            value={form.description}
+            onChange={(e) => handleChange("description", e.target.value)}
+          />
+          {errors.description && (
+            <p className="text-red-500 text-sm mt-1">{errors.description}</p>
+          )}
         </section>
 
         {/* Summary */}
-        <section className="bg-white/95 text-black rounded-xl shadow-lg p-6">
+        <section className="bg-white/90 text-black rounded-xl shadow-lg p-6">
           <h3 className="text-xl font-bold mb-4">Summary</h3>
           <table className="w-full text-left">
             <tbody>
               <tr>
-                <th className="pr-4 align-top font-semibold w-28">Service:</th>
-                <td>{service || "—"}</td>
+                <th className="pr-4 align-top font-semibold w-36">Name:</th>
+                <td>{form.customer_name || "—"}</td>
               </tr>
               <tr>
-                <th className="pr-4 align-top font-semibold w-28">Fuel:</th>
-                <td>{fuel || "—"}</td>
+                <th className="pr-4 align-top font-semibold w-36">Email:</th>
+                <td>{form.email || "—"}</td>
               </tr>
               <tr>
-                <th className="pr-4 align-top font-semibold w-28">Date:</th>
-                <td>{date || "—"}</td>
+                <th className="pr-4 align-top font-semibold w-36">Phone:</th>
+                <td>{form.phone || "—"}</td>
               </tr>
               <tr>
-                <th className="pr-4 align-top font-semibold w-28">Time:</th>
-                <td>{slot || "—"}</td>
+                <th className="pr-4 align-top font-semibold w-36">Service:</th>
+                <td>{form.service || "—"}</td>
               </tr>
               <tr>
-                <th className="pr-4 align-top font-semibold w-28">Vehicle:</th>
+                <th className="pr-4 align-top font-semibold w-36">Vehicle:</th>
                 <td>
-                  {[vehicle.make, vehicle.model, vehicle.year]
+                  {[form.make, form.model, form.year]
                     .filter(Boolean)
-                    .join(" ") || "—"}
-                  {vehicle.plate ? ` (${vehicle.plate})` : ""}
+                    .join(" ") || "—"}{" "}
+                  {form.plate ? `(${form.plate})` : ""}
                 </td>
               </tr>
-              {towing && (
-                <tr>
-                  <th className="pr-4 align-top font-semibold w-28">
-                    Towing pickup:
-                  </th>
-                  <td>{pickup || "—"}</td>
-                </tr>
-              )}
+              <tr>
+                <th className="pr-4 align-top font-semibold w-36">Fuel:</th>
+                <td>{form.fuel || "—"}</td>
+              </tr>
+              <tr>
+                <th className="pr-4 align-top font-semibold w-36">Date:</th>
+                <td>{form.date || "—"}</td>
+              </tr>
+              <tr>
+                <th className="pr-4 align-top font-semibold w-36">Issue:</th>
+                <td>{form.description || "—"}</td>
+              </tr>
             </tbody>
           </table>
 
+          {errors.api && (
+            <p className="text-red-600 text-sm mt-3 text-center">
+              {errors.api}
+            </p>
+          )}
+
           <button
             className={`w-full bg-orange-500 text-white py-2 rounded-lg font-medium hover:bg-orange-600 transition mt-4 ${
-              !readyToConfirm && "opacity-60 cursor-not-allowed"
+              loading && "opacity-60 cursor-not-allowed"
             }`}
-            disabled={!readyToConfirm || loading}
+            disabled={loading}
             onClick={handleConfirm}
           >
             {loading ? "Booking..." : "Confirm Booking"}

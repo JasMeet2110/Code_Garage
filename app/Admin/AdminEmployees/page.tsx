@@ -132,7 +132,7 @@ export default function AdminEmployees() {
   return (
     <div className="flex min-h-screen relative text-white overflow-hidden">
       {/* Background */}
-      <div className="absolute inset-0 -z-10">
+      <div className="fixed inset-0 -z-10">
         <Image
           src="/background/Admin.png"
           alt="Garage Background"
