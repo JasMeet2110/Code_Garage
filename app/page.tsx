@@ -24,8 +24,10 @@ export default function Home() {
       <div className="h-10 bg-gradient-to-b from-black/90 to-white/50"></div>
 
       {/*About us Information*/}
-      <section className="px-50 pt-5">
-        <h3 className="text-4xl font-bold mb-6 text-center">Welcome to Trackside Garage!</h3>
+      <section className="px-20 pt-10 pb-16 bg-white text-black">
+  <h3 className="text-4xl font-bold mb-6 text-center text-black">
+    Welcome to Trackside Garage!
+  </h3>
         <p className="text-lg text-gray-700 px-5">
           Located in the heart of Alberta, Trackside Garage has been serving the community with reliable and affordable auto repair services for years. We pride ourselves on being more than just a repair shop — we’re a team of passionate, certified mechanics dedicated to keeping your car safe, efficient, and performing at its best.<br /><br />
 
@@ -50,22 +52,33 @@ export default function Home() {
 
       {/* services text */}
       <section className="py-10 px-6 bg-gray-100 text-center">
-      <h2 className="text-4xl font-bold mb-6 text-center">Our Popular Services</h2>
+  {/* 👇 Made heading text black */}
+  <h2 className="text-4xl font-bold mb-6 text-center text-black">
+    Our Popular Services
+  </h2>
 
-      {/* service cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 px-50">
-        {/* card 1 */}
-        <div className="bg-white shadow-md rounded-lg overflow-hidden hover:shadow-lg transition">
-          <div className="h-50 w-full relative">
-            <Image src="/services/OilChange.png" alt="Oil Change" fill className="object-cover"/>
-          </div>
-          <div className="p-6">
-            <h3 className="text-xl font-semibold mb-2">Oil Change</h3>
-            <p className="text-gray-600 text-sm">
-              Keep your engine running smoothly with our quick and reliable oil change service.
-            </p>
-          </div>
-        </div>
+      {/* Service Cards */}
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-8 px-12">
+    {/* Card 1 */}
+    <div className="bg-white shadow-md rounded-lg overflow-hidden hover:shadow-lg transition">
+      <div className="h-50 w-full relative">
+        <Image
+          src="/services/OilChange.png"
+          alt="Oil Change"
+          fill
+          className="object-cover"
+        />
+      </div>
+      <div className="p-6">
+        <h3 className="text-xl font-semibold mb-2 text-black">
+          Oil Change
+        </h3>
+        <p className="text-gray-700 text-sm">
+          Keep your engine running smoothly with our quick and reliable oil
+          change service.
+        </p>
+      </div>
+    </div>
 
         {/* card 2 */}
         <div className="bg-white shadow-md rounded-lg overflow-hidden hover:shadow-lg transition">
@@ -109,7 +122,9 @@ export default function Home() {
         <section className="relative py-10 px-6 text-center bg-cover bg-gray-100 bg-center">
           <Image src="/background/ReviewsBackground.png" alt="Reviews Background" fill className="object-cover object-top brightness-70 blur-xs"/>
             <div className="relative z-10">
-            <h2 className="text-4xl font-bold mb-6 text-center">What Our Customers Say</h2>
+            <h2 className="text-4xl font-bold mb-6 text-center text-black">
+               What Our Customers Say
+            </h2>
 
             <div className="flex flex-col md:flex-row justify-center gap-6">
               {/* review 1 */}
