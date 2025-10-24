@@ -1,7 +1,7 @@
 import { query } from "@/lib/db";
 import { NextResponse } from "next/server";
 
-// ✅ GET: All appointments
+// ✅ GET: Fetch all appointments
 export async function GET() {
   try {
     const results = await query(
@@ -17,41 +17,41 @@ export async function GET() {
   }
 }
 
-// POST: Add new appointment
+// ✅ POST: Add new appointment
 export async function POST(req: Request) {
   try {
     const {
-      name,
+      customer_name,
+      email,
+      phone,
       service_type,
+      fuel_type,
       car_make,
       car_model,
       car_year,
       plate_number,
-      fuel_type,
       appointment_date,
-      slot,
-      request_towing,
-      message,
+      description,
       status,
     } = await req.json();
 
     const sql = `
       INSERT INTO appointments 
-      (name, service_type, car_make, car_model, car_year, plate_number, fuel_type, appointment_date, slot, request_towing, message, status)
+      (customer_name, email, phone, service_type, fuel_type, car_make, car_model, car_year, plate_number, appointment_date, description, status)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
     const values = [
-      name,
+      customer_name,
+      email,
+      phone,
       service_type,
+      fuel_type,
       car_make,
       car_model,
       car_year,
       plate_number,
-      fuel_type,
       appointment_date,
-      slot,
-      request_towing ? 1 : 0,
-      message || null,
+      description,
       status || "Pending",
     ];
 
@@ -71,39 +71,39 @@ export async function PUT(req: Request) {
   try {
     const {
       id,
-      name,
+      customer_name,
+      email,
+      phone,
       service_type,
+      fuel_type,
       car_make,
       car_model,
       car_year,
       plate_number,
-      fuel_type,
       appointment_date,
-      slot,
-      request_towing,
-      message,
+      description,
       status,
     } = await req.json();
 
     const sql = `
       UPDATE appointments 
-      SET name=?, service_type=?, car_make=?, car_model=?, car_year=?, plate_number=?, fuel_type=?, 
-          appointment_date=?, slot=?, request_towing=?, message=?, status=?
+      SET customer_name=?, email=?, phone=?, service_type=?, fuel_type=?, car_make=?, car_model=?, car_year=?, 
+          plate_number=?, appointment_date=?, description=?, status=?
       WHERE id=?
     `;
 
     await query(sql, [
-      name,
+      customer_name,
+      email,
+      phone,
       service_type,
+      fuel_type,
       car_make,
       car_model,
       car_year,
       plate_number,
-      fuel_type,
       appointment_date,
-      slot,
-      request_towing ? 1 : 0,
-      message || null,
+      description,
       status,
       id,
     ]);
