@@ -7,7 +7,7 @@ export async function GET(req: Request) {
     const monthParam = searchParams.get("month"); // e.g., 2025-10
 
     let dateCondition = "";
-    let params: any[] = [];
+    let params: string[] = [];
 
     if (monthParam) {
       const [year, month] = monthParam.split("-");

@@ -21,26 +21,21 @@ services:
       - garage_network
 
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: jasmeet2110/code_garage_app:latest
     container_name: code_garage_app
     restart: unless-stopped
     env_file:
       - .env.docker
     environment:
       DATABASE_URL: mysql://garage_user:garage_password@mysql:3306/code_garage_db
-      NODE_ENV: development
+      NODE_ENV: production
     depends_on:
       - mysql
     ports:
       - "3000:3000"
-    volumes:
-      - .:/app
-      - /app/node_modules
     networks:
       - garage_network
-    command: npm run dev
+    command: npm run start
 
 volumes:
   mysql_data:
