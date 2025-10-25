@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { signOut } from "next-auth/react";
 
 export default function AdminSidebar() {
   return (
@@ -39,12 +40,13 @@ export default function AdminSidebar() {
           </Link>
         ))}
 
-        <Link
-          href="/"
+        {/* Sign Out */}
+        <button
+          onClick={() => signOut({ callbackUrl: "/" })}
           className="mt-8 bg-red-600 hover:bg-red-700 text-white text-center px-4 py-2 rounded-xl font-semibold transition-all duration-200 shadow-sm"
         >
           Sign Out
-        </Link>
+        </button>
       </nav>
     </aside>
   );

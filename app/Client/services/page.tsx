@@ -53,7 +53,7 @@ export default function ServicesPage() {
 
               <div className="mt-auto">
                 <Link
-                  href={`/services/${service.slug}`}
+                  href={`/Client/services/${service.slug}`}
                   className="block w-full bg-orange-500 text-white py-2 rounded-lg font-medium hover:bg-orange-600 transition"
                 >
                   Learn More

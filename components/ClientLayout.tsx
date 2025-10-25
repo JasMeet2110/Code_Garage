@@ -14,7 +14,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   return (
     <>
       {!shouldHideLayout && <Navbar />}
-      <main className={`flex-grow ${shouldHideLayout ? "" : "mt-[140px]"}`}>{children}</main>
+      <main className={`flex-grow ${shouldHideLayout ? "" : "mt-[128px]"}`}>{children}</main>
       {!shouldHideLayout && <Footer />}
     </>
   );
