@@ -27,6 +27,7 @@ export default function AdminSidebar() {
           </div>
       </div>  
       <div className="flex gap-5 px-10">
+<<<<<<< HEAD
         <Link href="/HomePage" className="nav-btn">Home</Link>
         <Link href="/services" className="nav-btn">Services</Link>
         <Link href="/book-appointment" className="nav-btn">Book</Link>
@@ -43,6 +44,15 @@ export default function AdminSidebar() {
         <div className="text-lg font-bold">Admin</div>
         <div className="text-xs text-gray-400">Manage everything</div>
 >>>>>>> f87ea6a543b32f308e5e18c443849665512828db
+=======
+        <Link href="/" className="nav-btn">Home</Link>
+        <Link href="/Client/services" className="nav-btn">Services</Link>
+        <Link href="/Client/book-appointment" className="nav-btn">Book</Link>
+        <Link href="/Client/reviews" className="nav-btn">Reviews</Link>
+        <Link href="/Client/contact" className="nav-btn">Contact</Link>
+        <Link href="/Client/account" className="nav-btn">My Account</Link>
+        <Link href="/AuthScreen" className="nav-btn">Sign In</Link>
+>>>>>>> 00949fae4653a673228c3c913bca22d6e749203e
       </div>
 
       <nav className="px-2 py-4 space-y-1 overflow-y-auto">
