@@ -7,7 +7,7 @@ import Footer from "@/components/Footer";
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
-  const noLayoutRoutes = ["/", "/signin", "/signup", "/AdminSignIn", "/Termscondition", "/AdminHome", "/AdminAppointments", "/AdminInventory", "/AdminEmployees", "/AdminCustomers", "/AdminServices", "/AdminReports", "/AdminFinance"];
+  const noLayoutRoutes = ["/Admin/AdminHome", "/Admin/AdminAppointments", "/Admin/AdminInventory", "/Admin/AdminEmployees", "/Admin/AdminCustomers", "/Admin/AdminServices", "/Admin/AdminReports", "/Admin/AdminFinance"];
 
   const shouldHideLayout = noLayoutRoutes.includes(pathname);
 
