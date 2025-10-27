@@ -1,9 +1,11 @@
 "use client";
 
+//imports for the booking page
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
+//defines services and fuel types
 const SERVICES = [
   { key: "ac_repair", name: "Car AC Repair" },
   { key: "alternator", name: "Alternator Repair" },
@@ -25,8 +27,10 @@ const SERVICES = [
   { key: "other", name: "Other Services" },
 ];
 
+//defines fuel types
 const FUEL_TYPES = ["Petrol", "Diesel", "Hybrid", "Electric"];
 
+//main booking appointment page functions
 export default function BookAppointmentPage() {
   const router = useRouter();
 
@@ -47,7 +51,7 @@ export default function BookAppointmentPage() {
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState(false);
 
-  // ✅ Inline Validation
+  // inline validation
   const validate = () => {
     const newErrors: { [key: string]: string } = {};
     if (!form.customer_name.trim()) newErrors.customer_name = "Customer name is required.";
@@ -69,10 +73,12 @@ export default function BookAppointmentPage() {
     return Object.keys(newErrors).length === 0;
   };
 
+  //handles confirmation of the booking
   const handleConfirm = async () => {
     if (!validate()) return;
     setLoading(true);
 
+    //api calls to save appointment
     try {
       const res = await fetch("/api/appointments", {
         method: "POST",
@@ -93,6 +99,7 @@ export default function BookAppointmentPage() {
         }),
       });
 
+      //if successful, navigates to confirmation otherwise push an error
       if (res.ok) {
         router.push("/Client/book-appointment/confirmation");
       } else {
@@ -107,14 +114,16 @@ export default function BookAppointmentPage() {
     }
   };
 
+  //handles the changes to the form
   const handleChange = (key: string, value: string) => {
     setForm((prev) => ({ ...prev, [key]: value }));
     if (errors[key]) setErrors((prev) => ({ ...prev, [key]: "" }));
   };
 
+  //ui output to the page
   return (
     <div className="relative min-h-screen text-white">
-      {/* Background */}
+      {/* background */}
       <div className="fixed inset-0 -z-10">
         <Image
           src="/appointmentBackground.JPG"
@@ -126,7 +135,7 @@ export default function BookAppointmentPage() {
       </div>
 
       <div className="relative z-10 max-w-5xl mx-auto px-6 py-16">
-        {/* Header */}
+        {/* header */}
         <header className="text-center mb-12">
           <h2 className="text-5xl font-bold text-orange-400 drop-shadow-lg mb-3">
             Book Your Appointment
@@ -136,7 +145,7 @@ export default function BookAppointmentPage() {
           </p>
         </header>
 
-        {/* Customer Info */}
+        {/* customer info */}
         <section className="bg-gray-100/95 text-black rounded-xl shadow-lg p-6 mb-10">
           <h3 className="text-xl font-bold mb-4">Customer Details</h3>
           {["customer_name", "email", "phone"].map((field) => (
@@ -182,7 +191,7 @@ export default function BookAppointmentPage() {
           )}
         </section>
 
-        {/* Vehicle Info */}
+        {/* vehicle info */}
         <section className="bg-gray-100/95 text-black rounded-xl shadow-lg p-6 mb-10">
           <h3 className="text-xl font-bold mb-4">Vehicle Details</h3>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -203,7 +212,7 @@ export default function BookAppointmentPage() {
             ))}
           </div>
 
-          {/* Fuel Type */}
+          {/* fuel type */}
           <div className="mt-6">
             <label className="block mb-2 font-semibold">Fuel Type</label>
             <div className="flex flex-wrap gap-3">
@@ -228,7 +237,7 @@ export default function BookAppointmentPage() {
           </div>
         </section>
 
-        {/* Date & Description */}
+        {/* date & description */}
         <section className="bg-white/95 text-black rounded-xl shadow-lg p-6 mb-10">
           <h3 className="text-xl font-bold mb-4">Appointment Details</h3>
           <div className="mb-5">
@@ -262,7 +271,7 @@ export default function BookAppointmentPage() {
           )}
         </section>
 
-        {/* Summary */}
+        {/* summary */}
         <section className="bg-white/90 text-black rounded-xl shadow-lg p-6">
           <h3 className="text-xl font-bold mb-4">Summary</h3>
           <table className="w-full text-left">

@@ -26,7 +26,7 @@ export default function AdminAppointments() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingAppointment, setEditingAppointment] = useState<Appointment | null>(null);
 
-  // ✅ Fetch appointments on mount
+  // Fetch appointments on mount
   useEffect(() => {
     fetchAppointments();
   }, []);
@@ -44,7 +44,7 @@ export default function AdminAppointments() {
     }
   };
 
-  // ✅ Add appointment
+  // Add appointment
   const handleAdd = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const form = e.currentTarget;
@@ -76,7 +76,7 @@ export default function AdminAppointments() {
     } else alert("Failed to add appointment");
   };
 
-  // ✅ Edit appointment
+  // Edit appointment
   const handleEdit = (appt: Appointment) => setEditingAppointment(appt);
 
   const handleSaveEdit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -101,7 +101,7 @@ export default function AdminAppointments() {
     } else alert("Failed to update appointment");
   };
 
-  // ✅ Delete appointment
+  // Delete appointment
   const handleDelete = async (id: number) => {
     if (!confirm("Delete this appointment?")) return;
     const res = await fetch("/api/appointments", {
@@ -112,7 +112,7 @@ export default function AdminAppointments() {
     if (res.ok) fetchAppointments();
   };
 
-  // ✅ Filter search
+  // Filter search
   const filtered = appointments.filter(
     (a) =>
       a.customer_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
