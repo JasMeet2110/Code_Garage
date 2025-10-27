@@ -1,3 +1,65 @@
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+/*its a client side page so we are using "use client" */
+"use client";
+
+/*imports*/
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Image from 'next/image';
+
+const HomePage = () => {
+  const [hoveredButton, setHoveredButton] = useState<string | null>(null);
+  const router = useRouter();
+
+  const buttonStyle = (buttonName: string) => ({
+    backgroundColor: '#f97316',
+    color: 'white',
+    padding: '15px 25px',
+    border: 'none',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    fontSize: '1.1rem',
+    fontWeight: 'bold',
+    boxShadow: '0 4px 8px rgba(0,0,0,0.3)',
+    transform: hoveredButton === buttonName ? 'scale(1.05)' : 'scale(1)',
+    transition: 'transform 0.2s, background-color 0.2s',
+    width: '100%'
+  });
+  
+  /* routers */
+  const handleSignIn = () => {
+    router.push('/signin');
+  };
+
+  const handleSignUp = () => {
+    router.push('/signup');
+  };
+
+  const handleAdminSignIn = () => {
+    router.push('/AdminSignIn');
+  
+  };
+
+  /* rendered screen for users */
+  return (
+    <div style={{
+      /* background image and layout */ 
+      backgroundImage: 'url("/background/ZR1.png")',
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      height: '100vh', 
+      display: 'flex', 
+      flexDirection: 'column', 
+      justifyContent: 'center', 
+      alignItems: 'center',
+      color: 'white',
+      textAlign: 'center',
+      position: 'relative'
+    }}>
+=======
+>>>>>>> 65026de7ed9c26dd09d2f9b4c45af6861a93b7be
 import Image from "next/image";
 import Link from "next/link";
 
@@ -5,11 +67,79 @@ export default function Home() {
   return (
     <div>
       {/* Page Intro with quick welcome and image */}
+<<<<<<< HEAD
+=======
+>>>>>>> 00949fae4653a673228c3c913bca22d6e749203e
+>>>>>>> 65026de7ed9c26dd09d2f9b4c45af6861a93b7be
 
         {/* Background image section */}
         <section className="relative bg-cover bg-center h-[800px] flex items-center justify-center text-center">
           <Image className="absolute inset-0 bg-cover bg-center brightness-50" src="/background/MustangRTR.png" alt="Mustang RTR" layout="fill" objectFit="cover" />
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+      {/* logo and heading with description */}
+      <div style={{ position: 'relative', zIndex: 1, maxWidth: "900px", alignItems: "center", display: "flex", flexDirection: "column" }}>
+        <div style={{ marginBottom: '30px' }}>
+          <Image src="/TracksideGarage.png" alt="Logo" width={400} height={300} className="invert brightness-0" />
+        </div>
+        <h1 style={{ 
+          fontSize: '4rem', 
+          fontWeight: 'bold', 
+          marginBottom: '10px',
+          textShadow: '2px 2px 4px rgba(0,0,0,0.8)',
+          color: '#f97316',
+          letterSpacing: '2px'
+        }}>
+          Trackside Garage
+        </h1>
+        
+        <p style={{ 
+          fontSize: '1.5rem', 
+          marginBottom: '30px',
+          textShadow: '1px 1px 2px rgba(0,0,0,0.8)',
+          fontWeight: 'bold'
+        }}>
+          Reliable Repairs. Built with Passion.
+        </p>
+        
+        {/* buttons to navigate to different pages */}
+        <div style={{ 
+          display: 'flex', 
+          flexDirection: 'column',
+          gap: '15px',
+          width: '250px',
+          margin: '0 auto'
+        }}>
+          <button 
+            style={buttonStyle('signin')}
+            onMouseEnter={() => setHoveredButton('signin')}
+            onMouseLeave={() => setHoveredButton(null)}
+            onClick={handleSignIn}
+          >
+            Sign in
+          </button>
+          
+          <button 
+            style={buttonStyle('signup')}
+            onMouseEnter={() => setHoveredButton('signup')}
+            onMouseLeave={() => setHoveredButton(null)}
+            onClick={handleSignUp}
+          >
+            Sign Up
+          </button>
+          
+          <button 
+            style={buttonStyle('admin')}
+            onMouseEnter={() => setHoveredButton('admin')}
+            onMouseLeave={() => setHoveredButton(null)}
+            onClick={handleAdminSignIn}
+          >
+            Sign in as admin
+          </button>
+=======
+>>>>>>> 65026de7ed9c26dd09d2f9b4c45af6861a93b7be
           {/* welcome text */}
           <div className="relative z-10 text-white px-6">
             <h1 className="text-5xl md:text-6xl font-extrabold leading-tight">
@@ -91,6 +221,10 @@ export default function Home() {
               Stay safe on the road with our professional tire replacement services.
             </p>
           </div>
+<<<<<<< HEAD
+=======
+>>>>>>> 00949fae4653a673228c3c913bca22d6e749203e
+>>>>>>> 65026de7ed9c26dd09d2f9b4c45af6861a93b7be
         </div>
       </div>
 

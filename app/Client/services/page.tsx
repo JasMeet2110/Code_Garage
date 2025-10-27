@@ -6,6 +6,23 @@ import { SERVICES } from "@/data/services";
 
 export default function ServicesPage() {
   return (
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD:app/services/page.tsx
+    <div className="flex flex-col justify-center items-center text-center text-white">
+      <Image
+        src="/ServiceShop.png"
+        alt="Background"
+        fill
+        className="object-cover min-h-[600px] -z-10 brightness-30"
+      />
+
+      <div className="h-10 bg-gradient-to-b from-brown-900 to-white/100 absolute bottom-0 left-0 w-full z-0"></div>
+
+      <div className="relative z-10 max-w-7xl px-6 py-14">
+        <h1 className="text-4xl font-bold text-orange-400 drop-shadow-lg">
+=======
+>>>>>>> 65026de7ed9c26dd09d2f9b4c45af6861a93b7be
     <div className="relative min-h-screen text-white">
       <div className="fixed inset-0 -z-10">
         <Image
@@ -19,6 +36,10 @@ export default function ServicesPage() {
 
       <div className="relative z-10 flex flex-col items-center text-center px-6 py-16 backdrop-blur-sm">
         <h1 className="text-5xl font-bold text-orange-400 drop-shadow-lg mb-4">
+<<<<<<< HEAD
+=======
+>>>>>>> 00949fae4653a673228c3c913bca22d6e749203e:app/Client/services/page.tsx
+>>>>>>> 65026de7ed9c26dd09d2f9b4c45af6861a93b7be
           Our Services
         </h1>
         <p className="text-lg text-gray-200 mb-12 drop-shadow-md max-w-2xl">
@@ -29,7 +50,15 @@ export default function ServicesPage() {
           {SERVICES.map((service) => (
             <div
               key={service.slug}
+<<<<<<< HEAD
               className="bg-gray-100/90 text-black rounded-xl shadow-lg hover:shadow-2xl transition transform hover:scale-105 p-6 flex flex-col backdrop-blur-md"
+=======
+<<<<<<< HEAD:app/services/page.tsx
+              className="bg-gray-200 text-black rounded-xl shadow-lg hover:shadow-2xl transition transform hover:scale-105 p-6 flex flex-col"
+=======
+              className="bg-gray-100/90 text-black rounded-xl shadow-lg hover:shadow-2xl transition transform hover:scale-105 p-6 flex flex-col backdrop-blur-md"
+>>>>>>> 00949fae4653a673228c3c913bca22d6e749203e:app/Client/services/page.tsx
+>>>>>>> 65026de7ed9c26dd09d2f9b4c45af6861a93b7be
             >
               <div className="flex flex-col items-center mb-4">
                 <h2 className="text-xl font-bold mb-2">{service.name}</h2>
