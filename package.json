@@ -2,6 +2,7 @@
   "name": "sunrise-mechanic-shop",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -11,10 +12,16 @@
   "dependencies": {
     "@react-google-maps/api": "^2.20.7",
     "lucide-react": "^0.543.0",
+<<<<<<< HEAD
     "mysql2": "^3.15.1",
+=======
+    "mysql2": "^3.15.3",
+>>>>>>> 00949fae4653a673228c3c913bca22d6e749203e
     "next": "15.5.2",
     "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react-dom": "19.1.0",
+    "react-icons": "^5.5.0",
+    "recharts": "^3.3.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

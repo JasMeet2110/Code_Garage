@@ -1,10 +1,21 @@
+<<<<<<< HEAD
 version: '3.8'
 
 services: 
+=======
+version: "3.8"
+
+services:
+>>>>>>> 00949fae4653a673228c3c913bca22d6e749203e
   mysql:
     image: mysql:8.0
     container_name: code_garage_mysql
     restart: always
+<<<<<<< HEAD
+=======
+    env_file:
+      - .env.docker
+>>>>>>> 00949fae4653a673228c3c913bca22d6e749203e
     environment:
       MYSQL_ROOT_PASSWORD: root_password
       MYSQL_DATABASE: code_garage_db
@@ -18,6 +29,26 @@ services:
     networks:
       - garage_network
 
+<<<<<<< HEAD
+=======
+  app:
+    image: jasmeet2110/code_garage_app:latest
+    container_name: code_garage_app
+    restart: unless-stopped
+    env_file:
+      - .env.docker
+    environment:
+      DATABASE_URL: mysql://garage_user:garage_password@mysql:3306/code_garage_db
+      NODE_ENV: production
+    depends_on:
+      - mysql
+    ports:
+      - "3000:3000"
+    networks:
+      - garage_network
+    command: npm run start
+
+>>>>>>> 00949fae4653a673228c3c913bca22d6e749203e
 volumes:
   mysql_data:
     driver: local
