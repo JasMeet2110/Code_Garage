@@ -10,7 +10,8 @@ type Props = {
 };
 
 export default function ServicePage({ params }: Props) {
-  const { slug } = React.use(params); 
+  const { slug } = React.use(params);
+
   const service = SERVICES.find((s) => s.slug === slug);
 
   if (!service) return notFound();
@@ -27,7 +28,6 @@ export default function ServicePage({ params }: Props) {
 
       {/* Content */}
       <div className="relative z-10 max-w-3xl my-5 px-6 py-16 bg-black/70 rounded-lg">
-        {/* Service Image */}
         <Image
           src={service.image}
           alt={service.name}
@@ -36,25 +36,23 @@ export default function ServicePage({ params }: Props) {
           className="mx-auto mb-6 object-contain"
         />
 
-        {/* Title + Description */}
         <h1 className="text-4xl font-bold mb-4 text-orange-400">{service.name}</h1>
         <p className="text-lg text-gray-200 mb-6">{service.description}</p>
 
-        {/* Price */}
         <p className="text-xl font-semibold text-white mb-8">
           Starting at: ${service.price}
         </p>
 
-        {/* Why Section */}
         {service.why && (
           <div className="mb-6">
-            <h2 className="text-2xl font-semibold text-orange-400 mb-2">Why it Matters</h2>
+            <h2 className="text-2xl font-semibold text-orange-400 mb-2">
+              Why it Matters
+            </h2>
             <p className="text-gray-200">{service.why}</p>
           </div>
         )}
 
-        {/* Signs Section */}
-        {service.signs && service.signs.length > 0 && (
+        {service.signs?.length ? (
           <div className="mb-6">
             <h2 className="text-2xl font-semibold text-orange-400 mb-2">
               Common Signs You Need This Service
@@ -65,18 +63,21 @@ export default function ServicePage({ params }: Props) {
               ))}
             </ul>
           </div>
-        )}
+        ) : null}
 
-        {/* Process Section */}
         {service.process && (
           <div className="mb-6">
-            <h2 className="text-2xl font-semibold text-orange-400 mb-2">Our Process</h2>
+            <h2 className="text-2xl font-semibold text-orange-400 mb-2">
+              Our Process
+            </h2>
             <p className="text-gray-200">{service.process}</p>
           </div>
         )}
 
-        {/* Book Button */}
-        <a href="/book-appointment" className="mt-8 px-6 py-3 bg-orange-500 text-white font-semibold rounded-lg hover:bg-orange-600">
+        <a
+          href="/Client/book-appointment"
+          className="mt-8 px-6 py-3 bg-orange-500 text-white font-semibold rounded-lg hover:bg-orange-600"
+        >
           Book Now
         </a>
       </div>

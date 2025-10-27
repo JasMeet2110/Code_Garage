@@ -212,19 +212,3 @@ body {
   gap: 16px;
   flex-wrap: wrap;
 }
-
-/* --- Admin dark theme helpers (high-contrast) --- */
-.admin-card {
-  @apply rounded-xl bg-slate-900 border border-slate-800 shadow-sm;
-}
-.admin-card-muted {
-  @apply rounded-xl bg-slate-900/80 border border-slate-800;
-}
-.admin-card-pad { @apply p-5 md:p-6; }
-
-.admin-stat-title { @apply text-slate-300 text-sm font-medium; }
-.admin-stat-value { @apply text-slate-50 text-2xl md:text-3xl font-semibold; }
-.admin-stat-delta { @apply text-slate-400 text-xs; }
-
-.admin-panel-title { @apply text-slate-100 text-lg font-semibold; }
-.admin-muted { @apply text-slate-400; }

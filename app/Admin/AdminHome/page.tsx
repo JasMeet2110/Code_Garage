@@ -1,8 +1,9 @@
 "use client";
 
-import React from "react";
-import Image from "next/image";
+import React, { useEffect } from "react";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import {
   FaBoxOpen,
   FaUsers,
@@ -15,7 +16,28 @@ import AdminSidebar from "@/components/AdminSidebar";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 
 export default function AdminHome() {
+  const { data: session, status } = useSession();
   const router = useRouter();
+
+  // ✅ Protect the page so only admin email can access it
+  useEffect(() => {
+    if (status === "loading") return; // wait for session to load
+    if (session?.user?.email !== "tracksidegarage0101@gmail.com") {
+      router.replace("/AuthScreen"); // redirect non-admins
+    }
+  }, [session, status, router]);
+
+  if (status === "loading") {
+    return (
+      <div className="flex justify-center items-center h-screen text-white text-xl">
+        Loading Dashboard...
+      </div>
+    );
+  }
+
+  if (session?.user?.email !== "tracksidegarage0101@gmail.com") {
+    return null; // avoids flicker before redirect
+  }
 
   // Dummy Data (to be replaced with DB values later)
   const inventoryCount = 124;
@@ -36,7 +58,7 @@ export default function AdminHome() {
 
   return (
     <div className="flex min-h-screen relative text-white overflow-hidden">
-      {/* Background Image using <Image /> */}
+      {/* Background */}
       <div className="fixed inset-0 -z-10">
         <Image
           src="/background/Admin.png"
@@ -45,14 +67,13 @@ export default function AdminHome() {
           priority
           className="object-cover brightness-[0.45] blur-sm"
         />
-        {/* Overlay tint for better text contrast */}
         <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px]" />
       </div>
 
       {/* Sidebar */}
       <AdminSidebar />
 
-      {/* Main Dashboard Area */}
+      {/* Main Dashboard */}
       <main className="ml-72 flex-1 p-10 relative z-10">
         <div className="backdrop-blur-lg bg-white/5 rounded-2xl p-8 shadow-lg border border-white/20">
           <h1 className="text-4xl font-bold text-orange-400 mb-2 drop-shadow-md">
@@ -134,7 +155,7 @@ export default function AdminHome() {
               </p>
             </div>
 
-            {/* Reports with Pie Chart */}
+            {/* Reports */}
             <div
               onClick={() => router.push("/Admin/AdminReports")}
               className="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-6 hover:scale-105 hover:bg-white/20 transition-all cursor-pointer shadow-lg col-span-1 md:col-span-2 lg:col-span-1"

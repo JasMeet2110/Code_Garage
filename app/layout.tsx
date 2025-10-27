@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import ClientLayout from "@/components/ClientLayout";
+import SessionProviderWrapper from "@/components/SessionProviderWrapper";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -16,21 +17,24 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Trackside Garage",
   description: "Reliable Repairs. Built with Passion.",
-  icons: {icon: "/logo/TracksideGarage.png"},
+  icons: { icon: "/logo/TracksideGarage.png" },
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}>
+        className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}
+      >
+        <SessionProviderWrapper>
           <ClientLayout>
             <main className="flex-grow">{children}</main>
           </ClientLayout>
+        </SessionProviderWrapper>
       </body>
     </html>
   );
