@@ -8,18 +8,44 @@ export default function SignInPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSignIn = (e: React.FormEvent) => {
+  const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
+    setLoading(true);
 
-    // TODO: Replace with real authentication (NextAuth, API call, etc.)
-    console.log("Attempt Sign In:", { email, password });
-    router.push("/"); // Redirect after login
+    try {
+      const response = await fetch("/api/auth/signin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || "Sign-in failed");
+        setLoading(false);
+        return;
+      }
+
+      // Success! Route based on role
+      if (data.user.role === "admin") {
+        router.push("/Admin/AdminHome");
+      } else {
+        router.push("/Client/account");
+      }
+    } catch  {
+      setError("Network error. Please try again.");
+      setLoading(false);
+    }
   };
 
   return (
     <div className="relative min-h-screen text-white overflow-y-auto">
-      {/* ✅ Fixed background */}
+      {/* Fixed background */}
       <div className="fixed inset-0 -z-10">
         <Image
           src="/background/ZR1.png"
@@ -31,7 +57,7 @@ export default function SignInPage() {
         <div className="absolute inset-0 bg-black/60" />
       </div>
 
-      {/* ✅ Centered scrollable content */}
+      {/* Centered scrollable content */}
       <div className="relative z-10 flex flex-col items-center justify-start min-h-screen py-16 px-4">
         {/* Logo + Title */}
         <div className="flex flex-col items-center mb-10 text-center">
@@ -51,7 +77,7 @@ export default function SignInPage() {
           </p>
         </div>
 
-        {/* ✅ Glass Sign-In Box */}
+        {/* Glass Sign-In Box */}
         <div className="bg-white/90 text-black rounded-2xl shadow-2xl p-8 w-full max-w-md backdrop-blur-sm">
           <h1 className="text-3xl font-extrabold text-center text-orange-500 mb-2 drop-shadow">
             Sign In
@@ -59,6 +85,13 @@ export default function SignInPage() {
           <p className="text-center text-gray-600 mb-6">
             Welcome back! Please sign in to continue.
           </p>
+
+          {/* Error Message */}
+          {error && (
+            <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+              {error}
+            </div>
+          )}
 
           {/* Form */}
           <form onSubmit={handleSignIn} className="space-y-4">
@@ -82,27 +115,18 @@ export default function SignInPage() {
 
             <button
               type="submit"
-              className="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-lg font-semibold transition"
+              disabled={loading}
+              className="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-lg font-semibold transition disabled:opacity-50"
             >
-              Sign In
+              {loading ? "Signing in..." : "Sign In"}
             </button>
           </form>
 
-          {/* Divider */}
-          <div className="flex items-center my-6">
-            <div className="flex-1 h-px bg-gray-300" />
-            <span className="px-2 text-gray-500 text-sm">OR</span>
-            <div className="flex-1 h-px bg-gray-300" />
-          </div>
-
-          {/* Social Sign In */}
-          <div className="flex flex-col space-y-3">
-            <button className="w-full border border-gray-300 hover:bg-gray-50 py-2 rounded-lg font-medium transition">
-              Continue with Google
-            </button>
-            <button className="w-full border border-gray-300 hover:bg-gray-50 py-2 rounded-lg font-medium transition">
-              Continue with GitHub
-            </button>
+          {/* Test Accounts Info */}
+          <div className="mt-6 p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm">
+            <p className="font-semibold text-blue-900 mb-1">Test Accounts:</p>
+            <p className="text-blue-700">Admin: admin@tracksidegarage.com / admin123</p>
+            <p className="text-blue-700">Client: client@example.com / client123</p>
           </div>
 
           {/* Links */}
@@ -111,7 +135,7 @@ export default function SignInPage() {
               onClick={() => router.push("/AuthScreen/signup")}
               className="text-sm text-orange-500 hover:underline"
             >
-              Don’t have an account? Sign Up
+              Don&apos;t have an account? Sign Up
             </button>
 
             <button
