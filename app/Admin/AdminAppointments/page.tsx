@@ -44,7 +44,7 @@ export default function AdminAppointments() {
     }
   };
 
-  // Add appointment
+  // add appointment
   const handleAdd = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const form = e.currentTarget;
