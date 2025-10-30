@@ -9,7 +9,7 @@ export default function AuthScreen() {
   const { data: session, status } = useSession();
   const router = useRouter();
 
-  // ✅ Proper redirect logic
+  // Proper redirect logic
   useEffect(() => {
     if (status === "loading") return; // wait for session
     if (session?.user?.email === "tracksidegarage0101@gmail.com") {
