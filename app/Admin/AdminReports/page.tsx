@@ -22,14 +22,21 @@ export default function ReportsAnalyticsPage() {
   const [appointmentsTrend, setAppointmentsTrend] = useState<any[]>([]);
   const [topServices, setTopServices] = useState<any[]>([]);
   const [selectedMonth, setSelectedMonth] = useState<string>("");
+  const [selectedYear, setSelectedYear] = useState<string>("");
 
   useEffect(() => {
     fetchReports();
-  }, [selectedMonth]);
+  }, [selectedMonth, selectedYear]);
 
   const fetchReports = async () => {
     try {
-      const queryParam = selectedMonth ? `?month=${selectedMonth}` : "";
+      let queryParam = "";
+      if (selectedMonth) {
+        const [year, month] = selectedMonth.split("-");
+        queryParam = `?year=${year}&month=${month}`;
+      } else if (selectedYear) {
+        queryParam = `?year=${selectedYear}`;
+      }
       const res = await fetch(`/api/reports${queryParam}`, { cache: "no-store" });
       const data = await res.json();
       setSummary(data.summary);
@@ -40,21 +47,10 @@ export default function ReportsAnalyticsPage() {
     }
   };
 
-  const months = [
-    { label: "All Year", value: "" },
-    { label: "January", value: "2025-01" },
-    { label: "February", value: "2025-02" },
-    { label: "March", value: "2025-03" },
-    { label: "April", value: "2025-04" },
-    { label: "May", value: "2025-05" },
-    { label: "June", value: "2025-06" },
-    { label: "July", value: "2025-07" },
-    { label: "August", value: "2025-08" },
-    { label: "September", value: "2025-09" },
-    { label: "October", value: "2025-10" },
-    { label: "November", value: "2025-11" },
-    { label: "December", value: "2025-12" },
-  ];
+  const clearFilters = () => {
+    setSelectedMonth("");
+    setSelectedYear("");
+  };
 
   return (
     <div className="flex min-h-screen relative text-white overflow-hidden">
@@ -74,21 +70,51 @@ export default function ReportsAnalyticsPage() {
 
       <main className="ml-72 flex-1 p-10 relative z-10">
         <div className="backdrop-blur-lg bg-white/5 rounded-2xl p-8 shadow-lg border border-white/20">
-          <div className="flex justify-between items-center mb-8">
+          {/* Header + Filters */}
+          <div className="flex flex-wrap items-end justify-between gap-6 mb-10">
             <h1 className="text-4xl font-bold text-orange-400 drop-shadow-md">
               Reports & Analytics
             </h1>
-            <select
-              value={selectedMonth}
-              onChange={(e) => setSelectedMonth(e.target.value)}
-              className="bg-white/10 border border-white/20 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400"
-            >
-              {months.map((m) => (
-                <option key={m.value} value={m.value}>
-                  {m.label}
-                </option>
-              ))}
-            </select>
+
+            <div className="flex items-center gap-4">
+              {/* Month Selector */}
+              <div className="flex flex-col">
+                <label className="text-sm text-gray-300 mb-1">Show report for a Month</label>
+                <input
+                  type="month"
+                  value={selectedMonth}
+                  onChange={(e) => {
+                    setSelectedMonth(e.target.value);
+                    setSelectedYear("");
+                  }}
+                  className="bg-black/40 text-white border border-white/20 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400"
+                />
+              </div>
+
+              {/* Year Selector */}
+              <div className="flex flex-col">
+                <label className="text-sm text-gray-300 mb-1">Show full report for Year</label>
+                <input
+                  placeholder="e.g. 2025"
+                  min="2000"
+                  max="2099"
+                  value={selectedYear}
+                  onChange={(e) => {
+                    setSelectedYear(e.target.value);
+                    setSelectedMonth("");
+                  }}
+                  className="bg-black/40 text-white border border-white/20 rounded-lg px-4 py-2 w-28 focus:outline-none focus:ring-2 focus:ring-orange-400"
+                />
+              </div>
+
+              {/* Clear Filters */}
+              <button
+                onClick={clearFilters}
+                className="bg-gray-600 hover:bg-gray-500 px-5 py-2 mt-6 rounded-lg text-sm font-semibold"
+              >
+                Clear
+              </button>
+            </div>
           </div>
 
           {/* Summary Cards */}
@@ -127,7 +153,12 @@ export default function ReportsAnalyticsPage() {
           {/* Appointments Trend */}
           <div className="glass-card h-80 mb-10">
             <h2 className="text-xl font-bold text-orange-400 mb-4">
-              Appointments Trend (Monthly)
+              Appointments Trend{" "}
+              {selectedYear
+                ? `(Year: ${selectedYear})`
+                : selectedMonth
+                ? `(Month: ${selectedMonth})`
+                : "(All Time)"}
             </h2>
             {appointmentsTrend.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
@@ -135,7 +166,15 @@ export default function ReportsAnalyticsPage() {
                   <CartesianGrid strokeDasharray="3 3" stroke="#444" />
                   <XAxis dataKey="month" stroke="#ccc" />
                   <YAxis stroke="#ccc" />
-                  <Tooltip />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "rgba(0,0,0,0.8)",
+                      borderRadius: "8px",
+                      border: "1px solid #f97316",
+                    }}
+                    labelStyle={{ color: "#fff" }}
+                    itemStyle={{ color: "#f97316" }}
+                  />
                   <Line
                     type="monotone"
                     dataKey="count"
@@ -147,7 +186,7 @@ export default function ReportsAnalyticsPage() {
               </ResponsiveContainer>
             ) : (
               <p className="text-gray-400 text-center mt-12">
-                No appointment data available.
+                No appointment data found for this period.
               </p>
             )}
           </div>
@@ -157,7 +196,7 @@ export default function ReportsAnalyticsPage() {
             {/* Pie Chart */}
             <div className="glass-card">
               <h2 className="text-2xl font-bold text-orange-400 mb-4">
-                Top Services ({selectedMonth || "All Year"})
+                Top Services
               </h2>
               {topServices.length > 0 ? (
                 <ResponsiveContainer width="100%" height={300}>
@@ -174,12 +213,20 @@ export default function ReportsAnalyticsPage() {
                         <Cell key={i} fill={COLORS[i % COLORS.length]} />
                       ))}
                     </Pie>
-                    <Tooltip />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "rgba(0,0,0,0.8)",
+                        borderRadius: "8px",
+                        border: "1px solid #f97316",
+                      }}
+                      labelStyle={{ color: "#fff" }}
+                      itemStyle={{ color: "#f97316" }}
+                    />
                   </PieChart>
                 </ResponsiveContainer>
               ) : (
                 <p className="text-gray-400 text-center py-12">
-                  No completed services found for this month.
+                  No completed services found for this period.
                 </p>
               )}
             </div>
@@ -199,10 +246,7 @@ export default function ReportsAnalyticsPage() {
                 <tbody>
                   {topServices.length === 0 ? (
                     <tr>
-                      <td
-                        colSpan={2}
-                        className="text-center text-gray-400 py-4"
-                      >
+                      <td colSpan={2} className="text-center text-gray-400 py-4">
                         No data available.
                       </td>
                     </tr>
@@ -210,7 +254,7 @@ export default function ReportsAnalyticsPage() {
                     topServices.map((s, i) => (
                       <tr
                         key={i}
-                        className="border-t border-white/10 hover:bg-white/5"
+                        className="border-t border-white/10 hover:bg-white/5 transition-all"
                       >
                         <td className="px-2 py-1">{s.name}</td>
                         <td className="px-2 py-1 text-right">{s.count}</td>

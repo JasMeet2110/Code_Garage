@@ -148,6 +148,12 @@ const InventoryPage = () => {
             </div>
           )}
 
+          <div className="mb-4">
+            <h2 className="text-xl font-semibold text-orange-400">
+              Inventory Items ({filteredItems.length})
+            </h2>
+          </div>
+
           {/* Inventory Table */}
           <div className="overflow-x-auto rounded-xl bg-white/10 backdrop-blur-md border border-white/20 shadow-lg">
             <table className="min-w-full text-left">
@@ -361,26 +367,27 @@ const FormFields = ({
     }
   };
 
+  const fields = [
+    { label: "Part Name", name: "name", type: "text" },
+    { label: "Quantity", name: "quantity", type: "number" },
+    { label: "Part Number", name: "partNumber", type: "text" },
+    { label: "Price", name: "price", type: "number" },
+  ];
+
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-      {[
-        { label: "Part Name", name: "name", type: "text" },
-        { label: "Quantity", name: "quantity", type: "number" },
-        { label: "Part Number", name: "partNumber", type: "text" },
-        { label: "Price", name: "price", type: "number" },
-      ].map((field) => (
+      {fields.map((field) => (
         <div key={field.name} className="flex flex-col">
-          <label className="block text-sm text-gray-300 mb-1">
-            {field.label}
-          </label>
+          <label className="block text-sm text-gray-300 mb-1">{field.label}</label>
           <input
             name={field.name}
             type={field.type}
             value={formData[field.name as keyof typeof formData]}
             onChange={handleChange}
-            className={`glass-input w-full ${
-              errors[field.name as keyof typeof errors] ? "border-red-500" : ""
-            }`}
+            className={`w-full rounded-lg px-4 py-2 bg-black/40 text-white border border-white/20 
+              placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 transition-all ${
+                errors[field.name as keyof typeof errors] ? "border-red-500" : ""
+              }`}
             placeholder={`Enter ${field.label.toLowerCase()}`}
           />
           {errors[field.name as keyof typeof errors] && (
@@ -394,14 +401,14 @@ const FormFields = ({
       <div className="mt-6 flex gap-4">
         <button
           type="submit"
-          className="bg-orange-500 hover:bg-orange-600 px-6 py-2 rounded-lg font-semibold"
+          className="bg-orange-500 hover:bg-orange-600 px-6 py-2 rounded-lg font-semibold transition-all"
         >
           {mode === "add" ? "Add Item" : "Save Changes"}
         </button>
         <button
           type="button"
           onClick={onSubmitSuccess}
-          className="bg-gray-600 hover:bg-gray-500 px-6 py-2 rounded-lg"
+          className="bg-gray-600 hover:bg-gray-500 px-6 py-2 rounded-lg transition-all"
         >
           Cancel
         </button>
