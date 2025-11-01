@@ -130,8 +130,9 @@ export default function BookAppointmentPage() {
           alt="Background"
           fill
           priority
-          className="object-cover brightness-50"
+          className="object-cover brightness-[0.8] blur-[6px]"
         />
+        <div className="absolute inset-0 bg-black/70"></div>
       </div>
 
       <div className="relative z-10 max-w-5xl mx-auto px-6 py-16">
@@ -146,8 +147,10 @@ export default function BookAppointmentPage() {
         </header>
 
         {/* customer info */}
-        <section className="bg-gray-100/95 text-black rounded-xl shadow-lg p-6 mb-10">
-          <h3 className="text-xl font-bold mb-4">Customer Details</h3>
+        <section className="group bg-black/40 backdrop-blur-xl border border-orange-500/40 text-white rounded-2xl shadow-2xl p-6 mb-10 transition-all hover:border-orange-500/70">
+          <h3 className="text-xl font-bold mb-4 transition-colors duration-300 group-hover:text-orange-400">
+            Customer Details
+          </h3>
           {["customer_name", "email", "phone"].map((field) => (
             <div key={field} className="mb-5">
               <label className="block mb-1 font-semibold capitalize">
@@ -156,8 +159,8 @@ export default function BookAppointmentPage() {
               <input
                 type={field === "email" ? "email" : "text"}
                 placeholder={`Enter your ${field.replace("_", " ")}`}
-                className={`w-full border p-3 rounded ${
-                  errors[field] ? "border-red-500" : ""
+                className={`w-full bg-white/10 text-white border p-3 rounded backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-orange-400 ${
+                  errors[field] ? "border-red-500" : "border-white/20"
                 }`}
                 value={(form as any)[field]}
                 onChange={(e) => handleChange(field, e.target.value)}
@@ -175,13 +178,13 @@ export default function BookAppointmentPage() {
             id="service-select"
             value={form.service}
             onChange={(e) => handleChange("service", e.target.value)}
-            className={`w-full border p-3 rounded ${
-              errors.service ? "border-red-500" : ""
+            className={`w-full bg-white/10 text-white border p-3 rounded backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-orange-400 ${
+              errors.service ? "border-red-500" : "border-white/20"
             }`}
           >
             <option value="">-- Choose a service --</option>
             {SERVICES.map((s) => (
-              <option key={s.key} value={s.name}>
+              <option key={s.key} value={s.name} className="text-black">
                 {s.name}
               </option>
             ))}
@@ -192,14 +195,16 @@ export default function BookAppointmentPage() {
         </section>
 
         {/* vehicle info */}
-        <section className="bg-gray-100/95 text-black rounded-xl shadow-lg p-6 mb-10">
-          <h3 className="text-xl font-bold mb-4">Vehicle Details</h3>
+        <section className="group bg-black/40 backdrop-blur-xl border border-orange-500/40 text-white rounded-2xl shadow-2xl p-6 mb-10 transition-all hover:border-orange-500/70">
+          <h3 className="text-xl font-bold mb-4 transition-colors duration-300 group-hover:text-orange-400">
+            Vehicle Details
+          </h3>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {["make", "model", "year", "plate"].map((field) => (
               <div key={field}>
                 <input
-                  className={`border p-2 rounded w-full ${
-                    errors[field] ? "border-red-500" : ""
+                  className={`bg-white/10 text-white border p-3 rounded w-full backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-orange-400 ${
+                    errors[field] ? "border-red-500" : "border-white/20"
                   }`}
                   placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
                   value={(form as any)[field]}
@@ -219,10 +224,10 @@ export default function BookAppointmentPage() {
               {FUEL_TYPES.map((t) => (
                 <button
                   key={t}
-                  className={`px-4 py-2 rounded-lg border ${
+                  className={`px-4 py-2 rounded-lg border transition-all ${
                     form.fuel === t
                       ? "bg-orange-500 text-white border-orange-500"
-                      : "bg-gray-100 text-black border-gray-300"
+                      : "bg-white/10 text-white border-white/20 hover:bg-white/20"
                   }`}
                   onClick={() => handleChange("fuel", t)}
                   type="button"
@@ -238,14 +243,16 @@ export default function BookAppointmentPage() {
         </section>
 
         {/* date & description */}
-        <section className="bg-white/95 text-black rounded-xl shadow-lg p-6 mb-10">
-          <h3 className="text-xl font-bold mb-4">Appointment Details</h3>
+        <section className="group bg-black/40 backdrop-blur-xl border border-orange-500/40 text-white rounded-2xl shadow-2xl p-6 mb-10 transition-all hover:border-orange-500/70">
+          <h3 className="text-xl font-bold mb-4 transition-colors duration-300 group-hover:text-orange-400">
+            Appointment Details
+          </h3>
           <div className="mb-5">
             <label className="block mb-2 font-semibold">Date</label>
             <input
               type="date"
-              className={`border p-2 rounded w-full ${
-                errors.date ? "border-red-500" : ""
+              className={`bg-white/10 text-white border p-3 rounded w-full backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-orange-400 ${
+                errors.date ? "border-red-500" : "border-white/20"
               }`}
               value={form.date}
               onChange={(e) => handleChange("date", e.target.value)}
@@ -259,8 +266,8 @@ export default function BookAppointmentPage() {
             Description of Issue
           </label>
           <textarea
-            className={`w-full border p-3 rounded h-28 ${
-              errors.description ? "border-red-500" : ""
+            className={`w-full bg-white/10 text-white border p-3 rounded h-28 backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-orange-400 ${
+              errors.description ? "border-red-500" : "border-white/20"
             }`}
             placeholder="Describe the issue briefly..."
             value={form.description}
@@ -272,8 +279,10 @@ export default function BookAppointmentPage() {
         </section>
 
         {/* summary */}
-        <section className="bg-white/90 text-black rounded-xl shadow-lg p-6">
-          <h3 className="text-xl font-bold mb-4">Summary</h3>
+        <section className="group bg-black/40 backdrop-blur-xl border border-orange-500/40 text-white rounded-2xl shadow-2xl p-6 transition-all hover:border-orange-500/70">
+          <h3 className="text-xl font-bold mb-4 transition-colors duration-300 group-hover:text-orange-400">
+            Summary
+          </h3>
           <table className="w-full text-left">
             <tbody>
               <tr>
