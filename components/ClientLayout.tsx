@@ -20,7 +20,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
 
   const shouldHideLayout = noLayoutRoutes.includes(pathname);
 
-  const noPaddingRoutes = ["/", "/Client/contact"];
+  const noPaddingRoutes = ["/"];
   const shouldRemovePadding =
     noPaddingRoutes.includes(pathname) || pathname.startsWith("/Client/services/");
 
