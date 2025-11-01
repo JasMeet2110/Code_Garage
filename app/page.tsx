@@ -7,8 +7,8 @@ export default function Home() {
       {/* Page Intro with quick welcome and image */}
 
         {/* Background image section */}
-        <section className="relative bg-cover bg-center h-[800px] flex items-center justify-center text-center">
-          <Image className="absolute inset-0 bg-cover bg-center brightness-50" src="/background/MustangRTR.png" alt="Mustang RTR" layout="fill" objectFit="cover" />
+        <section className="relative bg-cover bg-center h-[950px] flex items-center justify-center text-center">
+          <Image className="absolute inset-0 bg-cover bg-center brightness-50" src="/background/mustangrtr.png" alt="Mustang RTR" layout="fill" objectFit="cover" />
 
           {/* welcome text */}
           <div className="relative z-10 text-white px-6">
@@ -57,7 +57,7 @@ export default function Home() {
         {/* card 1 */}
         <div className="bg-white shadow-md rounded-lg overflow-hidden hover:shadow-lg transition">
           <div className="h-50 w-full relative">
-            <Image src="/services/OilChange.png" alt="Oil Change" fill className="object-cover"/>
+            <Image src="/services/oilchange.png" alt="Oil Change" fill className="object-cover"/>
           </div>
           <div className="p-6">
             <h3 className="text-xl font-semibold mb-2">Oil Change</h3>
@@ -70,7 +70,7 @@ export default function Home() {
         {/* card 2 */}
         <div className="bg-white shadow-md rounded-lg overflow-hidden hover:shadow-lg transition">
           <div className="h-50 w-full relative">
-            <Image src="/services/BrakeService.png" alt="Brake Service" fill className="object-cover"/>
+            <Image src="/services/brakeservice.png" alt="Brake Service" fill className="object-cover"/>
           </div>
           <div className="p-6">
             <h3 className="text-xl font-semibold mb-2">Brake Service</h3>
@@ -83,7 +83,7 @@ export default function Home() {
         {/* card 3 */}
         <div className="bg-white shadow-md rounded-lg overflow-hidden hover:shadow-lg transition">
           <div className="h-50 w-full relative">
-            <Image src="/services/TireChange.png" alt="Tire Change" fill className="object-cover"/>
+            <Image src="/services/tirechange.png" alt="Tire Change" fill className="object-cover"/>
           </div>
           <div className="p-6">
             <h3 className="text-xl font-semibold mb-2">Tire Replacement</h3>
@@ -107,7 +107,7 @@ export default function Home() {
 
       {/* reviews section */}
         <section className="relative py-10 px-6 text-center bg-cover bg-gray-100 bg-center">
-          <Image src="/background/ReviewsBackground.png" alt="Reviews Background" fill className="object-cover object-top brightness-70 blur-xs"/>
+          <Image src="/background/reviewsbackground.png" alt="Reviews Background" fill className="object-cover object-top brightness-70 blur-xs"/>
             <div className="relative z-10">
             <h2 className="text-4xl font-bold mb-6 text-center">What Our Customers Say</h2>
 

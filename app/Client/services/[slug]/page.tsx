@@ -20,7 +20,7 @@ export default function ServicePage({ params }: Props) {
     <div className="relative min-h-screen flex flex-col justify-center items-center text-white">
       {/* Background */}
       <Image
-        src="/background/Garage.png"
+        src="/background/garage.png"
         alt="Background"
         fill
         className="absolute inset-0 object-cover brightness-30"

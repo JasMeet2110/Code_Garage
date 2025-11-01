@@ -23,16 +23,16 @@ export default function Contact() {
   return (
     <div>
       {/* Hero Section with Background Image */}
-      <section className="relative bg-cover bg-center h-[800px] flex items-center justify-center">
+      <section className="relative bg-cover bg-center h-[950px] flex items-center justify-center">
         <Image
           className="absolute inset-0 object-cover brightness-50"
-          src="/MustangGT.jpg"
+          src="/background/mustanggt.jpg"
           alt="Mustang GT"
           fill
         />
 
         {/* Overlay Container */}
-        <div className="relative z-10 w-full max-w-6xl px-6">
+        <div className="relative z-10 w-full max-w-6xl px-6 pt-26">
           {/* Heading */}
           <div className="text-center mb-12 text-white">
             <h1 className="text-4xl font-bold">Contact Us & Location</h1>

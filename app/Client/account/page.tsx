@@ -181,7 +181,7 @@ export default function AccountPage() {
       {/* Background */}
       <div className="fixed inset-0 -z-10">
         <Image
-          src="/background/Mustang.jpg"
+          src="/background/mustang.jpg"
           alt="Garage Background"
           fill
           priority
@@ -239,7 +239,7 @@ export default function AccountPage() {
           {/* Right: Car Image */}
           <div className="flex flex-col items-center justify-center w-full md:w-[45%] min-h-[700px]">
             <Image
-              src={carImage || "/logo/Car.png"}
+              src={carImage || "/logo/car.png"}
               alt="Car Image"
               width={550}
               height={400}
