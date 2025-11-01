@@ -155,7 +155,7 @@ export const SERVICES: Service[] = [
     name: "Oil Change",
     description:
       "Keep your engine running smoothly with our quick and affordable oil change services.",
-    image: "/services/oilchange.png",
+    image: "/services/oil.png",
     signs: ["Engine noise", "Oil smell", "Warning light"],
     why: "Regular oil changes are essential for engine health and performance.",
     process:
