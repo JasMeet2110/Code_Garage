@@ -126,7 +126,7 @@ export default function BookAppointmentPage() {
       {/* background */}
       <div className="fixed inset-0 -z-10">
         <Image
-          src="/appointmentBackground.JPG"
+          src="/background/appointmentbackground.jpg"
           alt="Background"
           fill
           priority

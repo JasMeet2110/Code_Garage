@@ -15,7 +15,7 @@ export const SERVICES: Service[] = [
     name: "Car AC Repair",
     description:
       "Keep your cool with our expert A/C repair services for all vehicle makes and models.",
-    image: "/services/AC.png",
+    image: "/services/ac.png",
     signs: [
       "Weak airflow",
       "Strange noises",
@@ -31,7 +31,7 @@ export const SERVICES: Service[] = [
     name: "Alternator Repair",
     description:
       "We diagnose, repair, and replace alternators to ensure your car’s electrical systems run smoothly.",
-    image: "/services/Alternator.png",
+    image: "/services/alternator.png",
     signs: [
       "Dimming headlights",
       "Battery warning light",
@@ -47,7 +47,7 @@ export const SERVICES: Service[] = [
     name: "Brake Repair",
     description:
       "Reliable brake inspection and replacement to keep you safe on Calgary’s roads.",
-    image: "/services/Brake.png",
+    image: "/services/brake.png",
     signs: ["Squeaking noises", "Soft brake pedal", "Increased stopping distance"],
     why: "Brakes are critical for your safety. Worn brakes reduce stopping power and increase accident risk.",
     process:
@@ -59,7 +59,7 @@ export const SERVICES: Service[] = [
     name: "Car Battery Services",
     description:
       "Comprehensive battery testing, replacement, and maintenance to keep your vehicle running smoothly.",
-    image: "/services/Battery.png",
+    image: "/services/battery.png",
     signs: ["Slow engine crank", "Dim lights", "Check engine light"],
     why: "A failing battery can leave you stranded. Regular checks ensure reliability and longevity.",
     process:
@@ -71,7 +71,7 @@ export const SERVICES: Service[] = [
     name: "Cooling System Service",
     description:
       "Keep your engine cool with our comprehensive cooling system services.",
-    image: "/services/Cooling.png",
+    image: "/services/cooling.png",
     signs: ["Overheating", "Coolant leaks", "Unpleasant odors"],
     why: "A well-functioning cooling system is vital to prevent engine damage. Regular checks can save you from costly repairs.",
     process:
@@ -83,7 +83,7 @@ export const SERVICES: Service[] = [
     name: "Auto Diagnostics",
     description:
       "Advanced diagnostic services to identify and resolve vehicle issues quickly.",
-    image: "/services/AutoDiagnostics.png",
+    image: "/services/autodiagnostics.png",
     signs: ["Check engine light", "Unusual noises", "Poor performance"],
     why: "Early detection of issues can prevent costly repairs down the line.",
     process:
@@ -95,7 +95,7 @@ export const SERVICES: Service[] = [
     name: "Drivetrain & Differential Repair",
     description:
       "Expert repair services for your vehicle's drivetrain and differential systems.",
-    image: "/services/Drivetrain.png",
+    image: "/services/drivetrain.png",
     signs: ["Unusual noises", "Vibration", "Difficulty turning"],
     why: "The drivetrain and differential are crucial for power distribution. Issues can lead to more extensive damage.",
     process:
@@ -107,7 +107,7 @@ export const SERVICES: Service[] = [
     name: "Auto Electrical Repair",
     description:
       "Comprehensive electrical system diagnostics and repairs to keep your vehicle running smoothly.",
-    image: "/services/Electrical.png",
+    image: "/services/electrical.png",
     signs: ["Flickering lights", "Power window issues", "Dead battery"],
     why: "Electrical problems can affect your vehicle's performance and safety. Timely repairs are essential.",
     process:
@@ -119,7 +119,7 @@ export const SERVICES: Service[] = [
     name: "Engine Repair",
     description:
       "Comprehensive engine diagnostics and repair services to keep your vehicle running smoothly.",
-    image: "/services/Engine.png",
+    image: "/services/engine.png",
     signs: ["Check engine light", "Unusual noises", "Poor acceleration"],
     why: "Engine issues can lead to poor performance and costly repairs. Timely diagnostics are crucial.",
     process:
@@ -131,7 +131,7 @@ export const SERVICES: Service[] = [
     name: "General Car Repair",
     description:
       "Comprehensive car repair services to address a wide range of issues.",
-    image: "/services/General.png",
+    image: "/services/general.png",
     signs: ["Unusual noises", "Fluid leaks", "Warning lights"],
     why: "General wear and tear can lead to various issues. Regular maintenance helps prevent breakdowns.",
     process:
@@ -143,7 +143,7 @@ export const SERVICES: Service[] = [
     name: "Heater Repair",
     description:
       "Stay warm with our expert heater repair services for all vehicle makes and models.",
-    image: "/services/Heater.png",
+    image: "/services/heater.png",
     signs: ["Weak airflow", "Strange noises", "Inconsistent temperatures"],
     why: "A malfunctioning heater can make winter driving uncomfortable and unsafe. Regular maintenance is key.",
     process:
@@ -155,7 +155,7 @@ export const SERVICES: Service[] = [
     name: "Oil Change",
     description:
       "Keep your engine running smoothly with our quick and affordable oil change services.",
-    image: "/services/OilChange.png",
+    image: "/services/oilchange.png",
     signs: ["Engine noise", "Oil smell", "Warning light"],
     why: "Regular oil changes are essential for engine health and performance.",
     process:
@@ -167,7 +167,7 @@ export const SERVICES: Service[] = [
     name: "Starter Repair",
     description:
       "Expert starter repair services to ensure your vehicle starts smoothly every time.",
-    image: "/services/Starter.png",
+    image: "/services/starter.png",
     signs: ["Engine won't start", "Clicking noise", "Intermittent starting issues"],
     why: "A faulty starter can leave you stranded. Timely repairs are essential for reliable vehicle operation.",
     process:
@@ -179,7 +179,7 @@ export const SERVICES: Service[] = [
     name: "Suspension & Steering Repair",
     description:
       "Comprehensive suspension and steering system diagnostics and repairs.",
-    image: "/services/Steering.png",
+    image: "/services/steering.png",
     signs: ["Unusual noises", "Poor handling", "Vibration"],
     why: "Suspension and steering issues can affect vehicle control and safety.",
     process:
@@ -191,7 +191,7 @@ export const SERVICES: Service[] = [
     name: "Tire Repair",
     description:
       "Fast and reliable tire repair services to keep you safe on the road.",
-    image: "/services/Tire.png",
+    image: "/services/tire.png",
     signs: ["Flat tire", "Uneven wear", "Vibration while driving"],
     why: "Tires are your vehicle's only contact with the road. Proper maintenance is crucial for safety.",
     process:
@@ -203,7 +203,7 @@ export const SERVICES: Service[] = [
     name: "Transmission Repair",
     description:
       "Expert transmission repair services to ensure smooth and reliable gear shifting.",
-    image: "/services/Transmission.png",
+    image: "/services/transmission.png",
     signs: ["Slipping gears", "Delayed engagement", "Unusual noises"],
     why: "Transmission issues can lead to costly repairs if not addressed promptly.",
     process:
@@ -215,7 +215,7 @@ export const SERVICES: Service[] = [
     name: "Wheel Alignment",
     description:
       "Professional wheel alignment services to ensure your vehicle drives straight and true.",
-    image: "/services/WheelAlignment.png",
+    image: "/services/wheelalignment.png",
     signs: ["Uneven tire wear", "Pulling to one side", "Steering wheel off-center"],
     why: "Proper wheel alignment is crucial for safe handling and tire longevity.",
     process:

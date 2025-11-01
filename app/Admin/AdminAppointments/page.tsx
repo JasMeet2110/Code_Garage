@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import AdminSidebar from "@/components/AdminSidebar";
-import { ChevronDown } from "lucide-react";
 
 interface Appointment {
   id: number;
@@ -76,7 +75,7 @@ export default function AdminAppointments() {
       {/* Background */}
       <div className="fixed inset-0 -z-10">
         <Image
-          src="/background/Admin.png"
+          src="/background/admin.png"
           alt="Garage Background"
           fill
           priority

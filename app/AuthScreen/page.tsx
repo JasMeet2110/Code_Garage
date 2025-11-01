@@ -24,7 +24,7 @@ export default function AuthScreen() {
       {/* Background */}
       <div className="fixed inset-0 -z-10">
         <Image
-          src="/background/ZR1.png"
+          src="/background/zr1.png"
           alt="Background"
           fill
           priority
@@ -37,7 +37,7 @@ export default function AuthScreen() {
       <div className="relative z-10 bg-white/90 text-black rounded-2xl shadow-2xl p-10 w-full max-w-md text-center backdrop-blur-sm">
         <div className="flex flex-col items-center mb-8">
           <Image
-            src="/TracksideGarage.png"
+            src="/logo/tracksidegarage.png"
             alt="Trackside Garage"
             width={200}
             height={120}

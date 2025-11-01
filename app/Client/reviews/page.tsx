@@ -70,7 +70,7 @@ export default function ReviewsPage() {
       {/* ✅ Fixed background */}
       <div className="fixed inset-0 -z-10">
         <Image
-          src="/reviews.png"
+          src="/background/reviews.png"
           alt="Garage Reviews Background"
           fill
           priority

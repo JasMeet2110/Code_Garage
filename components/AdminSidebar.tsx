@@ -14,7 +14,7 @@ export default function AdminSidebar() {
         {/* Logo Section */}
         <div className="flex flex-col items-center mb-10">
           <Image
-            src="/TracksideGarage.png"
+            src="/logo/tracksidegarage.png"
             alt="Logo"
             width={120}
             height={120}
