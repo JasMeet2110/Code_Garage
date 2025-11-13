@@ -101,11 +101,26 @@ export default function BookAppointmentPage() {
 
       //if successful, navigates to confirmation otherwise push an error
       if (res.ok) {
-        router.push("/Client/book-appointment/confirmation");
-      } else {
-        const err = await res.json();
-        setErrors({ api: err.error || "Failed to save appointment." });
-      }
+      // send email notification
+      await fetch("/api/email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customerName: form.customer_name,
+          email: form.email,
+          phone: form.phone,
+          service: form.service,
+          vehicle: `${form.make} ${form.model} ${form.year} (${form.plate})`,
+          date: form.date,
+          issue: form.description,
+        }),
+      });
+
+      router.push("/Client/book-appointment/confirmation");
+    } else {
+      const err = await res.json();
+      setErrors({ api: err.error || "Failed to save appointment." });
+    }
     } catch (error) {
       console.error("Error booking appointment:", error);
       setErrors({ api: "Something went wrong. Please try again." });

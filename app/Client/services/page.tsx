@@ -10,11 +10,11 @@ export default function ServicesPage() {
       {/* Fixed Background */}
       <div className="fixed inset-0 -z-10">
         <Image
-          src="/background/serviceshop.png"
+          src="/background/service.png"
           alt="Background"
           fill
           priority
-          className="object-cover brightness-20"
+          className="object-cover brightness-30"
         />
       </div>
 
