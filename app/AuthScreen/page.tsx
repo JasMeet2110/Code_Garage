@@ -24,7 +24,7 @@ export default function AuthScreen() {
       {/* Background */}
       <div className="fixed inset-0 -z-10">
         <Image
-          src="/background/zr1.png"
+          src="/background/login.png"
           alt="Background"
           fill
           priority
