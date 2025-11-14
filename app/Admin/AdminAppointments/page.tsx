@@ -25,8 +25,8 @@ export default function AdminAppointments() {
   const [searchTerm, setSearchTerm] = useState("");
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingAppointment, setEditingAppointment] = useState<Appointment | null>(null);
+  const [appointmentToDelete, setAppointmentToDelete] = useState<Appointment | null>(null);
 
-  // ✅ Fetch appointments on mount
   useEffect(() => {
     fetchAppointments();
   }, []);
@@ -35,7 +35,6 @@ export default function AdminAppointments() {
     try {
       const res = await fetch("/api/appointments");
       const data = await res.json();
-
       if (Array.isArray(data)) setAppointments(data);
       else setAppointments([]);
     } catch (err) {
@@ -44,75 +43,26 @@ export default function AdminAppointments() {
     }
   };
 
-  // ✅ Add appointment
-  const handleAdd = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const form = e.currentTarget;
-    const data = Object.fromEntries(new FormData(form));
-
-    const res = await fetch("/api/appointments", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        customer_name: data.customer_name,
-        email: data.email,
-        phone: data.phone,
-        service_type: data.service_type,
-        fuel_type: data.fuel_type,
-        car_make: data.car_make,
-        car_model: data.car_model,
-        car_year: data.car_year,
-        plate_number: data.plate_number,
-        appointment_date: data.appointment_date,
-        description: data.description,
-        status: data.status,
-      }),
-    });
-
-    if (res.ok) {
-      await fetchAppointments();
-      setShowAddForm(false);
-      form.reset();
-    } else alert("Failed to add appointment");
+  // Delete appointment
+  const confirmDeleteAppointment = async () => {
+    if (!appointmentToDelete) return;
+    try {
+      const res = await fetch("/api/appointments", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: appointmentToDelete.id }),
+      });
+      if (res.ok) {
+        await fetchAppointments();
+        setAppointmentToDelete(null);
+      } else {
+        console.error("Failed to delete appointment");
+      }
+    } catch (err) {
+      console.error("Error deleting appointment:", err);
+    }
   };
 
-  // ✅ Edit appointment
-  const handleEdit = (appt: Appointment) => setEditingAppointment(appt);
-
-  const handleSaveEdit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!editingAppointment) return;
-
-    const form = e.currentTarget;
-    const data = Object.fromEntries(new FormData(form));
-
-    const res = await fetch("/api/appointments", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        id: editingAppointment.id,
-        ...data,
-      }),
-    });
-
-    if (res.ok) {
-      await fetchAppointments();
-      setEditingAppointment(null);
-    } else alert("Failed to update appointment");
-  };
-
-  // ✅ Delete appointment
-  const handleDelete = async (id: number) => {
-    if (!confirm("Delete this appointment?")) return;
-    const res = await fetch("/api/appointments", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id }),
-    });
-    if (res.ok) fetchAppointments();
-  };
-
-  // ✅ Filter search
   const filtered = appointments.filter(
     (a) =>
       a.customer_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -125,7 +75,7 @@ export default function AdminAppointments() {
       {/* Background */}
       <div className="fixed inset-0 -z-10">
         <Image
-          src="/background/Admin.png"
+          src="/background/admin.png"
           alt="Garage Background"
           fill
           priority
@@ -161,99 +111,34 @@ export default function AdminAppointments() {
 
           {/* Add Form */}
           {showAddForm && (
-            <form
-              onSubmit={handleAdd}
-              className="mb-8 p-6 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 shadow-md"
-            >
-              <h2 className="text-2xl font-bold text-orange-400 mb-4">
-                Add New Appointment
-              </h2>
-              <div className="grid md:grid-cols-2 gap-4">
-                <input name="customer_name" placeholder="Customer Name" className="glass-input" />
-                <input name="email" placeholder="Email" className="glass-input" />
-                <input name="phone" placeholder="Phone" className="glass-input" />
-                <input name="service_type" placeholder="Service Type" className="glass-input" />
-                <input name="fuel_type" placeholder="Fuel Type" className="glass-input" />
-                <input name="car_make" placeholder="Car Make" className="glass-input" />
-                <input name="car_model" placeholder="Car Model" className="glass-input" />
-                <input name="car_year" placeholder="Year" className="glass-input" />
-                <input name="plate_number" placeholder="Plate Number" className="glass-input" />
-                <input name="appointment_date" type="date" className="glass-input" />
-                <select name="status" className="glass-input">
-                  <option>Pending</option>
-                  <option>In Progress</option>
-                  <option>Completed</option>
-                  <option>Cancelled</option>
-                </select>
-                <textarea name="description" placeholder="Issue Description" className="glass-input" />
-              </div>
-              <div className="mt-4 flex gap-4">
-                <button
-                  type="submit"
-                  className="bg-orange-500 hover:bg-orange-600 px-6 py-2 rounded-lg font-semibold"
-                >
-                  Add Appointment
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowAddForm(false)}
-                  className="bg-gray-600 hover:bg-gray-500 px-6 py-2 rounded-lg"
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
+            <div className="mb-8 p-6 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 shadow-md animate-fadeIn">
+              <h2 className="text-2xl font-bold text-orange-400 mb-4">Add New Appointment</h2>
+              <AppointmentForm
+                mode="add"
+                onSubmitSuccess={() => setShowAddForm(false)}
+                fetchAppointments={fetchAppointments}
+              />
+            </div>
           )}
 
           {/* Edit Form */}
           {editingAppointment && (
-            <form
-              onSubmit={handleSaveEdit}
-              className="mb-8 p-6 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 shadow-md"
-            >
+            <div className="mb-8 p-6 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 shadow-md animate-fadeIn">
               <h2 className="text-2xl font-bold text-orange-400 mb-4">Edit Appointment</h2>
-              <div className="grid md:grid-cols-2 gap-4">
-                <input name="customer_name" defaultValue={editingAppointment.customer_name} className="glass-input" />
-                <input name="email" defaultValue={editingAppointment.email} className="glass-input" />
-                <input name="phone" defaultValue={editingAppointment.phone} className="glass-input" />
-                <input name="service_type" defaultValue={editingAppointment.service_type} className="glass-input" />
-                <input name="fuel_type" defaultValue={editingAppointment.fuel_type} className="glass-input" />
-                <input name="car_make" defaultValue={editingAppointment.car_make} className="glass-input" />
-                <input name="car_model" defaultValue={editingAppointment.car_model} className="glass-input" />
-                <input name="car_year" defaultValue={editingAppointment.car_year} className="glass-input" />
-                <input name="plate_number" defaultValue={editingAppointment.plate_number} className="glass-input" />
-                <input
-                  name="appointment_date"
-                  type="date"
-                  defaultValue={editingAppointment.appointment_date?.slice(0, 10)}
-                  className="glass-input"
-                />
-                <select name="status" defaultValue={editingAppointment.status} className="glass-input">
-                  <option>Pending</option>
-                  <option>In Progress</option>
-                  <option>Completed</option>
-                  <option>Cancelled</option>
-                </select>
-                <textarea
-                  name="description"
-                  defaultValue={editingAppointment.description || ""}
-                  className="glass-input"
-                />
-              </div>
-              <div className="mt-4 flex gap-4">
-                <button type="submit" className="bg-orange-500 hover:bg-orange-600 px-6 py-2 rounded-lg font-semibold">
-                  Save
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setEditingAppointment(null)}
-                  className="bg-gray-600 hover:bg-gray-500 px-6 py-2 rounded-lg"
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
+              <AppointmentForm
+                mode="edit"
+                editingAppointment={editingAppointment}
+                onSubmitSuccess={() => setEditingAppointment(null)}
+                fetchAppointments={fetchAppointments}
+              />
+            </div>
           )}
+
+          <div className="mb-4">
+              <h2 className="text-xl font-semibold text-orange-400">
+                List of Appointments ({filtered.length})
+              </h2>
+          </div>
 
           {/* Table */}
           <div className="overflow-x-auto rounded-xl bg-white/10 backdrop-blur-md border border-white/20 shadow-lg">
@@ -288,7 +173,9 @@ export default function AdminAppointments() {
                         {a.car_make} {a.car_model} {a.car_year} ({a.plate_number})
                         <div className="text-sm text-gray-400">{a.fuel_type}</div>
                       </td>
-                      <td className="px-6 py-4 text-gray-300">{new Date(a.appointment_date).toLocaleDateString()}</td>
+                      <td className="px-6 py-4 text-gray-300">
+                        {new Date(a.appointment_date).toLocaleDateString()}
+                      </td>
                       <td className="px-6 py-4">
                         <span
                           className={`px-3 py-1 rounded-full text-sm ${
@@ -305,10 +192,10 @@ export default function AdminAppointments() {
                         </span>
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <button onClick={() => handleEdit(a)} className="text-blue-400 hover:text-blue-300 mr-4">
+                        <button onClick={() => setEditingAppointment(a)} className="text-blue-400 hover:text-blue-300 mr-4">
                           Edit
                         </button>
-                        <button onClick={() => handleDelete(a.id)} className="text-red-400 hover:text-red-300">
+                        <button onClick={() => setAppointmentToDelete(a)} className="text-red-400 hover:text-red-300">
                           Delete
                         </button>
                       </td>
@@ -321,11 +208,216 @@ export default function AdminAppointments() {
         </div>
       </main>
 
+      {/* Delete Modal */}
+      {appointmentToDelete && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 animate-fadeIn">
+          <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-8 shadow-lg w-[90%] max-w-md text-center">
+            <h2 className="text-2xl font-semibold text-orange-400 mb-3">Confirm Deletion</h2>
+            <p className="text-gray-300 mb-6">
+              Are you sure you want to delete{" "}
+              <span className="text-white font-semibold">{appointmentToDelete.customer_name}</span>
+              ’s appointment?
+            </p>
+            <div className="flex justify-center gap-4">
+              <button
+                onClick={confirmDeleteAppointment}
+                className="bg-red-500 hover:bg-red-600 px-6 py-2 rounded-lg font-semibold"
+              >
+                Delete
+              </button>
+              <button
+                onClick={() => setAppointmentToDelete(null)}
+                className="bg-gray-600 hover:bg-gray-500 px-6 py-2 rounded-lg font-semibold"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <style jsx>{`
         .glass-input {
           @apply px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400;
+        }
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: scale(0.95);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+        .animate-fadeIn {
+          animation: fadeIn 0.25s ease-out forwards;
         }
       `}</style>
     </div>
   );
 }
+
+/* Inline Validation */
+const AppointmentForm = ({
+  mode,
+  editingAppointment,
+  onSubmitSuccess,
+  fetchAppointments,
+}: {
+  mode: "add" | "edit";
+  editingAppointment?: Appointment;
+  onSubmitSuccess: () => void;
+  fetchAppointments: () => Promise<void>;
+}) => {
+  const [formData, setFormData] = useState({
+    customer_name: editingAppointment?.customer_name || "",
+    email: editingAppointment?.email || "",
+    phone: editingAppointment?.phone || "",
+    service_type: editingAppointment?.service_type || "",
+    fuel_type: editingAppointment?.fuel_type || "",
+    car_make: editingAppointment?.car_make || "",
+    car_model: editingAppointment?.car_model || "",
+    car_year: editingAppointment?.car_year || "",
+    plate_number: editingAppointment?.plate_number || "",
+    appointment_date: editingAppointment?.appointment_date?.slice(0, 10) || "",
+    description: editingAppointment?.description || "",
+    status: editingAppointment?.status || "Pending",
+  });
+
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    setErrors((prev) => ({ ...prev, [name]: "" }));
+  };
+
+  const validate = () => {
+    const newErrors: Record<string, string> = {};
+    if (!formData.customer_name.trim()) newErrors.customer_name = "Customer name is required.";
+    if (!formData.email.trim()) newErrors.email = "Email is required.";
+    if (!formData.phone.trim()) newErrors.phone = "Phone number is required.";
+    if (!formData.service_type.trim()) newErrors.service_type = "Service type is required.";
+    if (!formData.car_make.trim()) newErrors.car_make = "Car make is required.";
+    if (!formData.car_model.trim()) newErrors.car_model = "Car model is required.";
+    if (!formData.plate_number.trim()) newErrors.plate_number = "Plate number is required.";
+    if (!formData.appointment_date.trim()) newErrors.appointment_date = "Date is required.";
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!validate()) return;
+
+    try {
+      const res = await fetch("/api/appointments", {
+        method: mode === "add" ? "POST" : "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(
+          mode === "add"
+            ? formData
+            : {
+                id: editingAppointment?.id,
+                ...formData,
+              }
+        ),
+      });
+
+      if (res.ok) {
+        await fetchAppointments();
+        onSubmitSuccess();
+      } else {
+        console.error("Error submitting form");
+      }
+    } catch (err) {
+      console.error("Error:", err);
+    }
+  };
+
+  const fields = [
+    { label: "Customer Name", name: "customer_name" },
+    { label: "Email", name: "email" },
+    { label: "Phone", name: "phone" },
+    { label: "Service Type", name: "service_type" },
+    { label: "Fuel Type", name: "fuel_type" },
+    { label: "Car Make", name: "car_make" },
+    { label: "Car Model", name: "car_model" },
+    { label: "Car Year", name: "car_year" },
+    { label: "Plate Number", name: "plate_number" },
+    { label: "Appointment Date", name: "appointment_date", type: "date" },
+  ];
+
+  return (
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      {fields.map((f) => (
+        <div key={f.name} className="flex flex-col">
+          <label className="text-sm text-gray-300 mb-1">{f.label}</label>
+          <input
+            name={f.name}
+            type={f.type || "text"}
+            value={formData[f.name as keyof typeof formData]}
+            onChange={handleChange}
+            className={`w-full rounded-lg px-4 py-2 bg-black/40 text-white border border-white/20 
+              placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 transition-all ${
+                errors[f.name] ? "border-red-500" : ""
+              }`}
+            placeholder={`Enter ${f.label.toLowerCase()}`}
+          />
+          {errors[f.name] && (
+            <span className="text-red-400 text-xs mt-1 animate-fadeIn">{errors[f.name]}</span>
+          )}
+        </div>
+      ))}
+
+      {/* Status Dropdown */}
+      <div className="flex flex-col relative">
+        <label className="text-sm text-gray-300 mb-1">Status</label>
+        <select
+          name="status"
+          value={formData.status}
+          onChange={handleChange}
+          className="w-full rounded-lg px-4 py-2 pr-10 bg-black/40 text-white border border-white/20 
+            focus:outline-none focus:ring-2 focus:ring-orange-400 appearance-none transition-all"
+        >
+          <option className="bg-gray-900 text-white">Pending</option>
+          <option className="bg-gray-900 text-yellow-300">In Progress</option>
+          <option className="bg-gray-900 text-green-300">Completed</option>
+          <option className="bg-gray-900 text-red-300">Cancelled</option>
+        </select>
+      </div>
+
+      {/* Description */}
+      <div className="flex flex-col">
+        <label className="text-sm text-gray-300 mb-1">Description</label>
+        <textarea
+          name="description"
+          value={formData.description}
+          onChange={handleChange}
+          placeholder="Enter issue description"
+          className="w-full rounded-lg px-4 py-2 bg-black/40 text-white border border-white/20 
+            placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 transition-all"
+        />
+      </div>
+
+      <div className="mt-6 flex gap-4">
+        <button
+          type="submit"
+          className="bg-orange-500 hover:bg-orange-600 px-6 py-2 rounded-lg font-semibold"
+        >
+          {mode === "add" ? "Add Appointment" : "Save Changes"}
+        </button>
+        <button
+          type="button"
+          onClick={onSubmitSuccess}
+          className="bg-gray-600 hover:bg-gray-500 px-6 py-2 rounded-lg"
+        >
+          Cancel
+        </button>
+      </div>
+    </form>
+  );
+};

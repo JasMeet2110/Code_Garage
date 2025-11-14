@@ -123,7 +123,7 @@ const CustomerPage = () => {
     <div className="flex min-h-screen relative text-white overflow-hidden">
       <div className="fixed inset-0 -z-10">
         <Image
-          src="/background/Admin.png"
+          src="/background/admin.png"
           alt="Garage Background"
           fill
           priority

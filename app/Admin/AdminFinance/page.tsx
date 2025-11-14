@@ -56,7 +56,7 @@ const FinancePage = () => {
       {/* Fixed Background */}
       <div className="fixed inset-0 -z-10">
         <Image
-          src="/background/Admin.png"
+          src="/background/admin.png"
           alt="Garage Background"
           fill
           priority

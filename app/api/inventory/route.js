@@ -1,6 +1,6 @@
 import { query } from "@/lib/db";
 
-// ✅ GET all inventory items
+// GET all inventory items
 export async function GET() {
   try {
     const results = await query(`
@@ -20,7 +20,7 @@ export async function GET() {
   }
 }
 
-// ✅ POST - Add new item
+// POST - Add new item
 export async function POST(req) {
   try {
     const { name, partNumber, quantity, price } = await req.json();
@@ -41,7 +41,7 @@ export async function POST(req) {
   }
 }
 
-// ✅ PUT - Update an existing item
+// PUT - Update an existing item
 export async function PUT(req) {
   try {
     const { id, name, partNumber, quantity, price } = await req.json();
@@ -62,7 +62,7 @@ export async function PUT(req) {
   }
 }
 
-// ✅ DELETE - Remove an item
+// DELETE - Remove an item
 export async function DELETE(req) {
   try {
     const { id } = await req.json();

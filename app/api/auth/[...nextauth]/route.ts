@@ -1,7 +1,7 @@
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 
-export const authOptions = {
+const handler = NextAuth({
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -15,10 +15,8 @@ export const authOptions = {
 
   callbacks: {
     async signIn({ user }) {
-      if (!user?.email) return false;
-      return true;
+      return !!user?.email;
     },
-
     async session({ session }) {
       if (session?.user?.email === "tracksidegarage0101@gmail.com") {
         session.user.role = "admin";
@@ -28,7 +26,6 @@ export const authOptions = {
       return session;
     },
   },
-};
+});
 
-const handler = NextAuth(authOptions);
 export { handler as GET, handler as POST };
