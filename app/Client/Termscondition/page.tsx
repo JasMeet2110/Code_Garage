@@ -11,7 +11,7 @@ export default function TermsConditions() {
       {/* ✅ Fixed background image */}
       <div className="fixed inset-0 -z-10">
         <Image
-          src="/background/ZR1.png"
+          src="/background/zr1.png"
           alt="Background"
           fill
           priority

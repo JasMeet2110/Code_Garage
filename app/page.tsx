@@ -1,165 +1,365 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
+/* ---------------------- SERVICES DATA ---------------------- */
+const SERVICES = [
+  {
+    img: "/services/oilchange.png",
+    title: "Oil Change & Maintenance",
+    text: "Keep your engine clean, cool, and running at peak efficiency.",
+  },
+  {
+    img: "/services/brakeservice.png",
+    title: "Brake Inspection & Repair",
+    text: "Quiet, precise braking performance you can rely on in any condition.",
+  },
+  {
+    img: "/services/tirechange.png",
+    title: "Tire Services & Alignment",
+    text: "Rotation, balancing, and alignment for maximum grip and safety.",
+  },
+  {
+    img: "/services/oilchange.png",
+    title: "Engine Diagnostics",
+    text: "Modern diagnostic tools to pinpoint issues before they become problems.",
+  },
+  {
+    img: "/services/brakeservice.png",
+    title: "Battery & Electrical",
+    text: "Reliable starts and stable power for all your vehicle systems.",
+  },
+];
+
+export default function Home() {
+  const [serviceIndex, setServiceIndex] = useState(0);
+
+  const [reviews, setReviews] = useState<any[]>([]);
+  const [reviewIndex, setReviewIndex] = useState(0);
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      setServiceIndex((prev) => (prev + 1) % SERVICES.length);
+    }, 5000);
+    return () => clearInterval(id);
+  }, []);
+
+  useEffect(() => {
+    async function loadReviews() {
+      try {
+        const res = await fetch("/api/reviews");
+        const data = await res.json();
+
+        const sorted = [...data]
+          .sort(
+            (a, b) =>
+              b.rating - a.rating ||
+              new Date(b.date).getTime() - new Date(a.date).getTime()
+          )
+          .slice(0, 5); 
+
+        setReviews(sorted);
+      } catch (e) {
+        console.error("Review load error:", e);
+      }
+    }
+
+    loadReviews();
+  }, []);
+
+  /* Auto-Rotate Reviews */
+  useEffect(() => {
+    if (reviews.length === 0) return;
+
+    const id = setInterval(() => {
+      setReviewIndex((prev) => (prev + 1) % reviews.length);
+    }, 6000);
+
+    return () => clearInterval(id);
+  }, [reviews]);
+
+  const currentService = SERVICES[serviceIndex];
+
 export default function Home() {
   return (
-    <div>
-      {/* Page Intro with quick welcome and image */}
+    <div className="relative text-white min-h-screen">
 
-        {/* Background image section */}
-        <section className="relative bg-cover bg-center h-[800px] flex items-center justify-center text-center">
-          <Image className="absolute inset-0 bg-cover bg-center brightness-50" src="/background/MustangRTR.png" alt="Mustang RTR" layout="fill" objectFit="cover" />
-
-          {/* welcome text */}
-          <div className="relative z-10 text-white px-6">
-            <h1 className="text-5xl md:text-6xl font-extrabold leading-tight">
-              Full-Service <br /> Auto Repair <br /> For All Makes & Models
-            </h1>
-            <a href="/Client/book-appointment" className="mt-6 inline-block bg-orange-500 text-white px-8 py-3 rounded-full font-semibold text-lg hover:scale-105 transition-transform duration-200">
-              Book Appointment
-            </a>
-          </div>
-        </section>
-
-      <div className="h-10 bg-gradient-to-b from-black/90 to-white/50"></div>
-
-      {/*About us Information*/}
-      <section className="px-20 pt-10 pb-16 bg-white text-black">
-  <h3 className="text-4xl font-bold mb-6 text-center text-black">
-    Welcome to Trackside Garage!
-  </h3>
-        <p className="text-lg text-gray-700 px-5">
-          Located in the heart of Alberta, Trackside Garage has been serving the community with reliable and affordable auto repair services for years. We pride ourselves on being more than just a repair shop — we’re a team of passionate, certified mechanics dedicated to keeping your car safe, efficient, and performing at its best.<br /><br />
-
-          At Trackside Garage, we believe every customer deserves honest advice, transparent pricing, and top-quality workmanship. Whether you’re driving a domestic, import, or luxury vehicle, our full-service facility is equipped to handle all makes and models. From routine maintenance like oil changes and tire rotations to advanced diagnostics and major repairs, we’ve got you covered.<br /><br />
-
-          Our shop combines modern technology with old-fashioned customer care. We use the latest diagnostic tools and high-quality parts, but we never lose sight of what matters most — building trust with our customers. That’s why drivers across Alberta choose Trackside Garage for:<br /><br />
-          <b>
-          • Experienced Technicians – Licensed mechanics with years of hands-on experience.<br />
-
-          • Complete Auto Services – Brakes, engines, transmissions, batteries, tires, and more.<br />
-
-          • Fast & Reliable Turnaround – Same-day service available for most jobs.<br />
-
-          • Fair Pricing – No hidden costs, just honest estimates before we start work.<br />
-
-          • Customer Comfort – Friendly staff and a clean, welcoming shop environment.<br /><br />
-          </b>
-
-          We’ve proudly serviced thousands of vehicles and built lasting relationships with Alberta drivers who rely on us to keep their cars running smoothly. Whether you need emergency repairs, seasonal maintenance, or just a quick inspection before a road trip, Trackside Garage is your go-to shop for trusted automotive care.<br /><br />
-        </p>
-      </section>
-
-      {/* services text */}
-      <section className="py-10 px-6 bg-gray-100 text-center">
-  {/* 👇 Made heading text black */}
-  <h2 className="text-4xl font-bold mb-6 text-center text-black">
-    Our Popular Services
-  </h2>
-
-      {/* Service Cards */}
-  <div className="grid grid-cols-1 md:grid-cols-3 gap-8 px-12">
-    {/* Card 1 */}
-    <div className="bg-white shadow-md rounded-lg overflow-hidden hover:shadow-lg transition">
-      <div className="h-50 w-full relative">
+      {/* BACKGROUND */}
+      <div className="fixed inset-0 -z-10">
         <Image
-          src="/services/OilChange.png"
-          alt="Oil Change"
+          src="/background/mustangrtr.png"
+          alt="Background"
           fill
-          className="object-cover"
+          priority
+          className="object-cover brightness-[0.20] scale-105"
         />
-      </div>
-      <div className="p-6">
-        <h3 className="text-xl font-semibold mb-2 text-black">
-          Oil Change
-        </h3>
-        <p className="text-gray-700 text-sm">
-          Keep your engine running smoothly with our quick and reliable oil
-          change service.
-        </p>
-      </div>
-    </div>
 
-        {/* card 2 */}
-        <div className="bg-white shadow-md rounded-lg overflow-hidden hover:shadow-lg transition">
-          <div className="h-50 w-full relative">
-            <Image src="/services/BrakeService.png" alt="Brake Service" fill className="object-cover"/>
-          </div>
-          <div className="p-6">
-            <h3 className="text-xl font-semibold mb-2">Brake Service</h3>
-            <p className="text-gray-600 text-sm">
-              Ensure your safety with expert brake inspection and maintenance.
-            </p>
-          </div>
-        </div>
-
-        {/* card 3 */}
-        <div className="bg-white shadow-md rounded-lg overflow-hidden hover:shadow-lg transition">
-          <div className="h-50 w-full relative">
-            <Image src="/services/TireChange.png" alt="Tire Change" fill className="object-cover"/>
-          </div>
-          <div className="p-6">
-            <h3 className="text-xl font-semibold mb-2">Tire Replacement</h3>
-            <p className="text-gray-600 text-sm">
-              Stay safe on the road with our professional tire replacement services.
-            </p>
-          </div>
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute -top-10 -left-10 h-64 w-64 bg-orange-500/25 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 right-0 h-72 w-72 bg-sky-500/20 rounded-full blur-3xl" />
         </div>
       </div>
 
-      {/* show more button */}
-      <div className="pt-5">
-        <Link
-          href="/Client/services"
-          className="inline-block bg-orange-500 text-white px-6 py-3 rounded-full font-medium hover:scale-105 transition-transform duration-200"
-        >
-          Show More Services
-        </Link>
-      </div>
+      {/* HERO SECTION */}
+      <section className="relative h-[850px] flex items-center justify-center text-center">
+        <div className="relative z-10 px-6 max-w-5xl mx-auto">
+
+          <p className="tracking-[0.3em] uppercase text-xs md:text-sm text-gray-300 mb-4">
+            Alberta · Full-Service Auto Care
+          </p>
+
+          <h1 className="text-5xl md:text-7xl font-extrabold leading-tight drop-shadow-2xl">
+            Trackside <span className="text-orange-500">Garage</span>
+            <br />
+            Precision Care For Every Ride.
+          </h1>
+
+          <p className="mt-6 text-gray-200 text-base md:text-lg max-w-2xl mx-auto">
+            From daily drivers to weekend builds, we keep your vehicle sharp, safe,
+            and road-ready with transparent service and performance-level attention to detail.
+          </p>
+
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+            <Link
+              href="/Client/book-appointment"
+              className="bg-orange-500 text-white px-8 py-3 rounded-full font-semibold text-lg shadow-[0_0_30px_rgba(249,115,22,0.6)]
+              hover:bg-orange-600 hover:scale-105 transition-all duration-200"
+            >
+              Book Appointment
+            </Link>
+
+            <Link
+              href="/Client/services"
+              className="border border-white/40 text-white px-8 py-3 rounded-full font-semibold text-lg
+              hover:bg-white/10 hover:scale-105 transition-all duration-200"
+            >
+              View Services
+            </Link>
+          </div>
+        </div>
       </section>
 
-      {/* reviews section */}
-        <section className="relative py-10 px-6 text-center bg-cover bg-gray-100 bg-center">
-          <Image src="/background/ReviewsBackground.png" alt="Reviews Background" fill className="object-cover object-top brightness-70 blur-xs"/>
-            <div className="relative z-10">
-            <h2 className="text-4xl font-bold mb-6 text-center text-black">
-               What Our Customers Say
+      {/* ABOUT SECTION */}
+      <section className="py-16 px-6 md:px-10 bg-black/40 backdrop-blur-sm border-y border-white/10">
+        <div className="max-w-5xl mx-auto grid md:grid-cols-[3fr,2fr] gap-10 items-center">
+
+          <div className="space-y-4">
+            <h2 className="text-3xl md:text-4xl font-bold text-orange-400">
+              Built For Drivers Who Actually Care.
             </h2>
 
-            <div className="flex flex-col md:flex-row justify-center gap-6">
-              {/* review 1 */}
-              <div className="bg-white shadow-md rounded-lg p-4 w-72 hover:shadow-lg transition">
-                <p className="text-gray-700 text-sm">Amazing service, quick and affordable! My car feels brand new.</p>
-                <p className="mt-2 font-semibold text-sm">- John D.</p>
-                <p className="text-yellow-500 text-sm">⭐⭐⭐⭐⭐</p>
-              </div>
+            <p className="text-gray-300 text-sm md:text-base leading-relaxed">
+              Trackside Garage combines certified expertise with a performance mindset.
+            </p>
 
-              {/* review 2 */}
-              <div className="bg-white shadow-md rounded-lg p-4 w-72 hover:shadow-lg transition">
-                <p className="text-gray-700 text-sm">They really care about your car like its their own. Highly recommend!</p>
-                <p className="mt-2 font-semibold text-sm">- Sarah K.</p>
-                <p className="text-yellow-500 text-sm">⭐⭐⭐⭐⭐</p>
-              </div>
+            <ul className="text-gray-300 text-sm md:text-base space-y-2">
+              <li>• Licensed mechanics.</li>
+              <li>• Transparent estimates.</li>
+              <li>• Same-day service available.</li>
+              <li>• All makes & models.</li>
+            </ul>
+          </div>
 
-              {/* review 3 */}
-              <div className="bg-white shadow-md rounded-lg p-4 w-72 hover:shadow-lg transition hidden md:block">
-                <p className="text-gray-700 text-sm">Great customer service and fast turnaround. Will be back for sure.</p>
-                <p className="mt-2 font-semibold text-sm">- Michael T.</p>
-                <p className="text-yellow-500 text-sm">⭐⭐⭐⭐⭐</p>
-              </div>
-            </div>
-
-            {/* write review button */}
-            <div className="mt-10">
-              <a
-                href="/Client/reviews"
-                className="inline-block bg-orange-500 text-white px-6 py-3 rounded-full font-medium hover:scale-105 transition-transform duration-200"
-              >
-                Write a Review
-              </a>
+          <div className="relative h-60 md:h-72 rounded-2xl overflow-hidden border border-white/10 bg-gradient-to-br from-orange-500/10 to-sky-500/10">
+            <Image
+              src="/background/garageinside.png"
+              alt="Garage Interior"
+              fill
+              className="object-cover opacity-80"
+            />
+            <div className="absolute inset-0 bg-black/40" />
+            <div className="absolute bottom-4 left-4 text-sm text-gray-100">
+              <p className="font-semibold text-lg">Trusted by Alberta drivers</p>
+              <p className="text-xs text-gray-300">
+                Hundreds of vehicles serviced every season.
+              </p>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
+
+      {/* SERVICES CAROUSEL */}
+      <section className="py-16 px-6 md:px-10 bg-black/40 backdrop-blur-sm border-y border-white/10">
+        <div className="max-w-5xl mx-auto text-center">
+
+          <p className="text-xs uppercase tracking-[0.25em] text-gray-400 mb-2">
+            Our Popular Services
+          </p>
+
+          <h2 className="text-3xl md:text-4xl font-bold text-orange-400 mb-2">
+            Dialed-In Maintenance & Repair.
+          </h2>
+
+          <p className="text-gray-300 text-sm md:text-base mb-10 max-w-2xl mx-auto">
+            From oil changes to diagnostics — tuned for real-world driving.
+          </p>
+
+          <div className="relative max-w-xl mx-auto">
+
+            {/* Card */}
+            <div className="bg-neutral-900/70 border border-neutral-700/80 rounded-2xl shadow-2xl 
+              overflow-hidden flex flex-col md:flex-row">
+
+              <div className="relative w-full md:w-1/2 h-52 md:h-64">
+                <Image
+                  src={currentService.img}
+                  alt={currentService.title}
+                  fill
+                  className="object-cover"
+                />
+              </div>
+
+              <div className="p-6 md:p-8 flex flex-col justify-center text-left">
+                <h3 className="text-2xl font-semibold mb-3 text-orange-300">
+                  {currentService.title}
+                </h3>
+
+                <p className="text-gray-300 text-sm md:text-base mb-4">
+                  {currentService.text}
+                </p>
+
+                <Link
+                  href="/Client/services"
+                  className="inline-block text-sm font-semibold text-orange-400 hover:text-orange-300"
+                >
+                  View service details →
+                </Link>
+              </div>
+            </div>
+
+            {/* Controls */}
+            <div className="flex items-center justify-between mt-4">
+              <button
+                onClick={() =>
+                  setServiceIndex((prev) => (prev - 1 + SERVICES.length) % SERVICES.length)
+                }
+                className="px-3 py-1 rounded-full border border-white/30 text-xs text-gray-200 hover:bg-white/10 transition-all"
+              >
+                ◀ Prev
+              </button>
+
+              <div className="flex gap-2">
+                {SERVICES.map((_, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setServiceIndex(idx)}
+                    className={`h-2 w-2 rounded-full transition-all ${
+                      idx === serviceIndex ? "bg-orange-500 w-4" : "bg-gray-500/60"
+                    }`}
+                  />
+                ))}
+              </div>
+
+              <button
+                onClick={() =>
+                  setServiceIndex((prev) => (prev + 1) % SERVICES.length)
+                }
+                className="px-3 py-1 rounded-full border border-white/30 text-xs text-gray-200 hover:bg-white/10 transition-all"
+              >
+                Next ▶
+              </button>
+            </div>
+          </div>
+
+          <Link
+            href="/Client/services"
+            className="mt-10 inline-block bg-orange-500 text-white px-8 py-3 rounded-full font-medium hover:bg-orange-600 hover:scale-105 transition-transform"
+          >
+            Explore All Services
+          </Link>
+        </div>
+      </section>
+
+      {/* REVIEWS */}
+      <section className="py-16 px-6 md:px-10 bg-black/40 backdrop-blur-sm border-y border-white/10">
+        <div className="max-w-5xl mx-auto text-center">
+
+          <p className="text-xs uppercase tracking-[0.25em] text-gray-400 mb-2">
+            Real Feedback
+          </p>
+
+          <h2 className="text-3xl md:text-4xl font-bold text-orange-400 mb-2">
+            What Drivers Are Saying.
+          </h2>
+
+          <p className="text-gray-300 text-sm md:text-base mb-10 max-w-2xl mx-auto">
+            These are the top-rated experiences from our customers.
+          </p>
+
+          {/* IF NO REVIEWS */}
+          {reviews.length === 0 ? (
+            <p className="opacity-70 text-gray-400">No reviews yet.</p>
+          ) : (
+            <div className="relative max-w-xl mx-auto">
+              <div className="bg-neutral-900/70 border border-neutral-700/80 rounded-2xl shadow-2xl 
+                p-8 text-left min-h-[180px]">
+
+                <p className="text-gray-200 text-sm md:text-base mb-4 break-words whitespace-normal">
+                  “{reviews[reviewIndex]?.comment}”
+                </p>
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-semibold text-orange-300">
+                      {reviews[reviewIndex]?.name}
+                    </p>
+
+                    <p className="text-yellow-400 text-xs md:text-sm">
+                      {"⭐".repeat(reviews[reviewIndex]?.rating || 0)}
+                    </p>
+                  </div>
+
+                  <span className="text-xs text-gray-500">Verified Customer</span>
+                </div>
+              </div>
+
+              {/* Controls */}
+              <div className="flex items-center justify-between mt-4">
+                <button
+                  onClick={() =>
+                    setReviewIndex((prev) =>
+                      (prev - 1 + reviews.length) % reviews.length
+                    )
+                  }
+                  className="px-3 py-1 rounded-full border border-white/30 text-xs text-gray-200 hover:bg-white/10 transition-all"
+                >
+                  ◀ Prev
+                </button>
+
+                <div className="flex gap-2">
+                  {reviews.map((_, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setReviewIndex(idx)}
+                      className={`h-2 w-2 rounded-full transition-all ${
+                        idx === reviewIndex ? "bg-orange-500 w-4" : "bg-gray-500/60"
+                      }`}
+                    />
+                  ))}
+                </div>
+
+                <button
+                  onClick={() =>
+                    setReviewIndex((prev) => (prev + 1) % reviews.length)
+                  }
+                  className="px-3 py-1 rounded-full border border-white/30 text-xs text-gray-200 hover:bg-white/10 transition-all"
+                >
+                  Next ▶
+                </button>
+              </div>
+            </div>
+          )}
+
+          <Link
+            href="/Client/reviews"
+            className="mt-10 inline-block bg-orange-500 text-white px-8 py-3 rounded-full font-medium hover:bg-orange-600 hover:scale-105 transition-transform"
+          >
+            Leave a Review
+          </Link>
+        </div>
+      </section>
     </div>
   );
 }

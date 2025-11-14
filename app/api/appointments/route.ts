@@ -1,7 +1,7 @@
 import { query } from "@/lib/db";
 import { NextResponse } from "next/server";
 
-// ✅ GET: Fetch all appointments
+// GET: fetch all appointments
 export async function GET() {
   try {
     const results = await query(
@@ -17,7 +17,7 @@ export async function GET() {
   }
 }
 
-// ✅ POST: Add new appointment
+// POST: add new appointment
 export async function POST(req: Request) {
   try {
     const {
@@ -66,7 +66,7 @@ export async function POST(req: Request) {
   }
 }
 
-// ✅ PUT: Update appointment
+// PUT: update appointment
 export async function PUT(req: Request) {
   try {
     const {
@@ -118,7 +118,7 @@ export async function PUT(req: Request) {
   }
 }
 
-// ✅ DELETE: Delete appointment
+// DELETE: delete appointment
 export async function DELETE(req: Request) {
   try {
     const { id } = await req.json();
