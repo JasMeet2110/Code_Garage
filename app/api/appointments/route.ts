@@ -1,5 +1,6 @@
 import { query } from "@/lib/db";
 import { NextResponse } from "next/server";
+import { ResultSetHeader } from "mysql2";
 
 // GET: fetch all appointments
 export async function GET() {
@@ -55,7 +56,7 @@ export async function POST(req: Request) {
       status || "Pending",
     ];
 
-    const result = await query(sql, values);
+    const result = (await query(sql, values)) as ResultSetHeader;
     return NextResponse.json({ success: true, id: result.insertId });
   } catch (error) {
     console.error("Error adding appointment:", error);

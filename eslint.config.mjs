@@ -5,20 +5,16 @@ import { FlatCompat } from "@eslint/eslintrc";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Convert old ESLint configs to new flat config
 const compat = new FlatCompat({
   baseDirectory: __dirname,
 });
 
-// ---------------------------------------------
-// ⭐ FULL ESLINT CONFIG WITH RULE OVERRIDES
-// ---------------------------------------------
-const eslintConfig = [
-  // Extend Next.js recommended configs
+export default [
   ...compat.extends("next/core-web-vitals", "next/typescript"),
-
-  // Ignore build folders
   {
+    rules: {
+      "@typescript-eslint/no-explicit-any": "off",
+    },
     ignores: [
       "node_modules/**",
       ".next/**",
@@ -27,15 +23,4 @@ const eslintConfig = [
       "next-env.d.ts",
     ],
   },
-
-  // -----------------------------------------
-  // ⭐ IMPORTANT: Disable the TS rule blocking build
-  // -----------------------------------------
-  {
-    rules: {
-      "@typescript-eslint/no-explicit-any": "off",
-    },
-  },
 ];
-
-export default eslintConfig;

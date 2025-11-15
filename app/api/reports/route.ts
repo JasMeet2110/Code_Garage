@@ -27,19 +27,20 @@ export async function GET(req: Request) {
     }
 
     // ✅ Summary now respects selected time period
-    const [summary] = await query(
+    const summaryResult = (await query(
       `
-      SELECT
-        (SELECT COUNT(*) FROM customers) AS total_customers,
-        (SELECT COUNT(*) FROM appointments WHERE 1=1 ${dateCondition}) AS total_appointments,
-        (SELECT COUNT(*) FROM employees) AS total_employees,
-        (SELECT ROUND(AVG(salary), 2) FROM employees) AS avg_salary
-      `,
+  SELECT
+    (SELECT COUNT(*) FROM customers) AS total_customers,
+    (SELECT COUNT(*) FROM appointments WHERE 1=1 ${dateCondition}) AS total_appointments,
+    (SELECT COUNT(*) FROM employees) AS total_employees,
+    (SELECT ROUND(AVG(salary), 2) FROM employees) AS avg_salary
+  `,
       params
-    );
+    )) as any[];
+    const summary = summaryResult[0];
 
     // ✅ Appointments Trend (safe under ONLY_FULL_GROUP_BY)
-    const appointmentsTrend = await query(
+    const appointmentsTrend = (await query(
       `
       SELECT 
         DATE_FORMAT(MIN(appointment_date), '%b %Y') AS month,
@@ -51,10 +52,10 @@ export async function GET(req: Request) {
       ORDER BY YEAR(appointment_date), MONTH(appointment_date)
       `,
       params
-    );
+    )) as any[];
 
     // ✅ Top Services (filtered by same date range)
-    const topServices = await query(
+    const topServices = (await query(
       `
       SELECT service_type AS name, COUNT(*) AS count
       FROM appointments
@@ -64,7 +65,7 @@ export async function GET(req: Request) {
       LIMIT 5
       `,
       params
-    );
+    )) as any[];
 
     return NextResponse.json({
       summary,
