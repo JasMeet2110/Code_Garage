@@ -9,23 +9,29 @@ const dbConfig = {
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
-  timezone: "Z", 
+  timezone: "Z",
 };
 
-let pool;
+// Extend global type for TypeScript
+declare global {
+  var _pool: mysql.Pool | undefined;
+}
 
-// prevent multiple pool instances in Next.js 
+// Prevent multiple pool instances in Next.js hot reload (dev mode)
 if (!global._pool) {
   global._pool = mysql.createPool(dbConfig);
 }
-pool = global._pool;
 
-export async function query(sql, params = []) {
+const pool: mysql.Pool = global._pool;
+
+export async function query(sql: string, params: unknown[] = []) {
   try {
     const [results] = await pool.execute(sql, params);
     return results;
   } catch (error) {
-    console.error("Database query error:", error.message);
+    if (error instanceof Error) {
+      console.error("Database query error:", error.message);
+    }
     throw error;
   }
 }
