@@ -17,6 +17,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     "/Admin/AdminReports",
     "/Admin/AdminFinance",
     "/Admin/AdminReviews",
+    "/Admin/AdminAIAssistant",
   ];
 
   const shouldHideLayout = noLayoutRoutes.includes(pathname);
