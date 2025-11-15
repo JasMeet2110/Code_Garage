@@ -1,19 +1,6 @@
 "use client";
 
 import Link from "next/link";
-<<<<<<< HEAD
-
-export default function ConfirmationPage() {
-  return (
-    <main className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white shadow-md rounded-lg p-8 max-w-md w-full text-center">
-        <h2 className="text-2xl font-bold mb-4 text-green-600">
-          Booking Confirmed!
-        </h2>
-        <p className="text-gray-600 mb-6">
-          Thank you for booking with Trackside Garage.  
-          Your appointment details will be shared soon.
-=======
 import Image from "next/image";
 
 export default function ConfirmationPage() {
@@ -60,22 +47,15 @@ export default function ConfirmationPage() {
           Thank you for booking with <span className="text-orange-400 font-semibold">Trackside Garage</span>.
           <br />
           Our team will review your appointment and contact you shortly.
->>>>>>> c4c87da685e264c6994ce1032a9dff60cdeb2b61
         </p>
 
         <Link
           href="/"
-<<<<<<< HEAD
-          className="inline-block bg-orange-500 text-white px-6 py-3 rounded-lg font-medium hover:bg-orange-600 transition"
-=======
           className="inline-block bg-orange-500 text-white px-8 py-3 rounded-lg font-semibold text-lg shadow-md hover:bg-orange-600 hover:shadow-lg transition-all"
->>>>>>> c4c87da685e264c6994ce1032a9dff60cdeb2b61
         >
           Back to Home
         </Link>
       </div>
-<<<<<<< HEAD
-=======
 
       {/* Animation Style */}
       <style jsx>{`
@@ -87,7 +67,6 @@ export default function ConfirmationPage() {
           animation: fadeIn 0.6s ease-out;
         }
       `}</style>
->>>>>>> c4c87da685e264c6994ce1032a9dff60cdeb2b61
     </main>
   );
 }
