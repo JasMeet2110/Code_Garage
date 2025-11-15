@@ -54,7 +54,7 @@ export default function Navbar() {
           {/* Auth Button */}
           {session ? (
             <button
-              onClick={() => signOut({ callbackUrl: "/" })}
+              onClick={() => signOut({ callbackUrl: "/AuthScreen" })}
               className="ml-4 bg-red-600 hover:bg-red-700 px-5 py-2 rounded-lg font-semibold shadow-md transition-all"
             >
               Sign Out
