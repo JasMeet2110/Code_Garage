@@ -1,59 +1,97 @@
 "use client";
-import React, { useState } from "react";
+
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import AdminSidebar from "@/components/AdminSidebar";
 import {
-  LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip,
-  PieChart, Pie, Cell, ResponsiveContainer
+  LineChart,
+  Line,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
 } from "recharts";
 
-const COLORS = ["#22c55e", "#ef4444", "#eab308", "#3b82f6", "#a855f7"];
+type Summary = {
+  revenue: number;
+  expenses: number;
+  profit: number;
+  outstanding: number;
+};
+
+type Transaction = {
+  id: number;
+  date: string;
+  type: string;
+  amount: number;
+  status: string;
+};
+
+type Invoice = {
+  id: number;
+  customer: string;
+  service: string;
+  amount: number;
+  status: string;
+  date: string;
+};
 
 const FinancePage = () => {
-  const [summary, setSummary] = useState({
-    revenue: 24500,
-    expenses: 17800,
-    profit: 6700,
-    outstanding: 3200,
+  const [summary, setSummary] = useState<Summary>({
+    revenue: 0,
+    expenses: 0,
+    profit: 0,
+    outstanding: 0,
   });
 
-  const [revenueTrend, setRevenueTrend] = useState([
-    { month: "Jan", revenue: 1800 },
-    { month: "Feb", revenue: 2200 },
-    { month: "Mar", revenue: 2700 },
-    { month: "Apr", revenue: 3100 },
-    { month: "May", revenue: 3500 },
-    { month: "Jun", revenue: 3800 },
-    { month: "Jul", revenue: 4100 },
-    { month: "Aug", revenue: 4400 },
-    { month: "Sep", revenue: 4700 },
-    { month: "Oct", revenue: 5000 },
-  ]);
+  const [revenueTrend, setRevenueTrend] = useState<
+    { month: string; revenue: number }[]
+  >([]);
 
-  const [expenseBreakdown, setExpenseBreakdown] = useState([
-    { category: "Parts", value: 6500 },
-    { category: "Salaries", value: 8200 },
-    { category: "Utilities", value: 2000 },
-    { category: "Supplies", value: 1500 },
-    { category: "Misc", value: 1600 },
-  ]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const [transactions, setTransactions] = useState([
-    { date: "Oct 19", type: "Revenue", amount: 850, status: "Completed" },
-    { date: "Oct 18", type: "Expense", amount: 320, status: "Completed" },
-    { date: "Oct 17", type: "Revenue", amount: 1240, status: "Completed" },
-    { date: "Oct 15", type: "Expense", amount: 210, status: "Pending" },
-  ]);
+  useEffect(() => {
+    const loadFinance = async () => {
+      try {
+        const res = await fetch("/api/finance");
+        if (!res.ok) {
+          console.error("Failed to fetch /api/finance");
+          return;
+        }
+        const data = await res.json();
 
-  const [invoices, setInvoices] = useState([
-    { id: "#INV-1024", customer: "Emma Wilson", amount: 420, status: "Pending" },
-    { id: "#INV-1025", customer: "David Miller", amount: 580, status: "Pending" },
-    { id: "#INV-1026", customer: "Raj Singh", amount: 360, status: "Overdue" },
-  ]);
+        if (data.summary) setSummary(data.summary);
+        if (data.revenueTrend) setRevenueTrend(data.revenueTrend);
+        if (data.recentTransactions)
+          setTransactions(data.recentTransactions);
+        if (data.pendingInvoices) setInvoices(data.pendingInvoices);
+      } catch (err) {
+        console.error("Error loading finance data:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadFinance();
+  }, []);
+
+  const formatMoney = (n: number) =>
+    `$${Number(n || 0).toLocaleString("en-CA", { maximumFractionDigits: 0 })}`;
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center text-white text-xl">
+        Loading Finance Overview...
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen relative text-white overflow-hidden">
-      {/* Fixed Background */}
+      {/* Background */}
       <div className="fixed inset-0 -z-10">
         <Image
           src="/background/admin.png"
@@ -79,30 +117,30 @@ const FinancePage = () => {
             <div className="glass-card">
               <h3 className="text-lg font-semibold">Revenue</h3>
               <p className="text-3xl font-bold text-green-400 mt-2">
-                ${summary.revenue.toLocaleString()}
+                {formatMoney(summary.revenue)}
               </p>
             </div>
             <div className="glass-card">
               <h3 className="text-lg font-semibold">Expenses</h3>
               <p className="text-3xl font-bold text-red-400 mt-2">
-                ${summary.expenses.toLocaleString()}
+                {formatMoney(summary.expenses)}
               </p>
             </div>
             <div className="glass-card">
               <h3 className="text-lg font-semibold">Profit</h3>
               <p className="text-3xl font-bold text-orange-400 mt-2">
-                ${summary.profit.toLocaleString()}
+                {formatMoney(summary.profit)}
               </p>
             </div>
             <div className="glass-card">
               <h3 className="text-lg font-semibold">Outstanding</h3>
               <p className="text-3xl font-bold text-yellow-400 mt-2">
-                ${summary.outstanding.toLocaleString()}
+                {formatMoney(summary.outstanding)}
               </p>
             </div>
           </div>
 
-          {/* Charts */}
+          {/* Trend + (keep pie chart empty for now) */}
           <div className="grid grid-cols-2 gap-6 mb-8">
             {/* Revenue Trend */}
             <div className="glass-card h-80">
@@ -126,33 +164,17 @@ const FinancePage = () => {
               </ResponsiveContainer>
             </div>
 
-            {/* Expense Breakdown */}
-            <div className="glass-card h-80">
-              <h2 className="text-xl font-bold text-orange-400 mb-4">
-                Expense Breakdown
-              </h2>
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={expenseBreakdown}
-                    dataKey="value"
-                    nameKey="category"
-                    outerRadius={100}
-                    label
-                  >
-                    {expenseBreakdown.map((_, i) => (
-                      <Cell key={i} fill={COLORS[i % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
+            {/* Placeholder for Expense Breakdown (can wire later) */}
+            <div className="glass-card h-80 flex items-center justify-center">
+              <p className="text-gray-300 text-center">
+                Expense breakdown chart can be connected later.
+              </p>
             </div>
           </div>
 
-          {/* Tables Section */}
+          {/* Tables */}
           <div className="grid grid-cols-2 gap-6 mt-24">
-            {/* Transactions */}
+            {/* Recent Transactions */}
             <div className="glass-card">
               <h2 className="text-2xl font-bold text-orange-400 mb-4">
                 Recent Transactions
@@ -167,22 +189,47 @@ const FinancePage = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {transactions.map((t, i) => (
-                    <tr key={i} className="border-b border-white/10 hover:bg-white/5">
-                      <td className="px-4 py-2">{t.date}</td>
-                      <td className="px-4 py-2 text-gray-300">{t.type}</td>
-                      <td className="px-4 py-2">${t.amount}</td>
+                  {transactions.length === 0 ? (
+                    <tr>
                       <td
-                        className={`px-4 py-2 ${
-                          t.status === "Completed"
-                            ? "text-green-400"
-                            : "text-yellow-400"
-                        }`}
+                        colSpan={4}
+                        className="px-4 py-4 text-center text-gray-400"
                       >
-                        {t.status}
+                        No transactions found.
                       </td>
                     </tr>
-                  ))}
+                  ) : (
+                    transactions.map((t) => (
+                      <tr
+                        key={t.id}
+                        className="border-b border-white/10 hover:bg-white/5"
+                      >
+                        <td className="px-4 py-2">
+                          {new Date(t.date).toLocaleDateString("en-CA", {
+                            month: "short",
+                            day: "2-digit",
+                          })}
+                        </td>
+                        <td className="px-4 py-2 text-gray-300">
+                          {t.type}
+                        </td>
+                        <td className="px-4 py-2">
+                          {formatMoney(t.amount)}
+                        </td>
+                        <td
+                          className={`px-4 py-2 ${
+                            t.status === "Completed"
+                              ? "text-green-400"
+                              : t.status === "Pending"
+                              ? "text-yellow-400"
+                              : "text-gray-300"
+                          }`}
+                        >
+                          {t.status}
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>
@@ -202,22 +249,40 @@ const FinancePage = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {invoices.map((inv, i) => (
-                    <tr key={i} className="border-b border-white/10 hover:bg-white/5">
-                      <td className="px-4 py-2">{inv.id}</td>
-                      <td className="px-4 py-2 text-gray-300">{inv.customer}</td>
-                      <td className="px-4 py-2">${inv.amount}</td>
+                  {invoices.length === 0 ? (
+                    <tr>
                       <td
-                        className={`px-4 py-2 ${
-                          inv.status === "Pending"
-                            ? "text-yellow-400"
-                            : "text-red-400"
-                        }`}
+                        colSpan={4}
+                        className="px-4 py-4 text-center text-gray-400"
                       >
-                        {inv.status}
+                        No pending invoices.
                       </td>
                     </tr>
-                  ))}
+                  ) : (
+                    invoices.map((inv) => (
+                      <tr
+                        key={inv.id}
+                        className="border-b border-white/10 hover:bg白/5"
+                      >
+                        <td className="px-4 py-2">#{inv.id}</td>
+                        <td className="px-4 py-2 text-gray-300">
+                          {inv.customer || "-"}
+                        </td>
+                        <td className="px-4 py-2">
+                          {formatMoney(inv.amount)}
+                        </td>
+                        <td
+                          className={`px-4 py-2 ${
+                            inv.status === "Pending"
+                              ? "text-yellow-400"
+                              : "text-red-400"
+                          }`}
+                        >
+                          {inv.status}
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>
@@ -225,7 +290,7 @@ const FinancePage = () => {
         </div>
       </main>
 
-      {/* Styles */}
+      {/* Tailwind helper class */}
       <style jsx>{`
         .glass-card {
           @apply bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-6 shadow-md;
