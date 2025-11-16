@@ -1,28 +1,24 @@
-import NextAuth from "next-auth";
+import NextAuth, { DefaultSession, DefaultUser } from "next-auth";
+import { DefaultJWT } from "next-auth/jwt";
 
+// Extend the User type to include the role
 declare module "next-auth" {
-  interface Session {
-    user: {
-      name?: string | null;
-      email?: string | null;
-      image?: string | null;
-      role?: "admin" | "client";
-      dbInfo?: {
-        id: number;
-        name: string;
-        phone: string;
-        email: string;
-        car_name: string;
-        car_plate: string;
-        start_date: string;
-        is_profile_complete: boolean;
-        created_at: string;
-        updated_at: string;
-      };
-    };
+  interface User extends DefaultUser {
+    role?: "admin" | "client" | string; // Add the role property
   }
 
-  interface User {
-    role?: "admin" | "client";
+  // Extend the Session type to include the role
+  interface Session extends DefaultSession {
+    user?: {
+      id?: string;
+      role?: "admin" | "client" | string; // Add the role property
+    } & DefaultSession["user"];
+  }
+}
+
+// Extend the JWT type to include the role
+declare module "next-auth/jwt" {
+  interface JWT extends DefaultJWT {
+    role?: "admin" | "client" | string; // Add the role property
   }
 }
