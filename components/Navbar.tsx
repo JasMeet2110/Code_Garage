@@ -13,7 +13,7 @@ export default function Navbar() {
     <>
       <nav className="fixed top-0 left-0 w-full h-28 backdrop-blur-xl bg-gradient-to-b from-black/70 to-gray-900/50 border-b border-white/10 shadow-[0_0_25px_rgba(0,0,0,0.5)] text-white flex justify-between items-center px-16 z-50">
         {/* Logo + Brand */}
-        <div className="flex items-center gap-4">
+        <Link href="/" className="flex items-center gap-4"> {/* added homepage link to the logo */}
           <Image
             src="/logo/tracksidegarage.png"
             alt="Trackside Garage Logo"
@@ -30,7 +30,7 @@ export default function Navbar() {
               Reliable Repairs. Built with Passion.
             </p>
           </div>
-        </div>
+        </Link>
 
         {/* Navigation Links */}
         <div className="flex gap-6 text-lg font-medium items-center">
