@@ -3,8 +3,20 @@ import { NextResponse } from "next/server";
 import { ResultSetHeader } from "mysql2";
 
 // GET: fetch all appointments
-export async function GET() {
+export async function GET(req: Request) {
   try {
+    const { searchParams } = new URL(req.url);
+    const date = searchParams.get("date");
+
+    // if a date is provided, return booked time slots for that date
+    if (date) {
+      const results = await query(
+        "SELECT appointment_time FROM appointments WHERE appointment_date = ?",
+        [date]
+      );
+      return NextResponse.json(results);
+    }
+
     const results = await query(
       "SELECT * FROM appointments ORDER BY appointment_date DESC"
     );
@@ -32,14 +44,28 @@ export async function POST(req: Request) {
       car_year,
       plate_number,
       appointment_date,
+      appointment_time,
       description,
       status,
     } = await req.json();
 
+    // check if this date + time is already booked
+    const existing = (await query(
+      "SELECT id FROM appointments WHERE appointment_date = ? AND appointment_time = ?",
+      [appointment_date, appointment_time]
+    )) as any[];
+
+    if (existing && existing.length > 0) {
+      return NextResponse.json(
+        { error: "Selected time is already booked." },
+        { status: 400 }
+      );
+    }
+
     const sql = `
       INSERT INTO appointments 
-      (customer_name, email, phone, service_type, fuel_type, car_make, car_model, car_year, plate_number, appointment_date, description, status)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      (customer_name, email, phone, service_type, fuel_type, car_make, car_model, car_year, plate_number, appointment_date, appointment_time, description, status)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
     const values = [
       customer_name,
@@ -52,6 +78,7 @@ export async function POST(req: Request) {
       car_year,
       plate_number,
       appointment_date,
+      appointment_time,
       description,
       status || "Pending",
     ];
@@ -82,6 +109,7 @@ export async function PUT(req: Request) {
       car_year,
       plate_number,
       appointment_date,
+      appointment_time,
       description,
       status,
     } = await req.json();
@@ -89,7 +117,7 @@ export async function PUT(req: Request) {
     const sql = `
       UPDATE appointments 
       SET customer_name=?, email=?, phone=?, service_type=?, fuel_type=?, car_make=?, car_model=?, car_year=?, 
-          plate_number=?, appointment_date=?, description=?, status=?
+          plate_number=?, appointment_date=?, appointment_time=?, description=?, status=?
       WHERE id=?
     `;
 
@@ -104,6 +132,7 @@ export async function PUT(req: Request) {
       car_year,
       plate_number,
       appointment_date,
+      appointment_time,
       description,
       status,
       id,
