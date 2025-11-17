@@ -30,6 +30,7 @@ export default function AccountPage() {
     licensePlate: "",
     carImage: null,
   });
+
   const [carImage, setCarImage] = useState<string | null>(null);
   const [editMode, setEditMode] = useState(true);
   const [loading, setLoading] = useState(true);
@@ -39,42 +40,76 @@ export default function AccountPage() {
     if (status === "unauthenticated") router.replace("/AuthScreen");
   }, [status, router]);
 
-  // Fetch profile from DB
+  /* -----------------------------------------------------
+     ⭐ FIXED — LOAD + CREATE customer on first login
+  ------------------------------------------------------ */
   useEffect(() => {
     async function fetchProfile() {
       if (!session?.user?.email) return;
+
       try {
-        const res = await fetch("/api/customers", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: session.user.email }),
-        });
-        if (res.ok) {
-          const data = await res.json();
+        // 1️⃣ Try to load existing customer
+        const res = await fetch(
+          `/api/customers?email=${encodeURIComponent(session.user.email)}`,
+          { cache: "no-store" }
+        );
+
+        const customer = await res.json();
+
+        // 2️⃣ If customer exists → load profile
+        if (customer) {
           setFormData({
-            fullName: data.name || session.user.name || "",
-            phone: data.phone || "",
-            email: data.email || session.user.email || "",
-            carName: data.car_name || "",
-            year: data.year ? String(data.year) : "",
-            color: data.color || "",
-            licensePlate: data.car_plate || "",
-            carImage: data.car_image || null,
+            fullName: customer.name || session.user.name || "",
+            phone: customer.phone || "",
+            email: customer.email,
+            carName: customer.car_name || "",
+            year: customer.year ? String(customer.year) : "",
+            color: customer.color || "",
+            licensePlate: customer.car_plate || "",
+            carImage: customer.car_image || null,
           });
-          setCarImage(data.car_image || null);
+
+          setCarImage(customer.car_image || null);
           setEditMode(false);
-        } else {
-          setFormData({
-            fullName: session.user.name || "",
-            email: session.user.email || "",
-            phone: "",
-            carName: "",
-            year: "",
-            color: "",
-            licensePlate: "",
-            carImage: null,
+        }
+
+        // 3️⃣ If customer does NOT exist → create them
+        else {
+          const createRes = await fetch("/api/customers", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              name: session.user.name || "",
+              phone: "",
+              email: session.user.email,
+              carName: "",
+              carPlate: "",
+              year: "",
+              color: "",
+              carImage: null,
+            }),
           });
-          setEditMode(true);
+
+          if (createRes.ok) {
+            // Load the newly created row
+            const newCust = await fetch(
+              `/api/customers?email=${encodeURIComponent(session.user.email)}`
+            ).then((r) => r.json());
+
+            setFormData({
+              fullName: newCust.name || "",
+              phone: newCust.phone || "",
+              email: newCust.email,
+              carName: newCust.car_name || "",
+              year: newCust.year ? String(newCust.year) : "",
+              color: newCust.color || "",
+              licensePlate: newCust.car_plate || "",
+              carImage: newCust.car_image || null,
+            });
+
+            setCarImage(newCust.car_image || null);
+            setEditMode(true);
+          }
         }
       } catch (err) {
         console.error("Failed to load profile:", err);
@@ -82,9 +117,13 @@ export default function AccountPage() {
         setLoading(false);
       }
     }
+
     if (status === "authenticated") fetchProfile();
   }, [session, status]);
 
+  /* -----------------------------------------------------
+     Handlers
+  ------------------------------------------------------ */
   const handleChange = (name: keyof FormData, value: string) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
@@ -99,16 +138,29 @@ export default function AccountPage() {
   };
 
   const validateForm = () => {
-    const { fullName, phone, email, carName, year, color, licensePlate } = formData;
-    if (!fullName || !phone || !email || !carName || !year || !color || !licensePlate) {
+    const { fullName, phone, email, carName, year, color, licensePlate } =
+      formData;
+    if (
+      !fullName ||
+      !phone ||
+      !email ||
+      !carName ||
+      !year ||
+      !color ||
+      !licensePlate
+    ) {
       alert("Please fill all fields before saving.");
       return false;
     }
     return true;
   };
 
+  /* -----------------------------------------------------
+     ⭐ SAVE → PUT
+  ------------------------------------------------------ */
   const saveChanges = async () => {
     if (!validateForm()) return;
+
     try {
       const res = await fetch("/api/customers", {
         method: "PUT",
@@ -124,6 +176,7 @@ export default function AccountPage() {
           carImage: formData.carImage,
         }),
       });
+
       if (res.ok) {
         alert("Profile updated successfully!");
         setEditMode(false);
@@ -134,6 +187,17 @@ export default function AccountPage() {
       console.error("Save failed:", err);
     }
   };
+
+  /* -----------------------------------------------------
+     UI
+  ------------------------------------------------------ */
+  if (loading || status === "loading") {
+    return (
+      <div className="flex justify-center items-center h-screen text-white text-2xl">
+        Loading profile...
+      </div>
+    );
+  }
 
   const renderField = (label: string, name: keyof FormData) => (
     <div className="flex flex-col w-full">
@@ -152,17 +216,9 @@ export default function AccountPage() {
     </div>
   );
 
-  if (loading || status === "loading") {
-    return (
-      <div className="flex justify-center items-center h-screen text-white text-2xl">
-        Loading profile...
-      </div>
-    );
-  }
-
   return (
     <div className="relative min-h-screen text-white overflow-y-auto">
-      {/* 🔥 Background */}
+      {/* Background */}
       <div className="fixed inset-0 -z-10">
         <Image
           src="/background/mustang.jpg"
@@ -174,26 +230,19 @@ export default function AccountPage() {
         <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
       </div>
 
-      {/* Content */}
       <div className="relative z-10 flex flex-col items-center py-20 px-6 space-y-12">
-        {/* Header */}
         <header className="text-center mb-4">
-          <h1 className="text-5xl font-bold text-orange-400 drop-shadow-lg mb-4">
+          <h1 className="text-5xl font-bold text-orange-400 mb-4">
             My Account
           </h1>
           <p className="text-lg text-gray-300 max-w-2xl mx-auto">
-            Welcome, {session?.user?.name?.split(" ")[0]}! Manage your profile and vehicle details below.
+            Welcome, {session?.user?.name?.split(" ")[0]}!
           </p>
         </header>
 
-        {/* Glass Card Container */}
-        <section className="bg-white/10 border border-white/20 backdrop-blur-2xl rounded-2xl shadow-[0_0_35px_rgba(0,0,0,0.5)] hover:shadow-[0_0_40px_rgba(255,165,0,0.2)] transition-all duration-300 p-10 w-full max-w-5xl flex flex-col md:flex-row justify-between items-start gap-10">
-          {/* Left: Fields */}
+        <section className="bg-white/10 border border-white/20 backdrop-blur-2xl rounded-2xl p-10 w-full max-w-5xl flex flex-col md:flex-row gap-10">
+          {/* Left */}
           <div className="flex-1 flex flex-col space-y-4">
-            <h2 className="text-2xl font-extrabold text-orange-400 mb-4">
-              Customer & Vehicle Info
-            </h2>
-
             {renderField("Full Name", "fullName")}
             {renderField("Phone", "phone")}
             {renderField("Email", "email")}
@@ -206,14 +255,14 @@ export default function AccountPage() {
               {editMode ? (
                 <button
                   onClick={saveChanges}
-                  className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold shadow-[0_0_15px_rgba(0,255,0,0.2)] hover:shadow-[0_0_25px_rgba(0,255,0,0.4)] transition-all duration-300"
+                  className="px-6 py-2 bg-green-600 hover:bg-green-700 rounded-lg text-white font-semibold"
                 >
                   Save Changes
                 </button>
               ) : (
                 <button
                   onClick={() => setEditMode(true)}
-                  className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold shadow-[0_0_15px_rgba(0,128,255,0.3)] hover:shadow-[0_0_25px_rgba(0,128,255,0.5)] transition-all duration-300"
+                  className="px-6 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-white font-semibold"
                 >
                   Edit Profile
                 </button>
@@ -221,26 +270,19 @@ export default function AccountPage() {
             </div>
           </div>
 
-          {/* Right: Car Image */}
-          <div className="flex flex-col items-center justify-center mt-65 w-full md:w-[45%]">
-            <div className="relative w-full flex items-center justify-center">
-              <Image
-                src={carImage || "/logo/car.png"}
-                alt="Car Image"
-                width={550}
-                height={400}
-                className="object-contain rounded-lg drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]"
-              />
-            </div>
+          {/* Right */}
+          <div className="flex flex-col items-center justify-center w-full md:w-[45%]">
+            <Image
+              src={carImage || "/logo/car.png"}
+              alt="Car Image"
+              width={550}
+              height={400}
+              className="object-contain rounded-lg"
+            />
 
             <label className="mt-12">
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleFileChange}
-                className="hidden"
-              />
-              <span className="cursor-pointer px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-lg font-semibold shadow-[0_0_20px_rgba(255,165,0,0.3)] hover:shadow-[0_0_30px_rgba(255,165,0,0.5)] transition-all duration-300">
+              <input type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
+              <span className="cursor-pointer px-6 py-3 bg-orange-500 hover:bg-orange-600 rounded-lg text-white font-semibold">
                 Upload Vehicle Image
               </span>
             </label>

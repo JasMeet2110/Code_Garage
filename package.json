@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@react-google-maps/api": "^2.20.7",
+    "bcryptjs": "^3.0.3",
     "lucide-react": "^0.543.0",
     "mysql2": "^3.15.3",
     "next": "15.5.2",
