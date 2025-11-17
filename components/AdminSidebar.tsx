@@ -12,7 +12,7 @@ export default function AdminSidebar() {
     <>
       <aside className="fixed top-0 left-0 h-screen w-72 backdrop-blur-lg bg-white/10 border-r border-white/20 shadow-lg text-white flex flex-col items-center py-8 z-50">
         {/* Logo Section */}
-        <div className="flex flex-col items-center mb-10">
+        <Link href="/" className="flex flex-col items-center mb-10"> {/* added homepage link to the logo */}
           <Image
             src="/logo/tracksidegarage.png"
             alt="Logo"
@@ -24,7 +24,7 @@ export default function AdminSidebar() {
           <p className="text-sm text-gray-300">
             Reliable Repairs. Built with Passion.
           </p>
-        </div>
+        </Link>
 
         {/* Navigation Links */}
         <nav className="flex flex-col w-full px-6 space-y-4">
