@@ -100,7 +100,7 @@ export default function ServicesCarousel() {
         modules={[Autoplay]}
         spaceBetween={20}
         slidesPerView={3}
-        loop={true}
+        loop
         autoplay={{ delay: 2500 }}
         breakpoints={{
           0: { slidesPerView: 1 },
@@ -110,20 +110,37 @@ export default function ServicesCarousel() {
       >
         {services.map((service, i) => (
           <SwiperSlide key={i} className="flex">
-            <div className="bg-white shadow-md rounded-lg overflow-hidden hover:shadow-lg transition flex flex-col h-[340px] w-full">
+            <div
+              className="
+                bg-black/40 
+                backdrop-blur-md 
+                border border-white/10 
+                rounded-2xl 
+                shadow-xl 
+                overflow-hidden 
+                hover:scale-105 
+                transition-all 
+                flex flex-col 
+                h-[340px] 
+                w-full
+              "
+            >
+              {/* Image */}
               <div className="h-48 w-full relative">
                 <Image
                   src={service.img}
                   alt={service.title}
                   fill
-                  className="object-cover"
+                  className="object-cover opacity-90"
                 />
               </div>
+
+              {/* Text Area */}
               <div className="p-6 flex-1 flex flex-col">
-                <h3 className="text-xl font-semibold mb-2">
+                <h3 className="text-xl font-semibold mb-2 text-orange-400">
                   {service.title}
                 </h3>
-                <p className="text-gray-600 text-sm">
+                <p className="text-gray-300 text-sm leading-relaxed">
                   {service.desc}
                 </p>
               </div>

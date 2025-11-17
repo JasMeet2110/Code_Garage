@@ -1,7 +1,25 @@
 import { NextResponse } from "next/server";
 import { query } from "@/lib/db";
 
-// GET all employees
+function normalizeDate(input) {
+  if (!input) return null;
+
+  // Already valid ISO?
+  if (/^\d{4}-\d{2}-\d{2}$/.test(input)) return input;
+
+  try {
+    const parsed = new Date(input);
+    if (!isNaN(parsed.getTime())) {
+      const yyyy = parsed.getFullYear();
+      const mm = String(parsed.getMonth() + 1).padStart(2, "0");
+      const dd = String(parsed.getDate()).padStart(2, "0");
+      return `${yyyy}-${mm}-${dd}`;
+    }
+  } catch {}
+
+  return null; 
+}
+
 export async function GET() {
   try {
     const results = await query("SELECT * FROM employees ORDER BY id ASC");
@@ -12,18 +30,30 @@ export async function GET() {
   }
 }
 
-// POST - Add a new employee
 export async function POST(req) {
   try {
-    const { name, position, phone, email, salary, startDate } = await req.json();
+    const body = await req.json();
+    const { name, position, phone, email, salary, startDate } = body;
 
     if (!name || !position || !phone || !email || !salary || !startDate) {
-      return NextResponse.json({ error: "All fields are required" }, { status: 400 });
+      return NextResponse.json(
+        { error: "All fields are required" },
+        { status: 400 }
+      );
+    }
+
+    const startDateISO = normalizeDate(startDate);
+
+    if (!startDateISO) {
+      return NextResponse.json(
+        { error: "Invalid date format" },
+        { status: 400 }
+      );
     }
 
     await query(
       "INSERT INTO employees (name, position, phone, email, salary, start_date) VALUES (?, ?, ?, ?, ?, ?)",
-      [name, position, phone, email, salary, startDate]
+      [name, position, phone, email, salary, startDateISO]
     );
 
     return NextResponse.json({ success: true });
@@ -33,16 +63,20 @@ export async function POST(req) {
   }
 }
 
-// PUT - Edit existing employee
 export async function PUT(req) {
   try {
-    const { id, name, position, phone, email, salary, startDate } = await req.json();
+    const body = await req.json();
+    const { id, name, position, phone, email, salary, startDate } = body;
 
-    if (!id) return NextResponse.json({ error: "Missing employee ID" }, { status: 400 });
+    if (!id) {
+      return NextResponse.json({ error: "Missing employee ID" }, { status: 400 });
+    }
+
+    const startDateISO = normalizeDate(startDate);
 
     await query(
       "UPDATE employees SET name=?, position=?, phone=?, email=?, salary=?, start_date=? WHERE id=?",
-      [name, position, phone, email, salary, startDate, id]
+      [name, position, phone, email, salary, startDateISO, id]
     );
 
     return NextResponse.json({ success: true });
@@ -52,13 +86,15 @@ export async function PUT(req) {
   }
 }
 
-// DELETE - Remove an employee
 export async function DELETE(req) {
   try {
     const { id } = await req.json();
-    if (!id) return NextResponse.json({ error: "Missing employee ID" }, { status: 400 });
+    if (!id) {
+      return NextResponse.json({ error: "Missing employee ID" }, { status: 400 });
+    }
 
     await query("DELETE FROM employees WHERE id=?", [id]);
+
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error deleting employee:", error);

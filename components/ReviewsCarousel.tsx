@@ -17,7 +17,7 @@ interface ReviewsCarouselProps {
 export default function ReviewsCarousel({ reviews }: ReviewsCarouselProps) {
   const [startIndex, setStartIndex] = useState(0);
 
-  // auto rotate reviews
+  // Auto rotate
   useEffect(() => {
     if (!reviews || reviews.length === 0) return;
 
@@ -28,9 +28,7 @@ export default function ReviewsCarousel({ reviews }: ReviewsCarouselProps) {
     return () => clearInterval(id);
   }, [reviews]);
 
-  if (!reviews || reviews.length === 0) {
-    return null;
-  }
+  if (!reviews || reviews.length === 0) return null;
 
   const visibleCount = Math.min(3, reviews.length);
 
@@ -45,29 +43,42 @@ export default function ReviewsCarousel({ reviews }: ReviewsCarouselProps) {
     cards.push(
       <div
         key={`${r.id ?? r.name}-${i}`}
-        className="bg-neutral-900/70 border border-neutral-700/80 rounded-2xl shadow-2xl 
-        p-6 text-left min-h-[180px] flex flex-col justify-between"
+        className="
+          bg-black/40 
+          backdrop-blur-md
+          border border-white/10
+          rounded-2xl
+          shadow-xl
+          p-6 
+          text-left 
+          min-h-[200px] 
+          flex 
+          flex-col 
+          justify-between
+          hover:scale-[1.02] 
+          transition-transform 
+        "
       >
-        <p className="text-gray-200 text-sm md:text-base mb-4 break-words whitespace-normal">
-          “{r.comment}”
-        </p>
-
         <div className="flex items-center justify-between">
           <div>
-            <p className="font-semibold text-orange-300">{r.name}</p>
-            <p className="text-yellow-400 text-xs md:text-sm">
+            <p className="font-semibold text-orange-300 text-xl">{r.name}</p>
+            <p className="text-yellow-400 text-md">
               {"⭐".repeat(r.rating || 0)}
             </p>
           </div>
           <span className="text-xs text-gray-500">Verified Customer</span>
         </div>
+
+        <p className="text-gray-200 text-sm md:text-base mb-4 break-words whitespace-normal">
+          “{r.comment}”
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="relative max-w-5xl mx-auto">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div className="w-full px-2 md:px-0">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {cards}
       </div>
     </div>

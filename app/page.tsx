@@ -130,7 +130,7 @@ export default function Home() {
 
       {/* ABOUT SECTION */}
       <section className="py-16 px-6 md:px-10 bg-black/40 backdrop-blur-sm border-y border-white/10">
-        <div className="max-w-5xl mx-auto grid md:grid-cols-[3fr,2fr] gap-10 items-center">
+        <div className="max-w-7xl mx-auto grid md:grid-cols-[3fr,2fr] gap-10 items-center">
           <div className="space-y-4">
             <h2 className="text-3xl md:text-4xl font-bold text-orange-400">
               Built For Drivers Who Actually Care.
@@ -148,7 +148,7 @@ export default function Home() {
             </ul>
           </div>
 
-          <div className="relative h-60 md:h-72 rounded-2xl overflow-hidden border border-white/10 bg-gradient-to-br from-orange-500/10 to-sky-500/10">
+          <div className="relative h-60 md:h-100 rounded-2xl overflow-hidden border border-white/10 bg-gradient-to-br from-orange-500/10 to-sky-500/10">
             <Image
               src="/background/garageinside.png"
               alt="Garage Interior"
@@ -168,40 +168,37 @@ export default function Home() {
 
       {/* SERVICES CAROUSEL */}
       <section className="py-16 px-6 md:px-10 bg-black/40 backdrop-blur-sm border-y border-white/10">
-        <div className="max-w-5xl mx-auto text-center">
-          <p className="text-xs uppercase tracking-[0.25em] text-gray-400 mb-2">
-            Our Popular Services
-          </p>
+      <div className="max-w-7xl mx-auto text-center">
 
-          <h2 className="text-3xl md:text-4xl font-bold text-orange-400 mb-2">
-            Dialed-In Maintenance & Repair.
-          </h2>
+        <p className="text-xs uppercase tracking-[0.25em] text-gray-400 mb-2">
+          Our Popular Services
+        </p>
 
-          <p className="text-gray-300 text-sm md:text-base mb-10 max-w-2xl mx-auto">
-            From oil changes to diagnostics — tuned for real-world driving.
-          </p>
+        <h2 className="text-3xl md:text-4xl font-bold text-orange-400 mb-2">
+          Dialed-In Maintenance & Repair.
+        </h2>
 
-          <div className="relative max-w-xl mx-auto">
-            {/* Card */}
-            {/* Controls */}
-          </div>
+        <p className="text-gray-300 text-sm md:text-base mb-10 max-w-2xl mx-auto">
+          From oil changes to diagnostics — tuned for real-world driving.
+        </p>
 
-          <div className="mt-10">
-            <ServicesCarousel />
-          </div>
-
-          <Link
-            href="/Client/services"
-            className="mt-10 inline-block bg-orange-500 text-white px-8 py-3 rounded-full font-medium hover:bg-orange-600 hover:scale-105 transition-transform"
-          >
-            Explore All Services
-          </Link>
+        <div className="mt-10 w-full">
+          <ServicesCarousel />
         </div>
-      </section>
+
+        <Link
+          href="/Client/services"
+          className="mt-12 inline-block bg-orange-500 text-white px-8 py-3 rounded-full font-medium 
+                    hover:bg-orange-600 hover:scale-105 transition-transform"
+        >
+          Explore All Services
+        </Link>
+      </div>
+    </section>
 
       {/* REVIEWS */}
       <section className="py-16 px-6 md:px-10 bg-black/40 backdrop-blur-sm border-y border-white/10">
-        <div className="max-w-5xl mx-auto text-center">
+        <div className="max-w-7xl mx-auto text-center">
           <p className="text-xs uppercase tracking-[0.25em] text-gray-400 mb-2">
             Real Feedback
           </p>
