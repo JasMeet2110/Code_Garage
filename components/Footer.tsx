@@ -27,6 +27,7 @@ export default function Footer() {
               { href: "/Client/book-appointment", label: "Book Appointment" },
               { href: "/Client/reviews", label: "Reviews" },
               { href: "/Client/contact", label: "Contact" },
+              { href: "/Client/account", label: "My Account" },
             ].map((item) => (
               <li key={item.href}>
                 <Link
