@@ -1,7 +1,7 @@
 "use client";
 
 //imports for the booking page
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
@@ -30,6 +30,17 @@ const SERVICES = [
 //defines fuel types
 const FUEL_TYPES = ["Petrol", "Diesel", "Hybrid", "Electric"];
 
+//defines time slots (we will later mark some as booked)
+const TIME_SLOTS = [
+  "09:00 AM",
+  "10:00 AM",
+  "11:00 AM",
+  "01:00 PM",
+  "02:00 PM",
+  "03:00 PM",
+  "04:00 PM",
+];
+
 //main booking appointment page functions
 export default function BookAppointmentPage() {
   const router = useRouter();
@@ -45,11 +56,14 @@ export default function BookAppointmentPage() {
     fuel: "",
     service: "",
     date: "",
+    time: "",
     description: "",
   });
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState(false);
+  const [bookedTimes, setBookedTimes] = useState<string[]>([]);
+  const [loadingTimes, setLoadingTimes] = useState(false);
 
   // inline validation
   const validate = () => {
@@ -67,11 +81,46 @@ export default function BookAppointmentPage() {
     if (!form.year.trim()) newErrors.year = "Car year required.";
     if (!form.plate.trim()) newErrors.plate = "License plate required.";
     if (!form.date) newErrors.date = "Select appointment date.";
+    if (!form.time) newErrors.time = "Select appointment time.";
     if (!form.description.trim()) newErrors.description = "Please describe the issue.";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+
+  // load booked time slots when date changes
+  useEffect(() => {
+    if (!form.date) {
+      setBookedTimes([]);
+      return;
+    }
+
+    setLoadingTimes(true);
+    setForm((prev) => ({ ...prev, time: "" }));
+
+    const loadTimes = async () => {
+      try {
+        const res = await fetch(`/api/appointments?date=${form.date}`);
+        if (!res.ok) {
+          console.error("Failed to fetch booked times");
+          setBookedTimes([]);
+          return;
+        }
+        const data = await res.json();
+        const times = (data || [])
+          .map((row: any) => row.appointment_time)
+          .filter((t: any) => typeof t === "string" && t.trim().length > 0);
+        setBookedTimes(times);
+      } catch (e) {
+        console.error("Error loading booked times:", e);
+        setBookedTimes([]);
+      } finally {
+        setLoadingTimes(false);
+      }
+    };
+
+    loadTimes();
+  }, [form.date]);
 
   //handles confirmation of the booking
   const handleConfirm = async () => {
@@ -94,6 +143,7 @@ export default function BookAppointmentPage() {
           car_year: form.year,
           plate_number: form.plate,
           appointment_date: form.date,
+          appointment_time: form.time,
           description: form.description,
           status: "Pending",
         }),
@@ -101,26 +151,26 @@ export default function BookAppointmentPage() {
 
       //if successful, navigates to confirmation otherwise push an error
       if (res.ok) {
-      // send email notification
-      await fetch("/api/email", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          customerName: form.customer_name,
-          email: form.email,
-          phone: form.phone,
-          service: form.service,
-          vehicle: `${form.make} ${form.model} ${form.year} (${form.plate})`,
-          date: form.date,
-          issue: form.description,
-        }),
-      });
+        // send email notification
+        await fetch("/api/email", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            customerName: form.customer_name,
+            email: form.email,
+            phone: form.phone,
+            service: form.service,
+            vehicle: `${form.make} ${form.model} ${form.year} (${form.plate})`,
+            date: `${form.date} ${form.time}`,
+            issue: form.description,
+          }),
+        });
 
-      router.push("/Client/book-appointment/confirmation");
-    } else {
-      const err = await res.json();
-      setErrors({ api: err.error || "Failed to save appointment." });
-    }
+        router.push("/Client/book-appointment/confirmation");
+      } else {
+        const err = await res.json();
+        setErrors({ api: err.error || "Failed to save appointment." });
+      }
     } catch (error) {
       console.error("Error booking appointment:", error);
       setErrors({ api: "Something went wrong. Please try again." });
@@ -277,6 +327,47 @@ export default function BookAppointmentPage() {
             )}
           </div>
 
+          {/* time slots */}
+          <div className="mb-5">
+            <div className="flex items-center justify-between mb-2">
+              <label className="block font-semibold">Time</label>
+              {loadingTimes && (
+                <span className="text-xs text-gray-400">Loading time slots...</span>
+              )}
+            </div>
+            <div className="flex flex-wrap gap-3">
+              {TIME_SLOTS.map((slot) => {
+                const isBooked = bookedTimes.includes(slot);
+                const isSelected = form.time === slot;
+
+                return (
+                  <button
+                    key={slot}
+                    type="button"
+                    disabled={isBooked}
+                    onClick={() => {
+                      if (!isBooked) {
+                        handleChange("time", slot);
+                      }
+                    }}
+                    className={`px-4 py-2 rounded-lg border text-sm transition-all ${
+                      isBooked
+                        ? "bg-red-600/70 text-white border-red-600 cursor-not-allowed"
+                        : isSelected
+                        ? "bg-green-500 text-white border-green-500"
+                        : "bg-white/10 text-white border-white/20 hover:bg-white/20"
+                    }`}
+                  >
+                    {slot}
+                  </button>
+                );
+              })}
+            </div>
+            {errors.time && (
+              <p className="text-red-500 text-sm mt-1">{errors.time}</p>
+            )}
+          </div>
+
           <label className="block mb-2 font-semibold">
             Description of Issue
           </label>
@@ -332,6 +423,10 @@ export default function BookAppointmentPage() {
               <tr>
                 <th className="pr-4 align-top font-semibold w-36">Date:</th>
                 <td>{form.date || "—"}</td>
+              </tr>
+              <tr>
+                <th className="pr-4 align-top font-semibold w-36">Time:</th>
+                <td>{form.time || "—"}</td>
               </tr>
               <tr>
                 <th className="pr-4 align-top font-semibold w-36">Issue:</th>

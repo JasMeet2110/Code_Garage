@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import ServicesCarousel from "@/components/ServicesCarousel";
+import ReviewsCarousel from "@/components/ReviewsCarousel";
 
 /* ---------------------- SERVICES DATA ---------------------- */
 const SERVICES = [
@@ -37,7 +39,6 @@ export default function Home() {
   const [serviceIndex, setServiceIndex] = useState(0);
 
   const [reviews, setReviews] = useState<any[]>([]);
-  const [reviewIndex, setReviewIndex] = useState(0);
 
   useEffect(() => {
     const id = setInterval(() => {
@@ -58,7 +59,7 @@ export default function Home() {
               b.rating - a.rating ||
               new Date(b.date).getTime() - new Date(a.date).getTime()
           )
-          .slice(0, 5); 
+          .slice(0, 5);
 
         setReviews(sorted);
       } catch (e) {
@@ -69,22 +70,10 @@ export default function Home() {
     loadReviews();
   }, []);
 
-  /* Auto-Rotate Reviews */
-  useEffect(() => {
-    if (reviews.length === 0) return;
-
-    const id = setInterval(() => {
-      setReviewIndex((prev) => (prev + 1) % reviews.length);
-    }, 6000);
-
-    return () => clearInterval(id);
-  }, [reviews]);
-
   const currentService = SERVICES[serviceIndex];
 
   return (
     <div className="relative text-white min-h-screen">
-
       {/* BACKGROUND */}
       <div className="fixed inset-0 -z-10">
         <Image
@@ -104,7 +93,6 @@ export default function Home() {
       {/* HERO SECTION */}
       <section className="relative h-[850px] flex items-center justify-center text-center">
         <div className="relative z-10 px-6 max-w-5xl mx-auto">
-
           <p className="tracking-[0.3em] uppercase text-xs md:text-sm text-gray-300 mb-4">
             Alberta · Full-Service Auto Care
           </p>
@@ -142,8 +130,7 @@ export default function Home() {
 
       {/* ABOUT SECTION */}
       <section className="py-16 px-6 md:px-10 bg-black/40 backdrop-blur-sm border-y border-white/10">
-        <div className="max-w-5xl mx-auto grid md:grid-cols-[3fr,2fr] gap-10 items-center">
-
+        <div className="max-w-7xl mx-auto grid md:grid-cols-[3fr,2fr] gap-10 items-center">
           <div className="space-y-4">
             <h2 className="text-3xl md:text-4xl font-bold text-orange-400">
               Built For Drivers Who Actually Care.
@@ -161,7 +148,7 @@ export default function Home() {
             </ul>
           </div>
 
-          <div className="relative h-60 md:h-72 rounded-2xl overflow-hidden border border-white/10 bg-gradient-to-br from-orange-500/10 to-sky-500/10">
+          <div className="relative h-60 md:h-100 rounded-2xl overflow-hidden border border-white/10 bg-gradient-to-br from-orange-500/10 to-sky-500/10">
             <Image
               src="/background/garageinside.png"
               alt="Garage Interior"
@@ -181,100 +168,37 @@ export default function Home() {
 
       {/* SERVICES CAROUSEL */}
       <section className="py-16 px-6 md:px-10 bg-black/40 backdrop-blur-sm border-y border-white/10">
-        <div className="max-w-5xl mx-auto text-center">
+      <div className="max-w-7xl mx-auto text-center">
 
-          <p className="text-xs uppercase tracking-[0.25em] text-gray-400 mb-2">
-            Our Popular Services
-          </p>
+        <p className="text-xs uppercase tracking-[0.25em] text-gray-400 mb-2">
+          Our Popular Services
+        </p>
 
-          <h2 className="text-3xl md:text-4xl font-bold text-orange-400 mb-2">
-            Dialed-In Maintenance & Repair.
-          </h2>
+        <h2 className="text-3xl md:text-4xl font-bold text-orange-400 mb-2">
+          Dialed-In Maintenance & Repair.
+        </h2>
 
-          <p className="text-gray-300 text-sm md:text-base mb-10 max-w-2xl mx-auto">
-            From oil changes to diagnostics — tuned for real-world driving.
-          </p>
+        <p className="text-gray-300 text-sm md:text-base mb-10 max-w-2xl mx-auto">
+          From oil changes to diagnostics — tuned for real-world driving.
+        </p>
 
-          <div className="relative max-w-xl mx-auto">
-
-            {/* Card */}
-            <div className="bg-neutral-900/70 border border-neutral-700/80 rounded-2xl shadow-2xl 
-              overflow-hidden flex flex-col md:flex-row">
-
-              <div className="relative w-full md:w-1/2 h-52 md:h-64">
-                <Image
-                  src={currentService.img}
-                  alt={currentService.title}
-                  fill
-                  className="object-cover"
-                />
-              </div>
-
-              <div className="p-6 md:p-8 flex flex-col justify-center text-left">
-                <h3 className="text-2xl font-semibold mb-3 text-orange-300">
-                  {currentService.title}
-                </h3>
-
-                <p className="text-gray-300 text-sm md:text-base mb-4">
-                  {currentService.text}
-                </p>
-
-                <Link
-                  href="/Client/services"
-                  className="inline-block text-sm font-semibold text-orange-400 hover:text-orange-300"
-                >
-                  View service details →
-                </Link>
-              </div>
-            </div>
-
-            {/* Controls */}
-            <div className="flex items-center justify-between mt-4">
-              <button
-                onClick={() =>
-                  setServiceIndex((prev) => (prev - 1 + SERVICES.length) % SERVICES.length)
-                }
-                className="px-3 py-1 rounded-full border border-white/30 text-xs text-gray-200 hover:bg-white/10 transition-all"
-              >
-                ◀ Prev
-              </button>
-
-              <div className="flex gap-2">
-                {SERVICES.map((_, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => setServiceIndex(idx)}
-                    className={`h-2 w-2 rounded-full transition-all ${
-                      idx === serviceIndex ? "bg-orange-500 w-4" : "bg-gray-500/60"
-                    }`}
-                  />
-                ))}
-              </div>
-
-              <button
-                onClick={() =>
-                  setServiceIndex((prev) => (prev + 1) % SERVICES.length)
-                }
-                className="px-3 py-1 rounded-full border border-white/30 text-xs text-gray-200 hover:bg-white/10 transition-all"
-              >
-                Next ▶
-              </button>
-            </div>
-          </div>
-
-          <Link
-            href="/Client/services"
-            className="mt-10 inline-block bg-orange-500 text-white px-8 py-3 rounded-full font-medium hover:bg-orange-600 hover:scale-105 transition-transform"
-          >
-            Explore All Services
-          </Link>
+        <div className="mt-10 w-full">
+          <ServicesCarousel />
         </div>
-      </section>
+
+        <Link
+          href="/Client/services"
+          className="mt-12 inline-block bg-orange-500 text-white px-8 py-3 rounded-full font-medium 
+                    hover:bg-orange-600 hover:scale-105 transition-transform"
+        >
+          Explore All Services
+        </Link>
+      </div>
+    </section>
 
       {/* REVIEWS */}
       <section className="py-16 px-6 md:px-10 bg-black/40 backdrop-blur-sm border-y border-white/10">
-        <div className="max-w-5xl mx-auto text-center">
-
+        <div className="max-w-7xl mx-auto text-center">
           <p className="text-xs uppercase tracking-[0.25em] text-gray-400 mb-2">
             Real Feedback
           </p>
@@ -291,64 +215,7 @@ export default function Home() {
           {reviews.length === 0 ? (
             <p className="opacity-70 text-gray-400">No reviews yet.</p>
           ) : (
-            <div className="relative max-w-xl mx-auto">
-              <div className="bg-neutral-900/70 border border-neutral-700/80 rounded-2xl shadow-2xl 
-                p-8 text-left min-h-[180px]">
-
-                <p className="text-gray-200 text-sm md:text-base mb-4 break-words whitespace-normal">
-                  “{reviews[reviewIndex]?.comment}”
-                </p>
-
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-semibold text-orange-300">
-                      {reviews[reviewIndex]?.name}
-                    </p>
-
-                    <p className="text-yellow-400 text-xs md:text-sm">
-                      {"⭐".repeat(reviews[reviewIndex]?.rating || 0)}
-                    </p>
-                  </div>
-
-                  <span className="text-xs text-gray-500">Verified Customer</span>
-                </div>
-              </div>
-
-              {/* Controls */}
-              <div className="flex items-center justify-between mt-4">
-                <button
-                  onClick={() =>
-                    setReviewIndex((prev) =>
-                      (prev - 1 + reviews.length) % reviews.length
-                    )
-                  }
-                  className="px-3 py-1 rounded-full border border-white/30 text-xs text-gray-200 hover:bg-white/10 transition-all"
-                >
-                  ◀ Prev
-                </button>
-
-                <div className="flex gap-2">
-                  {reviews.map((_, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => setReviewIndex(idx)}
-                      className={`h-2 w-2 rounded-full transition-all ${
-                        idx === reviewIndex ? "bg-orange-500 w-4" : "bg-gray-500/60"
-                      }`}
-                    />
-                  ))}
-                </div>
-
-                <button
-                  onClick={() =>
-                    setReviewIndex((prev) => (prev + 1) % reviews.length)
-                  }
-                  className="px-3 py-1 rounded-full border border-white/30 text-xs text-gray-200 hover:bg-white/10 transition-all"
-                >
-                  Next ▶
-                </button>
-              </div>
-            </div>
+            <ReviewsCarousel reviews={reviews} />
           )}
 
           <Link

@@ -20,12 +20,18 @@ const handler = NextAuth({
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
 
+        const users = (await query("SELECT * FROM users WHERE email = ?", [
+          credentials.email,
+        ])) as any[];
+        if (!credentials?.email || !credentials?.password) return null;
+
         const users = (await query(
           "SELECT * FROM users WHERE email = ?",
           [credentials.email]
         )) as any[];
 
         const user = users[0];
+        if (!user) return null;
         if (!user) return null;
 
         const isValidPassword = await bcrypt.compare(
@@ -39,6 +45,7 @@ const handler = NextAuth({
           email: user.email,
           name: user.name,
           role: user.role,
+          role: user.role,
         };
       },
     }),
@@ -48,23 +55,23 @@ const handler = NextAuth({
     signIn: "/AuthScreen",
   },
 
+  session: {
+    strategy: "jwt",
+  },
+
   callbacks: {
     async signIn({ user }) {
       return !!user?.email;
     },
 
     async jwt({ token, user }) {
-      if (user) {
-        // @ts-expect-error if not typed yet
-        token.role = user.role;
-      }
+      if (user) token.role = user.role;
       return token;
     },
 
     async session({ session, token }) {
       if (!session.user) return session;
 
-      // @ts-expect-error if not typed yet
       if (token.role) {
         session.user.role = token.role;
       } else if (session.user.email === "tracksidegarage0101@gmail.com") {
