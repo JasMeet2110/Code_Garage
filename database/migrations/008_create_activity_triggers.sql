@@ -1,8 +1,8 @@
 -- Migration: Create all activity triggers
--- Date: 2025-10-23
--- Author: Jasmeet
+-- Date: 2025-10-23 updated on 2025-11-16
+-- Author: Jasmeet & Sami
 
-DELIMITER //
+
 
 -- BEFORE UPDATE: stamp completed_at when appointment first becomes Completed
 CREATE TRIGGER trg_appt_stamp_completed_at
@@ -14,7 +14,7 @@ BEGIN
      AND NEW.completed_at IS NULL THEN
     SET NEW.completed_at = NOW();
   END IF;
-END//
+END;
 
 -- AFTER UPDATE: log appointment completion in activity_log
 CREATE TRIGGER trg_appt_completed_log
@@ -32,33 +32,35 @@ BEGIN
              ' (', COALESCE(NEW.service_type,'N/A'), ')')
     );
   END IF;
-END//
+END;
+
+
 
 -- AFTER INSERT: log new customer
 CREATE TRIGGER trg_customer_added_log
 AFTER INSERT ON customers
 FOR EACH ROW
 BEGIN
-  INSERT INTO activity_log (action_type, entity_type, entity_name, message)
-  VALUES ('Add','Customer',NEW.name,CONCAT('Added customer: ',NEW.name));
-END//
+  INSERT INTO activity_log (table_name, record_id, action_type, entity_type, entity_name, message)
+  VALUES ('customers', NEW.id, 'Add','Customer',NEW.name,CONCAT('Added customer: ',NEW.name));
+END;
 
 -- AFTER UPDATE: log edited customer
 CREATE TRIGGER trg_customer_edited_log
 AFTER UPDATE ON customers
 FOR EACH ROW
 BEGIN
-  INSERT INTO activity_log (action_type, entity_type, entity_name, message)
-  VALUES ('Edit','Customer',NEW.name,CONCAT('Edited customer: ',NEW.name));
-END//
+  INSERT INTO activity_log (table_name, record_id, action_type, entity_type, entity_name, message)
+  VALUES ('customers', NEW.id, 'Edit','Customer',NEW.name,CONCAT('Edited customer: ',NEW.name));
+END;
 
 -- AFTER DELETE: log deleted customer
 CREATE TRIGGER trg_customer_deleted_log
 AFTER DELETE ON customers
 FOR EACH ROW
 BEGIN
-  INSERT INTO activity_log (action_type, entity_type, entity_name, message)
-  VALUES ('Delete','Customer',OLD.name,CONCAT('Deleted customer: ',OLD.name));
-END//
+  INSERT INTO activity_log (table_name, record_id, action_type, entity_type, entity_name, message)
+  VALUES ('customers', OLD.id, 'Delete','Customer',OLD.name,CONCAT('Deleted customer: ',OLD.name));
+END;
 
-DELIMITER ;
+
