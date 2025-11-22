@@ -1,162 +1,202 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { useState } from "react";
+import Link from "next/link";
+import { User, Mail, Lock, UserPlus, Eye, EyeOff } from "lucide-react";
 
 export default function SignUpPage() {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
   const router = useRouter();
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const handleSignUp = (e: React.FormEvent) => {
+  const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
 
-    if (form.password !== form.confirmPassword) {
-      alert("Passwords do not match!");
+    // 🔥 Check if passwords match
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
       return;
     }
 
-    // TODO: Replace with your real registration logic (NextAuth credentials or API call)
-    console.log("Sign Up:", form);
-    router.push("/AuthScreen/signin");
+    setLoading(true);
+
+    try {
+      const response = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password }),
+      });
+
+      const data = await response.json();
+      setLoading(false);
+
+      if (response.ok) {
+        router.push("/AuthScreen?success=true");
+      } else {
+        setError(data.error || "Failed to create account. Please try again.");
+      }
+    } catch {
+      setLoading(false);
+      setError("An unexpected error occurred. Check your network connection.");
+    }
   };
 
   return (
-    <div className="relative min-h-screen text-white overflow-y-auto">
-      {/* ✅ Fixed background */}
+    <div className="relative h-[900px] flex flex-col items-center justify-center p-4">
+
+      {/* Background */}
       <div className="fixed inset-0 -z-10">
         <Image
-          src="/background/ZR1.png"
-          alt="Garage Background"
+          src="/background/login.png"
+          alt="Background"
           fill
           priority
-          className="object-cover brightness-50"
+          className="object-cover brightness-[0.2]"
         />
-        <div className="absolute inset-0 bg-black/60" />
       </div>
 
-      {/* ✅ Scrollable content */}
-      <div className="relative z-10 flex flex-col items-center justify-start min-h-screen py-16 px-4">
-        {/* Logo + Title */}
-        <div className="flex flex-col items-center mb-10 text-center">
+      {/* Logo */}
+      <div className="flex flex-col items-center mb-16 z-10">
+        <div className="w-70 h-25 relative mb-3">
           <Image
-            src="/TracksideGarage.png"
-            alt="Trackside Garage"
-            width={220}
-            height={140}
-            className="invert brightness-0"
-            priority
+            src="/logo/TrackSideGarage.png"
+            alt="Trackside Garage Logo"
+            fill
+            className="invert brightness-0 drop-shadow-[0_0_10px_rgba(255,255,255,0.1)] object-contain"
           />
-          <h1 className="mt-4 text-4xl font-extrabold text-orange-400 drop-shadow-lg tracking-wide">
-            Trackside Garage
-          </h1>
-          <p className="mt-1 text-gray-200 drop-shadow">
-            Reliable Repairs. Built with Passion.
-          </p>
         </div>
 
-        {/* ✅ Glass Sign-Up Box */}
-        <div className="bg-white/90 text-black rounded-2xl shadow-2xl p-8 w-full max-w-md backdrop-blur-sm">
-          <h1 className="text-3xl font-extrabold text-center text-orange-500 mb-2 drop-shadow">
-            Create Account
-          </h1>
-          <p className="text-center text-gray-600 mb-6">
-            Join Trackside Garage to manage your bookings and services.
-          </p>
+        <h1 className="text-5xl font-extrabold tracking-wide text-white drop-shadow-lg">
+          Trackside <span className="text-orange-500">Garage</span>
+        </h1>
 
-          {/* Sign-Up Form */}
-          <form onSubmit={handleSignUp} className="space-y-4">
+        <p className="text-gray-300 text-md mt-1">
+          Precision Care For Every Ride
+        </p>
+      </div>
+
+      {/* Card */}
+      <div className="relative z-10 w-full max-w-md bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-8 shadow-2xl">
+        <h1 className="text-3xl font-bold text-center text-orange-400 mb-6">
+          Create Account
+        </h1>
+
+        {error && (
+          <div className="bg-red-500/20 text-red-400 border border-red-500/50 p-3 rounded-lg mb-4 text-sm">
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSignUp} className="space-y-4">
+
+          {/* Name */}
+          <div className="relative">
+            <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
             <input
               type="text"
-              name="name"
               placeholder="Full Name"
+              value={name}
               required
-              value={form.name}
-              onChange={handleChange}
-              className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400"
+              onChange={(e) => setName(e.target.value)}
+              className="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/30 rounded-lg 
+              text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400"
             />
+          </div>
 
+          {/* Email */}
+          <div className="relative">
+            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
             <input
               type="email"
-              name="email"
-              placeholder="Email"
+              placeholder="Email Address"
+              value={email}
               required
-              value={form.email}
-              onChange={handleChange}
-              className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400"
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/30 rounded-lg 
+              text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400"
             />
+          </div>
 
+          {/* Password */}
+          <div className="relative">
+            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
             <input
-              type="password"
-              name="password"
-              placeholder="Password"
+              type={showPassword ? "text" : "password"}
+              placeholder="Password (min 6 characters)"
+              value={password}
+              minLength={6}
               required
-              value={form.password}
-              onChange={handleChange}
-              className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400"
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full pl-10 pr-12 py-3 bg-white/10 border border-white/30 rounded-lg 
+              text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400"
             />
+            {/* Show/Hide Icon */}
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200"
+            >
+              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+            </button>
+          </div>
 
+          {/* Confirm Password */}
+          <div className="relative">
+            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
             <input
-              type="password"
-              name="confirmPassword"
+              type={showConfirmPassword ? "text" : "password"}
               placeholder="Confirm Password"
+              value={confirmPassword}
               required
-              value={form.confirmPassword}
-              onChange={handleChange}
-              className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400"
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className="w-full pl-10 pr-12 py-3 bg-white/10 border border-white/30 rounded-lg 
+              text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400"
             />
-
+            {/* Show/Hide Icon */}
             <button
-              type="submit"
-              className="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-lg font-semibold transition"
+              type="button"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200"
             >
-              Sign Up
-            </button>
-          </form>
-
-          {/* Divider */}
-          <div className="flex items-center my-6">
-            <div className="flex-1 h-px bg-gray-300" />
-            <span className="px-2 text-gray-500 text-sm">OR</span>
-            <div className="flex-1 h-px bg-gray-300" />
-          </div>
-
-          {/* Social Sign-Up */}
-          <div className="flex flex-col space-y-3">
-            <button className="w-full border border-gray-300 hover:bg-gray-50 py-2 rounded-lg font-medium transition">
-              Sign up with Google
-            </button>
-            <button className="w-full border border-gray-300 hover:bg-gray-50 py-2 rounded-lg font-medium transition">
-              Sign up with GitHub
+              {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
             </button>
           </div>
 
-          {/* Links */}
-          <div className="mt-6 flex flex-col items-center gap-2">
-            <button
-              onClick={() => router.push("/AuthScreen/signin")}
-              className="text-sm text-orange-500 hover:underline"
-            >
-              Already have an account? Sign In
-            </button>
+          {/* Submit Button */}
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full flex items-center justify-center bg-orange-500 hover:bg-orange-600 
+            text-white py-3 rounded-lg font-semibold transition-colors duration-200 disabled:opacity-50"
+          >
+            {loading ? (
+              "Creating Account..."
+            ) : (
+              <>
+                <UserPlus className="mr-2 h-5 w-5" /> Sign Up
+              </>
+            )}
+          </button>
+        </form>
 
-            <button
-              onClick={() => router.push("/")}
-              className="text-sm text-gray-600 hover:underline"
-            >
-              ← Back to Home
-            </button>
-          </div>
-        </div>
+        <p className="text-center text-gray-300 mt-6 text-sm">
+          Already have an account?{" "}
+          <Link href="/AuthScreen" className="text-orange-400 hover:underline font-medium">
+            Sign In
+          </Link>
+        </p>
       </div>
     </div>
   );

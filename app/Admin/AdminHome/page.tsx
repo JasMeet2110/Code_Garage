@@ -26,6 +26,13 @@ export default function AdminHome() {
   const [topServices, setTopServices] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const [summary, setSummary] = useState<{
+  revenue: number;
+  expenses: number;
+  profit: number;
+  outstanding: number;
+} | null>(null);
+
   // Restrict Access
   useEffect(() => {
     if (status === "loading") return;
@@ -62,6 +69,11 @@ export default function AdminHome() {
         const reportRes = await fetch("/api/reports");
         const reportData = await reportRes.json();
         setTopServices(reportData.topServices || []);
+
+        // Finance Summary
+        const finRes = await fetch("/api/finance");
+        const finData = await finRes.json();
+        if (finData?.summary) setSummary(finData.summary);
       } catch (error) {
         console.error("Error loading dashboard data:", error);
       } finally {
@@ -145,7 +157,7 @@ export default function AdminHome() {
               icon={<FaUsers className="text-yellow-400 text-4xl" />}
               title="Customers"
               subtitle={`Registered Clients: ${customersCount ?? "—"}`}
-              details="View loyalty stats and service history"
+              details="View and manage customer profiles"
               onClick={() => router.push("/Admin/AdminCustomers")}
             />
 
@@ -189,12 +201,18 @@ export default function AdminHome() {
 
             {/* Finance */}
             <DashboardCard
-              icon={<FaMoneyBillWave className="text-green-500 text-4xl" />}
-              title="Finance"
-              subtitle="View monthly revenue & cost"
-              details="Analyze your shop’s earnings"
-              onClick={() => router.push("/Admin/AdminFinance")}
-            />
+            icon={<FaMoneyBillWave className="text-green-500 text-4xl" />}
+            title="Finance"
+            subtitle={
+              summary
+                ? `Revenue: $${summary.revenue.toLocaleString("en-CA")}`
+                : "Loading..."
+            }
+            details={
+              "View monthly revenue & expenses"
+            }
+            onClick={() => router.push("/Admin/AdminFinance")}
+          />
           </div>
         </div>
       </main>

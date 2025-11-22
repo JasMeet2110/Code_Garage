@@ -21,3 +21,5 @@ for file in $(ls ./database/migrations/*.sql | sort); do
 done
 
 echo "✅ All migrations applied successfully!"
+
+

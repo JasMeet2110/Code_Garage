@@ -6,14 +6,14 @@ import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 export default function Navbar() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const router = useRouter();
 
   return (
     <>
       <nav className="fixed top-0 left-0 w-full h-28 backdrop-blur-xl bg-gradient-to-b from-black/70 to-gray-900/50 border-b border-white/10 shadow-[0_0_25px_rgba(0,0,0,0.5)] text-white flex justify-between items-center px-16 z-50">
         {/* Logo + Brand */}
-        <div className="flex items-center gap-4">
+        <Link href="/" className="flex items-center gap-4"> {/* added homepage link to the logo */}
           <Image
             src="/logo/tracksidegarage.png"
             alt="Trackside Garage Logo"
@@ -30,7 +30,7 @@ export default function Navbar() {
               Reliable Repairs. Built with Passion.
             </p>
           </div>
-        </div>
+        </Link>
 
         {/* Navigation Links */}
         <div className="flex gap-6 text-lg font-medium items-center">
@@ -52,9 +52,20 @@ export default function Navbar() {
           ))}
 
           {/* Auth Button */}
-          {session ? (
+          {status === "loading" ? (
             <button
-              onClick={() => signOut({ callbackUrl: "/" })}
+              disabled
+              className="ml-4 bg-gray-500 px-5 py-2 rounded-lg font-semibold opacity-50 cursor-not-allowed"
+            >
+              Loading...
+            </button>
+          ) : session ? (
+            <button
+              onClick={() =>
+                signOut({
+                  callbackUrl: `${window.location.origin}/AuthScreen`,
+                })
+              }
               className="ml-4 bg-red-600 hover:bg-red-700 px-5 py-2 rounded-lg font-semibold shadow-md transition-all"
             >
               Sign Out
