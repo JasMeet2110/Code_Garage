@@ -17,21 +17,14 @@ const handler = NextAuth({
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials) {
+      async authorize(credentials: Record<string, string> | undefined) {
         if (!credentials?.email || !credentials?.password) return null;
 
         const users = (await query("SELECT * FROM users WHERE email = ?", [
           credentials.email,
         ])) as any[];
-        if (!credentials?.email || !credentials?.password) return null;
-
-        const users = (await query(
-          "SELECT * FROM users WHERE email = ?",
-          [credentials.email]
-        )) as any[];
 
         const user = users[0];
-        if (!user) return null;
         if (!user) return null;
 
         const isValidPassword = await bcrypt.compare(
@@ -41,12 +34,11 @@ const handler = NextAuth({
         if (!isValidPassword) return null;
 
         return {
-          id: user.id,
+          id: user.id.toString(),
           email: user.email,
           name: user.name,
           role: user.role,
-          role: user.role,
-        };
+        } as any;
       },
     }),
   ],
@@ -69,15 +61,15 @@ const handler = NextAuth({
       return token;
     },
 
-    async session({ session, token }) {
+    async session({ session, token }: any) {
       if (!session.user) return session;
 
       if (token.role) {
-        session.user.role = token.role;
+        session.user.role = token.role as string;
       } else if (session.user.email === "tracksidegarage0101@gmail.com") {
-        session.user.role = "admin";
+        session.user.role = "admin" as string;
       } else {
-        session.user.role = "client";
+        session.user.role = "client" as string;
       }
 
       return session;
