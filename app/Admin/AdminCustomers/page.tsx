@@ -10,6 +10,7 @@ interface Customer {
   email: string;
   carName: string;
   carPlate: string;
+  color: string;
   startDate?: string;
 }
 
@@ -25,7 +26,18 @@ const CustomerPage = () => {
     try {
       const res = await fetch("/api/customers", { cache: "no-store" });
       const data = await res.json();
-      setCustomers(data);
+      setCustomers(
+        data.map((c: any) => ({
+          id: c.id,
+          name: c.name,
+          phone: c.phone,
+          email: c.email,
+          carName: c.car_name,
+          carPlate: c.car_plate,
+          color: c.color,
+          startDate: c.start_date,
+        }))
+      );
     } catch (error) {
       console.error("Error fetching customers:", error);
     }
@@ -46,6 +58,7 @@ const CustomerPage = () => {
       email: fd.get("email")?.toString(),
       carName: fd.get("carName")?.toString(),
       carPlate: fd.get("carPlate")?.toString(),
+      color: fd.get("color")?.toString(),
       startDate: new Date().toISOString().split("T")[0],
     };
 
@@ -81,6 +94,7 @@ const CustomerPage = () => {
       email: fd.get("email")?.toString(),
       carName: fd.get("carName")?.toString(),
       carPlate: fd.get("carPlate")?.toString(),
+      color: fd.get("color")?.toString(),
       startDate: fd.get("startDate")?.toString(),
     };
 
@@ -158,64 +172,152 @@ const CustomerPage = () => {
 
           {/* Add Form */}
           {showAddForm && (
-            <form
-              onSubmit={handleAddCustomer}
-              className="mb-8 p-6 rounded-xl bg-white/10 border border-white/20 shadow-md"
-            >
+            <div className="mb-8 p-6 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 shadow-md animate-fadeIn">
               <h2 className="text-2xl font-bold text-orange-400 mb-4">
                 Add New Customer
               </h2>
-              <div className="grid md:grid-cols-2 gap-4">
-                <input name="name" placeholder="Full Name" className="glass-input" />
-                <input name="phone" placeholder="Phone Number" className="glass-input" />
-                <input name="email" placeholder="Email Address" className="glass-input" />
-                <input name="carName" placeholder="Car Model" className="glass-input" />
-                <input name="carPlate" placeholder="License Plate" className="glass-input" />
-              </div>
-              <div className="mt-4 flex gap-4">
+
+              <form
+                id="add-customer-form"
+                onSubmit={handleAddCustomer}
+                className="grid md:grid-cols-2 gap-4"
+              >
+                <div className="flex flex-col">
+                  <label className="text-sm text-gray-300 mb-1">Full Name</label>
+                  <input name="name" className="glass-input" placeholder="Full Name" />
+                </div>
+
+                <div className="flex flex-col">
+                  <label className="text-sm text-gray-300 mb-1">Phone Number</label>
+                  <input name="phone" className="glass-input" placeholder="Phone Number" />
+                </div>
+
+                <div className="flex flex-col">
+                  <label className="text-sm text-gray-300 mb-1">Email</label>
+                  <input name="email" className="glass-input" placeholder="Email Address" />
+                </div>
+
+                <div className="flex flex-col">
+                  <label className="text-sm text-gray-300 mb-1">Car Name</label>
+                  <input name="carName" className="glass-input" placeholder="Car Name" />
+                </div>
+
+                <div className="flex flex-col">
+                  <label className="text-sm text-gray-300 mb-1">License Plate</label>
+                  <input name="carPlate" className="glass-input" placeholder="License Plate" />
+                </div>
+                
+                <div className="flex flex-col">
+                  <label className="text-sm text-gray-300 mb-1">Color</label>
+                  <input name="color" className="glass-input" placeholder="Color" />
+                </div>
+              </form>
+
+              <div className="mt-6 flex gap-4">
                 <button
                   type="submit"
-                  className="bg-orange-500 hover:bg-orange-600 px-6 py-2 rounded-lg font-semibold"
+                  form="add-customer-form"
+                  className="bg-orange-500 hover:bg-orange-600 px-6 py-2 rounded-lg font-semibold transition-all"
                 >
                   Add Customer
                 </button>
+
                 <button
                   type="button"
                   onClick={() => setShowAddForm(false)}
-                  className="bg-gray-600 hover:bg-gray-500 px-6 py-2 rounded-lg"
+                  className="bg-gray-600 hover:bg-gray-500 px-6 py-2 rounded-lg transition-all"
                 >
                   Cancel
                 </button>
               </div>
-            </form>
+            </div>
           )}
 
           {/* Edit Form */}
           {showEditForm && editingCustomer && (
-            <form
-              onSubmit={handleSaveChanges}
-              className="mb-8 p-6 rounded-xl bg-white/10 border border-white/20 shadow-md"
-            >
+            <div className="mb-8 p-6 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 shadow-md animate-fadeIn">
               <h2 className="text-2xl font-bold text-orange-400 mb-4">
                 Edit Customer
               </h2>
-              <div className="grid md:grid-cols-2 gap-4">
-                <input name="name" defaultValue={editingCustomer.name} className="glass-input" />
-                <input name="phone" defaultValue={editingCustomer.phone} className="glass-input" />
-                <input name="email" defaultValue={editingCustomer.email} className="glass-input" />
-                <input name="carName" defaultValue={editingCustomer.carName} className="glass-input" />
-                <input name="carPlate" defaultValue={editingCustomer.carPlate} className="glass-input" />
-                <input name="startDate" type="date" defaultValue={editingCustomer.startDate} className="glass-input" />
-              </div>
-              <div className="mt-4 flex gap-4">
-                <button type="submit" className="bg-orange-500 hover:bg-orange-600 px-6 py-2 rounded-lg font-semibold">
+
+              <form
+                id="edit-customer-form"
+                onSubmit={handleSaveChanges}
+                className="grid md:grid-cols-2 gap-4"
+              >
+                <div className="flex flex-col">
+                  <label className="text-sm text-gray-300 mb-1">Full Name</label>
+                  <input
+                    name="name"
+                    defaultValue={editingCustomer.name}
+                    className="glass-input"
+                  />
+                </div>
+
+                <div className="flex flex-col">
+                  <label className="text-sm text-gray-300 mb-1">Phone Number</label>
+                  <input
+                    name="phone"
+                    defaultValue={editingCustomer.phone}
+                    className="glass-input"
+                  />
+                </div>
+
+                <div className="flex flex-col">
+                  <label className="text-sm text-gray-300 mb-1">Email</label>
+                  <input
+                    name="email"
+                    defaultValue={editingCustomer.email}
+                    className="glass-input"
+                  />
+                </div>
+
+                <div className="flex flex-col">
+                  <label className="text-sm text-gray-300 mb-1">Car Name</label>
+                  <input
+                    name="carName"
+                    defaultValue={editingCustomer.carName}
+                    className="glass-input"
+                  />
+                </div>
+
+                <div className="flex flex-col">
+                  <label className="text-sm text-gray-300 mb-1">License Plate</label>
+                  <input
+                    name="carPlate"
+                    defaultValue={editingCustomer.carPlate}
+                    className="glass-input"
+                  />
+                </div>
+
+                <div className="flex flex-col">
+                  <label className="text-sm text-gray-300 mb-1">Color</label>
+                  <input
+                    name="color"
+                    defaultValue={editingCustomer.color}
+                    className="glass-input"
+                  />
+                </div>
+              </form>
+
+              <div className="mt-6 flex gap-4">
+                <button
+                  type="submit"
+                  form="edit-customer-form"
+                  className="bg-orange-500 hover:bg-orange-600 px-6 py-2 rounded-lg font-semibold transition-all"
+                >
                   Save Changes
                 </button>
-                <button type="button" onClick={() => setShowEditForm(false)} className="bg-gray-600 hover:bg-gray-500 px-6 py-2 rounded-lg">
+
+                <button
+                  type="button"
+                  onClick={() => setShowEditForm(false)}
+                  className="bg-gray-600 hover:bg-gray-500 px-6 py-2 rounded-lg transition-all"
+                >
                   Cancel
                 </button>
               </div>
-            </form>
+            </div>
           )}
 
           {/* Customer Table */}
@@ -226,8 +328,9 @@ const CustomerPage = () => {
                   <th className="px-6 py-3">Name</th>
                   <th className="px-6 py-3">Phone</th>
                   <th className="px-6 py-3">Email</th>
-                  <th className="px-6 py-3">Car</th>
+                  <th className="px-6 py-3">Car Name</th>
                   <th className="px-6 py-3">Plate</th>
+                  <th className="px-6 py-3">Color</th>
                   <th className="px-6 py-3 text-right">Actions</th>
                 </tr>
               </thead>
@@ -246,6 +349,7 @@ const CustomerPage = () => {
                       <td className="px-6 py-4">{c.email}</td>
                       <td className="px-6 py-4">{c.carName}</td>
                       <td className="px-6 py-4">{c.carPlate}</td>
+                      <td className="px-6 py-4">{c.color}</td>
                       <td className="px-6 py-4 text-right">
                         <button onClick={() => handleEditCustomer(c)} className="text-blue-400 hover:text-blue-300 mr-4">
                           Edit
@@ -264,8 +368,17 @@ const CustomerPage = () => {
       </main>
 
       <style jsx>{`
+        @keyframes fadeIn {
+          from { opacity: 0; transform: scale(0.95); }
+          to { opacity: 1; transform: scale(1); }
+        }
+        .animate-fadeIn {
+          animation: fadeIn 0.25s ease-out forwards;
+        }
         .glass-input {
-          @apply px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400;
+          @apply w-full rounded-lg px-4 py-2 bg-black/40 text-white
+          border border-white/20 placeholder-gray-400
+          focus:outline-none focus:ring-2 focus:ring-orange-400 transition-all;
         }
       `}</style>
     </div>
