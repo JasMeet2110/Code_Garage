@@ -8,8 +8,6 @@ CREATE TABLE IF NOT EXISTS users (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
--- Insert default admin account (password: admin123)
--- NOTE: In production, use bcrypt hashed passwords!
-INSERT INTO users (email, password, name, role) VALUES
-('admin@tracksidegarage.com', 'admin123', 'Admin User', 'admin'),
-('client@example.com', 'client123', 'Test Client', 'client');
+INSERT INTO users (email, password, name, role)
+VALUES ('tracksidegarage0101@gmail.com', '', 'Trackside Admin', 'admin')
+ON DUPLICATE KEY UPDATE role = 'admin';
