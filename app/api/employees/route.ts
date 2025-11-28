@@ -1,10 +1,10 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { query } from "@/lib/db";
+import { requireAdmin } from "@/lib/auth";
 
-function normalizeDate(input) {
+function normalizeDate(input: string | null | undefined) {
   if (!input) return null;
 
-  // Already valid ISO?
   if (/^\d{4}-\d{2}-\d{2}$/.test(input)) return input;
 
   try {
@@ -17,10 +17,19 @@ function normalizeDate(input) {
     }
   } catch {}
 
-  return null; 
+  return null;
 }
 
+//GET
 export async function GET() {
+  const admin = await requireAdmin();
+  if (!admin) {
+    return NextResponse.json(
+      { error: "Unauthorized (admin only)" },
+      { status: 403 }
+    );
+  }
+
   try {
     const results = await query("SELECT * FROM employees ORDER BY id ASC");
     return NextResponse.json(results);
@@ -30,7 +39,13 @@ export async function GET() {
   }
 }
 
-export async function POST(req) {
+//POST
+export async function POST(req: NextRequest) {
+  const admin = await requireAdmin();
+  if (!admin) {
+    return NextResponse.json({ error: "Unauthorized (admin only)" }, { status: 403 });
+  }
+
   try {
     const body = await req.json();
     const { name, position, phone, email, salary, startDate } = body;
@@ -43,7 +58,6 @@ export async function POST(req) {
     }
 
     const startDateISO = normalizeDate(startDate);
-
     if (!startDateISO) {
       return NextResponse.json(
         { error: "Invalid date format" },
@@ -63,7 +77,13 @@ export async function POST(req) {
   }
 }
 
-export async function PUT(req) {
+//PUT
+export async function PUT(req: NextRequest) {
+  const admin = await requireAdmin();
+  if (!admin) {
+    return NextResponse.json({ error: "Unauthorized (admin only)" }, { status: 403 });
+  }
+
   try {
     const body = await req.json();
     const { id, name, position, phone, email, salary, startDate } = body;
@@ -86,11 +106,21 @@ export async function PUT(req) {
   }
 }
 
-export async function DELETE(req) {
+//DELETE
+export async function DELETE(req: NextRequest) {
+  const admin = await requireAdmin();
+  if (!admin) {
+    return NextResponse.json({ error: "Unauthorized (admin only)" }, { status: 403 });
+  }
+
   try {
     const { id } = await req.json();
+
     if (!id) {
-      return NextResponse.json({ error: "Missing employee ID" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Missing employee ID" },
+        { status: 400 }
+      );
     }
 
     await query("DELETE FROM employees WHERE id=?", [id]);

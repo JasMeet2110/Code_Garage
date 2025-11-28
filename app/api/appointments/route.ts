@@ -1,14 +1,15 @@
 import { query } from "@/lib/db";
 import { NextResponse } from "next/server";
 import { ResultSetHeader } from "mysql2";
+import { requireAdmin } from "@/lib/auth";
 
-// GET: fetch all appointments
+
+//GET
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
     const date = searchParams.get("date");
 
-    // if a date is provided, return booked time slots for that date
     if (date) {
       const results = await query(
         "SELECT appointment_time FROM appointments WHERE appointment_date = ?",
@@ -30,7 +31,7 @@ export async function GET(req: Request) {
   }
 }
 
-// POST: add new appointment
+//POST
 export async function POST(req: Request) {
   try {
     const {
@@ -49,13 +50,12 @@ export async function POST(req: Request) {
       status,
     } = await req.json();
 
-    // check if this date + time is already booked
     const existing = (await query(
       "SELECT id FROM appointments WHERE appointment_date = ? AND appointment_time = ?",
       [appointment_date, appointment_time]
     )) as any[];
 
-    if (existing && existing.length > 0) {
+    if (existing.length > 0) {
       return NextResponse.json(
         { error: "Selected time is already booked." },
         { status: 400 }
@@ -64,9 +64,11 @@ export async function POST(req: Request) {
 
     const sql = `
       INSERT INTO appointments 
-      (customer_name, email, phone, service_type, fuel_type, car_make, car_model, car_year, plate_number, appointment_date, appointment_time, description, status)
+      (customer_name, email, phone, service_type, fuel_type, car_make, car_model, car_year, plate_number,
+       appointment_date, appointment_time, description, status)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
+
     const values = [
       customer_name,
       email,
@@ -94,48 +96,30 @@ export async function POST(req: Request) {
   }
 }
 
-// PUT: update appointment
 export async function PUT(req: Request) {
   try {
-    const {
-      id,
-      customer_name,
-      email,
-      phone,
-      service_type,
-      fuel_type,
-      car_make,
-      car_model,
-      car_year,
-      plate_number,
-      appointment_date,
-      appointment_time,
-      description,
-      status,
-    } = await req.json();
+    const data = await req.json();
+    const { id, status } = data;
 
-    // cancel feature
-    if (
+    const isCancelOnly =
       id &&
       status === "Cancelled" &&
-      !customer_name &&
-      !email &&
-      !phone &&
-      !service_type &&
-      !fuel_type &&
-      !car_make &&
-      !car_model &&
-      !car_year &&
-      !plate_number &&
-      !appointment_date &&
-      !appointment_time &&
-      !description
-    ) {
-      await query(
-        "UPDATE appointments SET status = ? WHERE id = ?",
-        [status, id]
-      );
+      Object.keys(data).length === 2;
+
+    if (isCancelOnly) {
+      await query("UPDATE appointments SET status = ? WHERE id = ?", [
+        "Cancelled",
+        id,
+      ]);
       return NextResponse.json({ success: true });
+    }
+
+    const admin = await requireAdmin();
+    if (!admin) {
+      return NextResponse.json(
+        { error: "Unauthorized (admin only)" },
+        { status: 403 }
+      );
     }
 
     const sql = `
@@ -146,19 +130,19 @@ export async function PUT(req: Request) {
     `;
 
     await query(sql, [
-      customer_name,
-      email,
-      phone,
-      service_type,
-      fuel_type,
-      car_make,
-      car_model,
-      car_year,
-      plate_number,
-      appointment_date,
-      appointment_time,
-      description,
-      status,
+      data.customer_name,
+      data.email,
+      data.phone,
+      data.service_type,
+      data.fuel_type,
+      data.car_make,
+      data.car_model,
+      data.car_year,
+      data.plate_number,
+      data.appointment_date,
+      data.appointment_time,
+      data.description,
+      data.status,
       id,
     ]);
 
@@ -172,11 +156,20 @@ export async function PUT(req: Request) {
   }
 }
 
-// DELETE: delete appointment
+//DELETE
 export async function DELETE(req: Request) {
   try {
+    const admin = await requireAdmin();
+    if (!admin) {
+      return NextResponse.json(
+        { error: "Unauthorized (admin only)" },
+        { status: 403 }
+      );
+    }
+
     const { id } = await req.json();
     await query("DELETE FROM appointments WHERE id = ?", [id]);
+
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error deleting appointment:", error);

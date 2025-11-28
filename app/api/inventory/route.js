@@ -1,7 +1,16 @@
 import { query } from "@/lib/db";
+import { requireAdmin } from "@/lib/auth";
 
-// GET all inventory items
+// GET 
 export async function GET() {
+  const admin = await requireAdmin();
+  if (!admin) {
+    return new Response(
+      JSON.stringify({ error: "Unauthorized (admin only)" }),
+      { status: 403 }
+    );
+  }
+
   try {
     const results = await query(`
       SELECT 
@@ -16,12 +25,23 @@ export async function GET() {
     return Response.json(results);
   } catch (error) {
     console.error("GET /api/inventory error:", error);
-    return new Response(JSON.stringify({ error: "Failed to fetch inventory" }), { status: 500 });
+    return new Response(
+      JSON.stringify({ error: "Failed to fetch inventory" }),
+      { status: 500 }
+    );
   }
 }
 
-// POST - Add new item
+// POST 
 export async function POST(req) {
+  const admin = await requireAdmin();
+  if (!admin) {
+    return new Response(
+      JSON.stringify({ error: "Unauthorized (admin only)" }),
+      { status: 403 }
+    );
+  }
+
   try {
     const { name, partNumber, quantity, price } = await req.json();
 
@@ -34,15 +54,29 @@ export async function POST(req) {
       [name, partNumber, quantity, price]
     );
 
-    return new Response(JSON.stringify({ message: "Item added successfully" }), { status: 201 });
+    return new Response(
+      JSON.stringify({ message: "Item added successfully" }),
+      { status: 201 }
+    );
   } catch (error) {
     console.error("POST /api/inventory error:", error);
-    return new Response(JSON.stringify({ error: "Failed to add item" }), { status: 500 });
+    return new Response(
+      JSON.stringify({ error: "Failed to add item" }),
+      { status: 500 }
+    );
   }
 }
 
-// PUT - Update an existing item
+// PUT 
 export async function PUT(req) {
+  const admin = await requireAdmin();
+  if (!admin) {
+    return new Response(
+      JSON.stringify({ error: "Unauthorized (admin only)" }),
+      { status: 403 }
+    );
+  }
+
   try {
     const { id, name, partNumber, quantity, price } = await req.json();
 
@@ -51,19 +85,33 @@ export async function PUT(req) {
     }
 
     await query(
-      "UPDATE inventory SET name = ?, part_number = ?, quantity = ?, price = ? WHERE id = ?",
+      "UPDATE inventory SET name=?, part_number=?, quantity=?, price=? WHERE id=?",
       [name, partNumber, quantity, price, id]
     );
 
-    return new Response(JSON.stringify({ message: "Item updated successfully" }), { status: 200 });
+    return new Response(
+      JSON.stringify({ message: "Item updated successfully" }),
+      { status: 200 }
+    );
   } catch (error) {
     console.error("PUT /api/inventory error:", error);
-    return new Response(JSON.stringify({ error: "Failed to update item" }), { status: 500 });
+    return new Response(
+      JSON.stringify({ error: "Failed to update item" }),
+      { status: 500 }
+    );
   }
 }
 
-// DELETE - Remove an item
+// DELETE 
 export async function DELETE(req) {
+  const admin = await requireAdmin();
+  if (!admin) {
+    return new Response(
+      JSON.stringify({ error: "Unauthorized (admin only)" }),
+      { status: 403 }
+    );
+  }
+
   try {
     const { id } = await req.json();
 
@@ -71,11 +119,17 @@ export async function DELETE(req) {
       return new Response(JSON.stringify({ error: "Missing item ID" }), { status: 400 });
     }
 
-    await query("DELETE FROM inventory WHERE id = ?", [id]);
+    await query("DELETE FROM inventory WHERE id=?", [id]);
 
-    return new Response(JSON.stringify({ message: "Item deleted successfully" }), { status: 200 });
+    return new Response(
+      JSON.stringify({ message: "Item deleted successfully" }),
+      { status: 200 }
+    );
   } catch (error) {
     console.error("DELETE /api/inventory error:", error);
-    return new Response(JSON.stringify({ error: "Failed to delete item" }), { status: 500 });
+    return new Response(
+      JSON.stringify({ error: "Failed to delete item" }),
+      { status: 500 }
+    );
   }
 }
