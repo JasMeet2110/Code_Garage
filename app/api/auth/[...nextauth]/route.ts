@@ -20,9 +20,10 @@ const handler = NextAuth({
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
 
-        const users = (await query("SELECT * FROM users WHERE email = ?", [
-          credentials.email,
-        ])) as any[];
+        const users = (await query(
+          "SELECT * FROM users WHERE email = ?",
+          [credentials.email]
+        )) as any[];
 
         const user = users[0];
         if (!user) return null;
@@ -35,7 +36,7 @@ const handler = NextAuth({
         if (!isValidPassword) return null;
 
         return {
-          id: user.id,
+          id: user.id.toString(),
           email: user.email,
           name: user.name,
           role: user.role,
@@ -53,29 +54,49 @@ const handler = NextAuth({
   },
 
   callbacks: {
-    async signIn({ user }) {
-      return !!user?.email;
-    },
-
-    async jwt({ token, user }) {
-      if (user) token.role = user.role;
-      return token;
-    },
-
-    async session({ session, token }) {
-      if (!session.user) return session;
-
-      if (token.role) {
-        session.user.role = token.role;
-      } else if (session.user.email === "tracksidegarage0101@gmail.com") {
-        session.user.role = "admin";
-      } else {
-        session.user.role = "client";
-      }
-
-      return session;
-    },
+  async signIn({ user, account, profile }) {
+    return true;
   },
+
+  async jwt({ token, user }) {
+    // When user logs in (first time in session)
+    if (user) {
+      token.email = user.email;
+      token.name = user.name;
+
+      // 🔥 Load role from DB on Google login
+      const users = (await query(
+        "SELECT * FROM users WHERE email = ?",
+        [user.email]
+      )) as any[];
+
+      if (users.length > 0) {
+        // Existing user
+        token.role = users[0].role;
+        token.id = users[0].id.toString();
+      } else {
+        // New Google user → create as client
+        const result = await query(
+          "INSERT INTO users (name, email, role, password) VALUES (?, ?, ?, ?)",
+          [user.name || "Google User", user.email, "client", ""]
+        );
+
+        token.role = "client";
+        token.id = result.insertId.toString();
+      }
+    }
+
+    return token;
+  },
+
+  async session({ session, token }) {
+    session.user.id = token.id;
+    session.user.email = token.email;
+    session.user.role = token.role;
+    session.user.name = token.name;
+    return session;
+  },
+},
 });
 
 export { handler as GET, handler as POST };

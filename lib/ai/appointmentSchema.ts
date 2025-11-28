@@ -14,7 +14,7 @@ export const appointmentSchema = z.object({
   plate_number: z.string().min(3),
 
   appointment_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-  appointment_time: z.string().min(1), // ✅ added
+  appointment_time: z.string().min(1),
   description: z.string().min(5),
 
   status: z
