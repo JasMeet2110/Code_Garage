@@ -15,6 +15,7 @@ interface Appointment {
   car_year: string;
   plate_number: string;
   fuel_type: string;
+  appointment_time: string;
   appointment_date: string;
   description: string;
   status: "Pending" | "In Progress" | "Completed" | "Cancelled";
@@ -204,7 +205,8 @@ export default function AdminAppointments() {
                         <div className="text-sm text-gray-400">{a.fuel_type}</div>
                       </td>
                       <td className="px-6 py-4 text-gray-300">
-                        {new Date(a.appointment_date).toLocaleDateString()}
+                        {new Date(a.appointment_date).toLocaleDateString()} 
+                        <div className="text-sm text-gray-400">{a.appointment_time}</div>
                       </td>
                       <td className="px-6 py-4">
                         <span
@@ -357,6 +359,7 @@ const AppointmentForm = ({
     car_model: editingAppointment?.car_model || "",
     car_year: editingAppointment?.car_year || "",
     plate_number: editingAppointment?.plate_number || "",
+    appointment_time: editingAppointment?.appointment_time || "",
     appointment_date: editingAppointment?.appointment_date?.slice(0, 10) || "",
     description: editingAppointment?.description || "",
     status: editingAppointment?.status || "Pending",
@@ -381,6 +384,7 @@ const AppointmentForm = ({
     if (!formData.car_make.trim()) newErrors.car_make = "Car make is required.";
     if (!formData.car_model.trim()) newErrors.car_model = "Car model is required.";
     if (!formData.plate_number.trim()) newErrors.plate_number = "Plate number is required.";
+    if (!formData.appointment_time.trim()) newErrors.appointment_time = "Time is required.";
     if (!formData.appointment_date.trim()) newErrors.appointment_date = "Date is required.";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -425,6 +429,7 @@ const AppointmentForm = ({
     { label: "Car Model", name: "car_model" },
     { label: "Car Year", name: "car_year" },
     { label: "Plate Number", name: "plate_number" },
+    { label: "Appointment Time", name: "appointment_time", type: "time" },
     { label: "Appointment Date", name: "appointment_date", type: "date" },
   ];
 

@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS appointments (
 
   -- Appointment Details
   appointment_date DATE NOT NULL,
+  appointment_time VARCHAR(20) NOT NULL,
   description TEXT NOT NULL,
 
   -- Status Tracking
@@ -32,3 +33,4 @@ CREATE TABLE IF NOT EXISTS appointments (
 );
 
 CREATE INDEX idx_appointment_date ON appointments (appointment_date);
+CREATE INDEX idx_appointment_time ON appointments (appointment_time);
