@@ -240,9 +240,17 @@ export default function AdminAppointments() {
                         {a.status !== "Cancelled" && (
                           <button
                             onClick={() => setAppointmentToCancel(a)}
-                            className="text-red-400 hover:text-red-300"
+                            className="text-red-400 hover:text-red-300 mr-4"
                           >
                             Cancel
+                          </button>
+                        )}
+                         {a.status === "Completed" && (
+                          <button
+                            onClick={() => window.open(`/api/invoice/${a.id}`, "_blank")}
+                            className="text-green-400 hover:text-green-300"
+                          >
+                            Invoice
                           </button>
                         )}
                       </td>
