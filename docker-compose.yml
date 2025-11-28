@@ -13,7 +13,7 @@ services:
       MYSQL_USER: garage_user
       MYSQL_PASSWORD: garage_password
     ports:
-      - "3307:3306"
+      - "3308:3306"
     volumes:
       - mysql_data:/var/lib/mysql
       - ./database/migrations:/docker-entrypoint-initdb.d
