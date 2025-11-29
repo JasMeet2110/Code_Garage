@@ -19,17 +19,32 @@ interface Appointment {
   appointment_date: string;
   description: string;
   status: "Pending" | "In Progress" | "Completed" | "Cancelled";
+  assigned_employee_id?: number | null;
+  employee_name?: string | null;
 }
 
 export default function AdminAppointments() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [showAddForm, setShowAddForm] = useState(false);
-  const [editingAppointment, setEditingAppointment] = useState<Appointment | null>(null);
-  const [appointmentToDelete, setAppointmentToDelete] = useState<Appointment | null>(null);
+  const [editingAppointment, setEditingAppointment] =
+    useState<Appointment | null>(null);
 
-  // cancel feature
-  const [appointmentToCancel, setAppointmentToCancel] = useState<Appointment | null>(null);
+  const [sortField, setSortField] = useState<"date" | "status" | "">("");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+
+  const [filterMonth, setFilterMonth] = useState("");
+  const [filterYear, setFilterYear] = useState("");
+  const [filterStatus, setFilterStatus] = useState("");
+
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: 10 }, (_, i) => currentYear - 5 + i);
+
+  const [appointmentToDelete, setAppointmentToDelete] =
+    useState<Appointment | null>(null);
+
+  const [appointmentToCancel, setAppointmentToCancel] =
+    useState<Appointment | null>(null);
 
   useEffect(() => {
     fetchAppointments();
@@ -47,7 +62,6 @@ export default function AdminAppointments() {
     }
   };
 
-  // Delete appointment
   const confirmDeleteAppointment = async () => {
     if (!appointmentToDelete) return;
     try {
@@ -56,20 +70,19 @@ export default function AdminAppointments() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: appointmentToDelete.id }),
       });
+
       if (res.ok) {
         await fetchAppointments();
         setAppointmentToDelete(null);
-      } else {
-        console.error("Failed to delete appointment");
       }
     } catch (err) {
       console.error("Error deleting appointment:", err);
     }
   };
 
-  // cancel feature
   const confirmCancelAppointment = async () => {
     if (!appointmentToCancel) return;
+
     try {
       const res = await fetch("/api/appointments", {
         method: "PUT",
@@ -83,20 +96,63 @@ export default function AdminAppointments() {
       if (res.ok) {
         await fetchAppointments();
         setAppointmentToCancel(null);
-      } else {
-        console.error("Failed to cancel appointment");
       }
     } catch (err) {
       console.error("Error cancelling appointment:", err);
     }
   };
 
-  const filtered = appointments.filter(
-    (a) =>
-      a.customer_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      a.service_type?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      a.car_make?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filtered = appointments.filter((a) => {
+    const matchesSearch =
+      a.customer_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      a.service_type.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      a.car_make.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const dateObj = new Date(a.appointment_date);
+    const month = dateObj.getMonth() + 1;
+    const year = dateObj.getFullYear();
+
+    const matchesMonth = filterMonth ? month === Number(filterMonth) : true;
+    const matchesYear = filterYear ? year === Number(filterYear) : true;
+    const matchesStatus = filterStatus ? a.status === filterStatus : true;
+
+    return matchesSearch && matchesMonth && matchesYear && matchesStatus;
+  });
+
+  
+  const toggleSort = (field: "date" | "status") => {
+    if (sortField === field) {
+      // flip asc <-> desc
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortOrder("asc");
+    }
+  };
+
+  // Apply sorting
+    const sorted = [...filtered].sort((a, b) => {
+      if (sortField === "date") {
+        const d1 = new Date(a.appointment_date).getTime();
+        const d2 = new Date(b.appointment_date).getTime();
+        return sortOrder === "asc" ? d1 - d2 : d2 - d1;
+      }
+
+      if (sortField === "status") {
+        const order = {
+          "Pending": 1,
+          "In Progress": 2,
+          "Completed": 3,
+          "Cancelled": 4
+        } as const;
+
+        return sortOrder === "asc"
+          ? order[a.status] - order[b.status]
+          : order[b.status] - order[a.status];
+      }
+
+      return 0;
+    });
 
   return (
     <div className="flex min-h-screen relative text-white overflow-hidden">
@@ -120,8 +176,10 @@ export default function AdminAppointments() {
             Appointments Management
           </h1>
 
-          {/* Search + Add */}
-          <div className="flex justify-between items-center mb-8">
+          {/* Top bar */}
+          <div className="flex flex-wrap gap-4 justify-between items-center mb-8">
+
+            {/* SEARCH BAR */}
             <input
               type="text"
               placeholder="Search by name, service, or vehicle..."
@@ -129,18 +187,67 @@ export default function AdminAppointments() {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full max-w-md px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400"
             />
+
+            {/* FILTERS */}
+            <div className="flex gap-4">
+
+              {/* MONTH */}
+              <select
+                value={filterMonth}
+                onChange={(e) => setFilterMonth(e.target.value)}
+                className="px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white"
+              >
+                <option value="">Month</option>
+                {Array.from({ length: 12 }, (_, i) => (
+                  <option key={i + 1} value={i + 1}>
+                    {new Date(0, i).toLocaleString("en", { month: "short" })}
+                  </option>
+                ))}
+              </select>
+
+              {/* YEAR */}
+              <select
+                value={filterYear}
+                onChange={(e) => setFilterYear(e.target.value)}
+                className="px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white"
+              >
+                <option value="">Year</option>
+                {years.map((y) => (
+                  <option key={y} value={y}>
+                    {y}
+                  </option>
+                ))}
+              </select>
+
+              {/* STATUS */}
+              <select
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
+                className="px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white"
+              >
+                <option value="">Status</option>
+                <option value="Pending">Pending</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Completed">Completed</option>
+                <option value="Cancelled">Cancelled</option>
+              </select>
+            </div>
+
+            {/* Add Button */}
             <button
               onClick={() => setShowAddForm(true)}
-              className="ml-4 bg-orange-500 hover:bg-orange-600 px-6 py-2 rounded-lg font-semibold"
+              className="bg-orange-500 hover:bg-orange-600 px-6 py-2 rounded-lg font-semibold"
             >
               + Add Appointment
             </button>
           </div>
 
-          {/* Add Form */}
+          {/* ADD FORM */}
           {showAddForm && (
-            <div className="mb-8 p-6 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 shadow-md animate-fadeIn">
-              <h2 className="text-2xl font-bold text-orange-400 mb-4">Add New Appointment</h2>
+            <div className="mb-8 p-6 rounded-xl bg-white/10 border border-white/20 backdrop-blur-md shadow-md animate-fadeIn">
+              <h2 className="text-2xl font-bold text-orange-400 mb-4">
+                Add New Appointment
+              </h2>
               <AppointmentForm
                 mode="add"
                 onSubmitSuccess={() => setShowAddForm(false)}
@@ -149,10 +256,12 @@ export default function AdminAppointments() {
             </div>
           )}
 
-          {/* Edit Form */}
+          {/* EDIT FORM */}
           {editingAppointment && (
-            <div className="mb-8 p-6 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 shadow-md animate-fadeIn">
-              <h2 className="text-2xl font-bold text-orange-400 mb-4">Edit Appointment</h2>
+            <div className="mb-8 p-6 rounded-xl bg-white/10 border border-white/20 backdrop-blur-md shadow-md animate-fadeIn">
+              <h2 className="text-2xl font-bold text-orange-400 mb-4">
+                Edit Appointment
+              </h2>
               <AppointmentForm
                 mode="edit"
                 editingAppointment={editingAppointment}
@@ -162,9 +271,10 @@ export default function AdminAppointments() {
             </div>
           )}
 
+          {/* List header */}
           <div className="mb-4">
             <h2 className="text-xl font-semibold text-orange-400">
-              List of Appointments ({filtered.length})
+              List of Appointments ({sorted.length})
             </h2>
           </div>
 
@@ -176,38 +286,78 @@ export default function AdminAppointments() {
                   <th className="px-6 py-3">Customer</th>
                   <th className="px-6 py-3">Service</th>
                   <th className="px-6 py-3">Vehicle</th>
-                  <th className="px-6 py-3">Date</th>
-                  <th className="px-6 py-3">Status</th>
+                  <th
+                    onClick={() => toggleSort("date")}
+                    className="px-6 py-3 cursor-pointer select-none"
+                  >
+                    Date
+                    {sortField === "date" && (sortOrder === "asc" ? " ↑" : " ↓")}
+                  </th>
+
+                  <th
+                    onClick={() => toggleSort("status")}
+                    className="px-6 py-3 cursor-pointer select-none"
+                  >
+                    Status
+                    {sortField === "status" && (sortOrder === "asc" ? " ↑" : " ↓")}
+                  </th>
                   <th className="px-6 py-3 text-right">Actions</th>
                 </tr>
               </thead>
+
               <tbody>
-                {filtered.length === 0 ? (
+                {sorted.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="px-6 py-6 text-center text-gray-400">
+                    <td
+                      colSpan={6}
+                      className="px-6 py-6 text-center text-gray-400"
+                    >
                       No appointments found.
                     </td>
                   </tr>
                 ) : (
-                  filtered.map((a) => (
+                  sorted.map((a) => (
                     <tr
                       key={a.id}
                       className="border-b border-white/10 hover:bg-white/10 transition-all"
                     >
+                      {/* Customer */}
                       <td className="px-6 py-4">
-                        <div className="font-semibold text-white">{a.customer_name}</div>
+                        <div className="font-semibold text-white">
+                          {a.customer_name}
+                        </div>
                         <div className="text-sm text-gray-300">{a.email}</div>
                         <div className="text-sm text-gray-400">{a.phone}</div>
                       </td>
-                      <td className="px-6 py-4 text-gray-300">{a.service_type}</td>
+
+                      {/* Service */}
                       <td className="px-6 py-4 text-gray-300">
-                        {a.car_make} {a.car_model} {a.car_year} ({a.plate_number})
-                        <div className="text-sm text-gray-400">{a.fuel_type}</div>
+                        {a.service_type}
+                        {a.employee_name && (
+                          <div className="text-xs text-gray-400 mt-1">
+                            Tech: {a.employee_name}
+                          </div>
+                        )}
                       </td>
+
+                      {/* Vehicle */}
                       <td className="px-6 py-4 text-gray-300">
-                        {new Date(a.appointment_date).toLocaleDateString()} 
-                        <div className="text-sm text-gray-400">{a.appointment_time}</div>
+                        {a.car_make} {a.car_model} {a.car_year} (
+                        {a.plate_number})
+                        <div className="text-sm text-gray-400">
+                          {a.fuel_type}
+                        </div>
                       </td>
+
+                      {/* Date */}
+                      <td className="px-6 py-4 text-gray-300">
+                        {new Date(a.appointment_date).toLocaleDateString()}
+                        <div className="text-sm text-gray-400">
+                          {a.appointment_time}
+                        </div>
+                      </td>
+
+                      {/* Status pill */}
                       <td className="px-6 py-4">
                         <span
                           className={`px-3 py-1 rounded-full text-sm ${
@@ -223,27 +373,85 @@ export default function AdminAppointments() {
                           {a.status}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-right">
+
+                      {/* Actions */}
+                      <td className="px-6 py-4 text-right space-x-4">
+                        {/* EDIT - always visible */}
                         <button
                           onClick={() => setEditingAppointment(a)}
-                          className="text-blue-400 hover:text-blue-300 mr-4"
+                          className="text-blue-400 hover:text-blue-300"
                         >
                           Edit
                         </button>
-                        <button
-                          onClick={() => setAppointmentToDelete(a)}
-                          className="text-red-400 hover:text-red-300 mr-4"
-                        >
-                          Delete
-                        </button>
-                        {/* cancel feature */}
-                        {a.status !== "Cancelled" && (
-                          <button
-                            onClick={() => setAppointmentToCancel(a)}
-                            className="text-red-400 hover:text-red-300"
-                          >
-                            Cancel
-                          </button>
+
+                        {/* STATUS: PENDING */}
+                        {a.status === "Pending" && (
+                          <>
+                            <button
+                              onClick={() => setAppointmentToDelete(a)}
+                              className="text-red-400 hover:text-red-300"
+                            >
+                              Delete
+                            </button>
+                            <button
+                              onClick={() => setAppointmentToCancel(a)}
+                              className="text-red-400 hover:text-red-300"
+                            >
+                              Cancel
+                            </button>
+                          </>
+                        )}
+
+                        {/* STATUS: IN PROGRESS */}
+                        {a.status === "In Progress" && (
+                          <>
+                            <button
+                              onClick={() => setAppointmentToDelete(a)}
+                              className="text-red-400 hover:text-red-300"
+                            >
+                              Delete
+                            </button>
+                            <button
+                              onClick={() => setAppointmentToCancel(a)}
+                              className="text-red-400 hover:text-red-300"
+                            >
+                              Cancel
+                            </button>
+                            <button
+                              onClick={() =>
+                                (window.location.href = `/Admin/AdminAppointments/complete/${a.id}`)
+                              }
+                              className="text-yellow-300 hover:text-yellow-200"
+                            >
+                              Complete
+                            </button>
+                          </>
+                        )}
+
+                        {/* STATUS: COMPLETED */}
+                        {a.status === "Completed" && (
+                          <>
+                            <button
+                              onClick={() =>
+                                window.open(`/api/invoice/${a.id}`, "_blank")
+                              }
+                              className="text-green-400 hover:text-green-300"
+                            >
+                              Invoice
+                            </button>
+                          </>
+                        )}
+
+                        {/* STATUS: CANCELLED */}
+                        {a.status === "Cancelled" && (
+                          <>
+                            <button
+                              onClick={() => setAppointmentToDelete(a)}
+                              className="text-red-400 hover:text-red-300"
+                            >
+                              Delete
+                            </button>
+                          </>
                         )}
                       </td>
                     </tr>
@@ -255,14 +463,18 @@ export default function AdminAppointments() {
         </div>
       </main>
 
-      {/* Delete Modal */}
+      {/* DELETE MODAL */}
       {appointmentToDelete && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 animate-fadeIn">
           <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-8 shadow-lg w-[90%] max-w-md text-center">
-            <h2 className="text-2xl font-semibold text-orange-400 mb-3">Confirm Deletion</h2>
+            <h2 className="text-2xl font-semibold text-orange-400 mb-3">
+              Confirm Deletion
+            </h2>
             <p className="text-gray-300 mb-6">
-              Are you sure you want to delete{" "}
-              <span className="text-white font-semibold">{appointmentToDelete.customer_name}</span>
+              Delete{" "}
+              <span className="text-white font-semibold">
+                {appointmentToDelete.customer_name}
+              </span>
               ’s appointment?
             </p>
             <div className="flex justify-center gap-4">
@@ -283,7 +495,7 @@ export default function AdminAppointments() {
         </div>
       )}
 
-      {/* cancel feature */}
+      {/* CANCEL MODAL */}
       {appointmentToCancel && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 animate-fadeIn">
           <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-8 shadow-lg w-[90%] max-w-md text-center">
@@ -291,12 +503,13 @@ export default function AdminAppointments() {
               Confirm Cancellation
             </h2>
             <p className="text-gray-300 mb-6">
-              Are you sure you want to cancel{" "}
+              Cancel{" "}
               <span className="text-white font-semibold">
                 {appointmentToCancel.customer_name}
               </span>
               ’s appointment?
             </p>
+
             <div className="flex justify-center gap-4">
               <button
                 onClick={confirmCancelAppointment}
@@ -304,9 +517,10 @@ export default function AdminAppointments() {
               >
                 Cancel Appointment
               </button>
+
               <button
                 onClick={() => setAppointmentToCancel(null)}
-                className="bg-gray-600 hover:bg-gray-500 px-6 py-2 rounded-lg font-semibold"
+                className="bg-gray-600 hover:bg-gray-500 px-6 py-2 rounded-lg"
               >
                 Close
               </button>
@@ -314,11 +528,16 @@ export default function AdminAppointments() {
           </div>
         </div>
       )}
+      <style jsx global>{`
+        select {
+          color: white !important;
+        }
+        select option {
+          color: black !important;
+        }
+      `}</style>
 
       <style jsx>{`
-        .glass-input {
-          @apply px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400;
-        }
         @keyframes fadeIn {
           from {
             opacity: 0;
@@ -337,17 +556,22 @@ export default function AdminAppointments() {
   );
 }
 
-/* Inline Validation */
-const AppointmentForm = ({
+/* ----------------------------
+   Appointment Form Component
+----------------------------- */
+
+type AppointmentFormProps = {
+  mode: "add" | "edit";
+  editingAppointment?: Appointment | null;
+  onSubmitSuccess: () => void;
+  fetchAppointments: () => Promise<void>;
+};
+
+const AppointmentForm: React.FC<AppointmentFormProps> = ({
   mode,
   editingAppointment,
   onSubmitSuccess,
   fetchAppointments,
-}: {
-  mode: "add" | "edit";
-  editingAppointment?: Appointment;
-  onSubmitSuccess: () => void;
-  fetchAppointments: () => Promise<void>;
 }) => {
   const [formData, setFormData] = useState({
     customer_name: editingAppointment?.customer_name || "",
@@ -363,59 +587,115 @@ const AppointmentForm = ({
     appointment_date: editingAppointment?.appointment_date?.slice(0, 10) || "",
     description: editingAppointment?.description || "",
     status: editingAppointment?.status || "Pending",
+    assigned_employee_id:
+      editingAppointment?.assigned_employee_id != null
+        ? String(editingAppointment.assigned_employee_id)
+        : "",
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [employees, setEmployees] = useState<any[]>([]);
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
-  ) => {
+  // Reset form when editing target changes
+  useEffect(() => {
+    if (mode === "edit" && editingAppointment) {
+      setFormData({
+        customer_name: editingAppointment.customer_name,
+        email: editingAppointment.email,
+        phone: editingAppointment.phone,
+        service_type: editingAppointment.service_type,
+        fuel_type: editingAppointment.fuel_type,
+        car_make: editingAppointment.car_make,
+        car_model: editingAppointment.car_model,
+        car_year: editingAppointment.car_year,
+        plate_number: editingAppointment.plate_number,
+        appointment_time: editingAppointment.appointment_time,
+        appointment_date: editingAppointment.appointment_date?.slice(0, 10),
+        description: editingAppointment.description,
+        status: editingAppointment.status,
+        assigned_employee_id:
+          editingAppointment.assigned_employee_id != null
+            ? String(editingAppointment.assigned_employee_id)
+            : "",
+      });
+    }
+  }, [editingAppointment, mode]);
+
+  useEffect(() => {
+    if (mode === "edit") {
+      fetch("/api/employees")
+        .then((res) => res.json())
+        .then((data) => setEmployees(data || []))
+        .catch((err) => console.error(err));
+    }
+  }, [mode]);
+
+  const handleChange = (e: any) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    setErrors((prev) => ({ ...prev, [name]: "" }));
+    setFormData((p) => ({ ...p, [name]: value }));
+    setErrors((p) => ({ ...p, [name]: "" }));
   };
 
   const validate = () => {
-    const newErrors: Record<string, string> = {};
-    if (!formData.customer_name.trim()) newErrors.customer_name = "Customer name is required.";
-    if (!formData.email.trim()) newErrors.email = "Email is required.";
-    if (!formData.phone.trim()) newErrors.phone = "Phone number is required.";
-    if (!formData.service_type.trim()) newErrors.service_type = "Service type is required.";
-    if (!formData.car_make.trim()) newErrors.car_make = "Car make is required.";
-    if (!formData.car_model.trim()) newErrors.car_model = "Car model is required.";
-    if (!formData.plate_number.trim()) newErrors.plate_number = "Plate number is required.";
-    if (!formData.appointment_time.trim()) newErrors.appointment_time = "Time is required.";
-    if (!formData.appointment_date.trim()) newErrors.appointment_date = "Date is required.";
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    const e: Record<string, string> = {};
+    if (!formData.customer_name.trim()) e.customer_name = "Required";
+    if (!formData.email.trim()) e.email = "Required";
+    if (!formData.phone.trim()) e.phone = "Required";
+    if (!formData.service_type.trim()) e.service_type = "Required";
+    if (!formData.car_make.trim()) e.car_make = "Required";
+    if (!formData.car_model.trim()) e.car_model = "Required";
+    if (!formData.plate_number.trim()) e.plate_number = "Required";
+    if (!formData.appointment_time.trim()) e.appointment_time = "Required";
+    if (!formData.appointment_date.trim()) e.appointment_date = "Required";
+
+    setErrors(e);
+    return Object.keys(e).length === 0;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
     if (!validate()) return;
 
     try {
+      let payload: any;
+
+      if (mode === "add") {
+        // New appointments always start as Pending, no employee assigned
+        payload = {
+          ...formData,
+          status: "Pending",
+          assigned_employee_id: null,
+        };
+      } else {
+        // EDIT MODE
+        const hasEmployee = !!formData.assigned_employee_id;
+        let finalStatus = formData.status;
+
+        // If an employee is assigned and not cancelled, force In Progress
+        if (hasEmployee && formData.status !== "Cancelled") {
+          finalStatus = "In Progress";
+        }
+
+        payload = {
+          id: editingAppointment?.id,
+          ...formData,
+          status: finalStatus,
+          assigned_employee_id: formData.assigned_employee_id || null,
+        };
+      }
+
       const res = await fetch("/api/appointments", {
         method: mode === "add" ? "POST" : "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(
-          mode === "add"
-            ? formData
-            : {
-                id: editingAppointment?.id,
-                ...formData,
-              }
-        ),
+        body: JSON.stringify(payload),
       });
 
       if (res.ok) {
         await fetchAppointments();
         onSubmitSuccess();
-      } else {
-        console.error("Error submitting form");
       }
     } catch (err) {
-      console.error("Error:", err);
+      console.error(err);
     }
   };
 
@@ -431,7 +711,7 @@ const AppointmentForm = ({
     { label: "Plate Number", name: "plate_number" },
     { label: "Appointment Time", name: "appointment_time", type: "time" },
     { label: "Appointment Date", name: "appointment_date", type: "date" },
-  ];
+  ] as const;
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -441,57 +721,78 @@ const AppointmentForm = ({
           <input
             name={f.name}
             type={f.type || "text"}
-            value={formData[f.name as keyof typeof formData]}
+            value={(formData as any)[f.name]}
             onChange={handleChange}
-            className={`w-full rounded-lg px-4 py-2 bg-black/40 text.white border border-white/20 
-              placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 transition-all ${
-                errors[f.name] ? "border-red-500" : ""
-              }`}
-            placeholder={`Enter ${f.label.toLowerCase()}`}
+            className={`w-full rounded-lg px-4 py-2 bg-black/40 text-white border border-white/20 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 ${
+              errors[f.name] ? "border-red-500" : ""
+            }`}
           />
           {errors[f.name] && (
-            <span className="text-red-400 text-xs mt-1 animate-fadeIn">{errors[f.name]}</span>
+            <span className="text-red-400 text-xs mt-1">{errors[f.name]}</span>
           )}
         </div>
       ))}
 
-      {/* Status Dropdown */}
-      <div className="flex flex-col relative">
-        <label className="text-sm text-gray-300 mb-1">Status</label>
-        <select
-          name="status"
-          value={formData.status}
-          onChange={handleChange}
-          className="w-full rounded-lg px-4 py-2 pr-10 bg-black/40 text-white border border-white/20 
-            focus:outline-none focus:ring-2 focus:ring-orange-400 appearance-none transition-all"
-        >
-          <option className="bg-gray-900 text-white">Pending</option>
-          <option className="bg-gray-900 text-yellow-300">In Progress</option>
-          <option className="bg-gray-900 text-green-300">Completed</option>
-          <option className="bg-gray-900 text-red-300">Cancelled</option>
-        </select>
-      </div>
+      {/* ASSIGNED EMPLOYEE - only when editing */}
+      {mode === "edit" && (
+        <div className="flex flex-col">
+          <label className="text-sm text-gray-300 mb-1">
+            Assigned Employee
+          </label>
+          <select
+            name="assigned_employee_id"
+            value={formData.assigned_employee_id}
+            onChange={handleChange}
+            className="w-full rounded-lg px-4 py-2 bg-black/40 text-white border border-white/20 focus:ring-2 focus:ring-orange-400"
+          >
+            <option value="">-- Select Employee --</option>
+            {employees.map((emp) => (
+              <option key={emp.id} value={emp.id}>
+                {emp.name} — {emp.position}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
 
-      {/* Description */}
+      {/* STATUS - only editable on EDIT, no Completed option */}
+      {mode === "edit" && (
+        <div className="flex flex-col">
+          <label className="text-sm text-gray-300 mb-1">Status</label>
+          <select
+            name="status"
+            value={formData.status}
+            onChange={handleChange}
+            className="w-full rounded-lg px-4 py-2 bg-black/40 text-white border border-white/20 focus:ring-2 focus:ring-orange-400"
+          >
+            <option value="Pending">Pending</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Cancelled">Cancelled</option>
+            {/* Completed is intentionally not here;
+                completion is done via the Complete page */}
+          </select>
+        </div>
+      )}
+
+      {/* DESCRIPTION */}
       <div className="flex flex-col">
         <label className="text-sm text-gray-300 mb-1">Description</label>
         <textarea
           name="description"
           value={formData.description}
           onChange={handleChange}
-          placeholder="Enter issue description"
-          className="w-full rounded-lg px-4 py-2 bg-black/40 text-white border border-white/20 
-            placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 transition-all"
+          className="w-full rounded-lg px-4 py-2 bg-black/40 text-white border border-white/20"
         />
       </div>
 
-      <div className="mt-6 flex gap-4">
+      <div className="flex gap-4 mt-4">
         <button
           type="submit"
           className="bg-orange-500 hover:bg-orange-600 px-6 py-2 rounded-lg font-semibold"
         >
           {mode === "add" ? "Add Appointment" : "Save Changes"}
         </button>
+
         <button
           type="button"
           onClick={onSubmitSuccess}

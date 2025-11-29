@@ -68,6 +68,34 @@ const InventoryPage = () => {
       item.partNumber.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const [sortConfig, setSortConfig] = useState<{ key: keyof InventoryItem | null, direction: "asc" | "desc" | null }>({
+  key: null,
+  direction: null,
+  });
+
+  const sortedItems = [...filteredItems].sort((a, b) => {
+  if (!sortConfig.key) return 0;
+
+  const key = sortConfig.key;
+  const direction = sortConfig.direction === "asc" ? 1 : -1;
+
+  if (typeof a[key] === "number") {
+    return (a[key] as number - (b[key] as number)) * direction;
+  }
+
+  return (a[key] as string).localeCompare(b[key] as string) * direction;
+  });
+
+  const toggleSort = (key: keyof InventoryItem) => {
+  setSortConfig((prev) => {
+    if (prev.key === key) {
+      if (prev.direction === "asc") return { key, direction: "desc" };
+      if (prev.direction === "desc") return { key: null, direction: null };
+    }
+    return { key, direction: "asc" };
+  });
+  };
+
   return (
     <div className="flex min-h-screen relative text-white overflow-hidden">
       {/* Background Image */}
@@ -108,6 +136,11 @@ const InventoryPage = () => {
               + Add New Item
             </button>
           </div>
+          {inventoryItems.some(item => item.quantity < 5) && (
+            <div className="mb-6 w-[600px] bg-red-500/20 border border-red-600 text-red-300 px-4 py-3 rounded-xl">
+              <b>Low Stock Alert:</b> Some parts are running low. Restock recommended.
+            </div>
+          )}
 
           {/* Loading */}
           {loading && (
@@ -157,12 +190,36 @@ const InventoryPage = () => {
           {/* Inventory Table */}
           <div className="overflow-x-auto rounded-xl bg-white/10 backdrop-blur-md border border-white/20 shadow-lg">
             <table className="min-w-full text-left">
-              <thead className="bg-white/10 border-b border-white/20 text-orange-400">
+              <thead className="bg-white/10 border-b border-white/20 text-orange-400 select-none">
                 <tr>
-                  <th className="px-6 py-3">Part Name</th>
-                  <th className="px-6 py-3">Part Number</th>
-                  <th className="px-6 py-3">Quantity</th>
-                  <th className="px-6 py-3">Price</th>
+                  <th 
+                    className="px-6 py-3 cursor-pointer"
+                    onClick={() => toggleSort("name")}
+                  >
+                    Part Name {sortConfig.key === "name" && (sortConfig.direction === "asc" ? "▲" : "▼")}
+                  </th>
+
+                  <th 
+                    className="px-6 py-3 cursor-pointer"
+                    onClick={() => toggleSort("partNumber")}
+                  >
+                    Part Number {sortConfig.key === "partNumber" && (sortConfig.direction === "asc" ? "▲" : "▼")}
+                  </th>
+
+                  <th 
+                    className="px-6 py-3 cursor-pointer"
+                    onClick={() => toggleSort("quantity")}
+                  >
+                    Quantity {sortConfig.key === "quantity" && (sortConfig.direction === "asc" ? "▲" : "▼")}
+                  </th>
+
+                  <th 
+                    className="px-6 py-3 cursor-pointer"
+                    onClick={() => toggleSort("price")}
+                  >
+                    Price {sortConfig.key === "price" && (sortConfig.direction === "asc" ? "▲" : "▼")}
+                  </th>
+
                   <th className="px-6 py-3 text-right">Actions</th>
                 </tr>
               </thead>
@@ -177,7 +234,7 @@ const InventoryPage = () => {
                     </td>
                   </tr>
                 ) : (
-                  filteredItems.map((item) => (
+                  sortedItems.map((item) => (
                     <tr
                       key={item.id}
                       className="border-b border-white/10 hover:bg-white/10 transition-all"
@@ -186,8 +243,19 @@ const InventoryPage = () => {
                       <td className="px-6 py-4 text-gray-300">
                         {item.partNumber}
                       </td>
-                      <td className="px-6 py-4 text-gray-300">
-                        {item.quantity}
+                      <td className="px-6 py-4">
+                        <span
+                          className={`px-3 py-1 rounded-lg text-sm font-semibold 
+                            ${item.quantity < 5 
+                              ? "bg-red-600/40 text-red-300 border border-red-600" 
+                              : "bg-white/10 text-gray-300"
+                            }`}
+                        >
+                          {item.quantity}
+                          {item.quantity < 5 && (
+                            <span className="ml-2 text-red-400 font-bold animate-pulse">⚠️</span>
+                          )}
+                        </span>
                       </td>
                       <td className="px-6 py-4 text-gray-300">
                         ${item.price}

@@ -1,8 +1,14 @@
 import { NextResponse } from "next/server";
 import { query } from "@/lib/db";
+import { requireAdmin } from "@/lib/auth";
 
-// ✅ Update by ID (Admin)
+// UPDATE
 export async function PUT(req: Request, context: { params: { id: string } }) {
+  const admin = await requireAdmin();
+  if (!admin) {
+    return NextResponse.json({ error: "Unauthorized (admin only)" }, { status: 403 });
+  }
+
   try {
     const body = await req.json();
     const { name, phone, email, carName, carPlate, startDate } = body;
@@ -19,8 +25,13 @@ export async function PUT(req: Request, context: { params: { id: string } }) {
   }
 }
 
-// ✅ Delete by ID (Admin)
+// DELETE
 export async function DELETE(req: Request, context: { params: { id: string } }) {
+  const admin = await requireAdmin();
+  if (!admin) {
+    return NextResponse.json({ error: "Unauthorized (admin only)" }, { status: 403 });
+  }
+
   try {
     await query("DELETE FROM customers WHERE id=?", [context.params.id]);
     return NextResponse.json({ message: "Customer deleted successfully" }, { status: 200 });

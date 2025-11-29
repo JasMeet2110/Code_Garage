@@ -20,7 +20,11 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     "/Admin/AdminAIAssistant",
   ];
 
-  const shouldHideLayout = noLayoutRoutes.includes(pathname);
+  const hideForAdminComplete =
+    pathname.startsWith("/Admin/AdminAppointments/complete/");
+
+  const shouldHideLayout =
+    noLayoutRoutes.includes(pathname) || hideForAdminComplete;
 
   const noPaddingRoutes = ["/"];
   const shouldRemovePadding =
