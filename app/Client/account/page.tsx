@@ -121,21 +121,27 @@ export default function AccountPage() {
     if (status === "authenticated") fetchProfile();
   }, [session, status]);
 
-  /* -----------------------------------------------------
-     Handlers
-  ------------------------------------------------------ */
   const handleChange = (name: keyof FormData, value: string) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+      };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const url = URL.createObjectURL(file);
-      setCarImage(url);
-      setFormData((prev) => ({ ...prev, carImage: url }));
-    }
-  };
+      const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+
+      const form = new FormData();
+      form.append("file", file);
+
+      const uploadReq = await fetch("/api/upload", {
+        method: "POST",
+        body: form,
+      });
+
+      const uploadRes = await uploadReq.json();
+
+      setCarImage(uploadRes.url);
+      setFormData((prev) => ({ ...prev, carImage: uploadRes.url }));
+    };
 
   const validateForm = () => {
     const { fullName, phone, email, carName, year, color, licensePlate } =

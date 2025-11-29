@@ -1,6 +1,7 @@
 "use client";
 
-import { Phone, Mail, MapPin, Clock } from "lucide-react";
+import { useState } from "react";
+import { Phone, Mail, MapPin, Clock, CheckCircle2, XCircle } from "lucide-react";
 import Image from "next/image";
 import { GoogleMap, useJsApiLoader, Marker } from "@react-google-maps/api";
 
@@ -19,6 +20,70 @@ export default function Contact() {
     id: "google-map-script",
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!,
   });
+
+    const [fullName, setFullName] = useState("");
+    const [email, setEmail] = useState("");
+    const [phone, setPhone] = useState("");
+    const [subject, setSubject] = useState("");
+    const [message, setMessage] = useState("");
+
+    const [loading, setLoading] = useState(false);
+    const [modal, setModal] = useState<null | "success" | "error">(null);
+    const [errorText, setErrorText] = useState("");
+
+    const MAX_MESSAGE_WORDS = 250;
+
+    const messageWordCount = message.trim().split(/\s+/).filter(Boolean).length;
+
+    const submitForm = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!fullName.trim() || !email.trim() || !subject.trim() || !message.trim()) {
+      setErrorText("Please fill all required fields.");
+      setModal("error");
+      return;
+    }
+
+    if (!email.includes("@") || !email.includes(".")) {
+      setErrorText("Enter a valid email address.");
+      setModal("error");
+      return;
+    }
+
+    if (messageWordCount > MAX_MESSAGE_WORDS) {
+      setErrorText(`Message too long. Max allowed: ${MAX_MESSAGE_WORDS} words.`);
+      setModal("error");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        body: JSON.stringify({ fullName, email, phone, subject, message }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setModal("success");
+        setFullName("");
+        setEmail("");
+        setPhone("");
+        setSubject("");
+        setMessage("");
+      } else {
+        setErrorText(data.error || "Failed to send message.");
+        setModal("error");
+      }
+    } catch (err) {
+      setErrorText("Unexpected error occurred.");
+      setModal("error");
+    }
+
+    setLoading(false);
+  };
 
   return (
     <div className="relative min-h-screen text-white">
@@ -101,46 +166,109 @@ export default function Contact() {
           </div>
 
           {/* Glassy Form */}
-          <form className="bg-white/10 backdrop-blur-xl border border-white/20 hover:border-orange-400/40 shadow-[0_0_25px_rgba(0,0,0,0.4)] rounded-2xl p-8 space-y-5 transition-all duration-300">
+          <form 
+            onSubmit={submitForm}
+            className="bg-white/10 backdrop-blur-xl border border-white/20 hover:border-orange-400/40 shadow-[0_0_25px_rgba(0,0,0,0.4)] rounded-2xl p-8 space-y-5 transition-all duration-300"
+          >
             <h3 className="text-2xl font-semibold text-orange-400 mb-2">
               Send Us a Message
             </h3>
-            <div className="grid grid-cols-2 gap-4">
-              <input
-                type="text"
-                placeholder="First Name"
-                className="bg-white/20 border border-white/30 rounded-lg px-4 py-3 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400"
-              />
-              <input
-                type="text"
-                placeholder="Last Name"
-                className="bg-white/20 border border-white/30 rounded-lg px-4 py-3 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400"
-              />
-            </div>
+
+            {/* FULL NAME (merged first + last) */}
+            <input
+              type="text"
+              placeholder="Full Name"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              className="w-full bg-white/20 border border-white/30 rounded-lg px-4 py-3 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400"
+            />
+
+            {/* Email */}
             <input
               type="email"
               placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="w-full bg-white/20 border border-white/30 rounded-lg px-4 py-3 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400"
             />
+
+            {/* Phone */}
             <input
               type="text"
               placeholder="Phone"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
               className="w-full bg-white/20 border border-white/30 rounded-lg px-4 py-3 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400"
             />
+
+            {/* Subject */}
             <input
               type="text"
               placeholder="Subject"
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
               className="w-full bg-white/20 border border-white/30 rounded-lg px-4 py-3 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400"
             />
-            <textarea
-              placeholder="Message"
-              rows={5}
-              className="w-full bg-white/20 border border-white/30 rounded-lg px-4 py-3 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400"
-            ></textarea>
-            <button className="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-lg font-semibold transition-transform hover:scale-105 duration-200">
-              Send Message
+
+            {/* Message with word count */}
+            <div>
+              <textarea
+                placeholder="Message"
+                rows={5}
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                className="w-full bg-white/20 border border-white/30 rounded-lg px-4 py-3 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400"
+              ></textarea>
+
+              <p className={`text-right text-sm mt-1 ${
+                messageWordCount > MAX_MESSAGE_WORDS ? "text-red-400" : "text-gray-300"
+              }`}>
+                {messageWordCount}/{MAX_MESSAGE_WORDS} words
+              </p>
+            </div>
+
+            {/* Submit button */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-lg font-semibold transition-transform hover:scale-105 duration-200 disabled:opacity-50"
+            >
+              {loading ? "Sending..." : "Send Message"}
             </button>
           </form>
+          {/* Success / Error Modal */}
+          {modal && (
+            <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 animate-fadeIn">
+              <div className="bg-white/10 border border-white/20 backdrop-blur-xl p-8 rounded-2xl w-[90%] max-w-md text-center">
+                {modal === "success" ? (
+                  <>
+                    <CheckCircle2 className="text-green-400 w-16 h-16 mx-auto mb-4" />
+                    <h2 className="text-2xl font-bold text-green-400 mb-2">
+                      Message Sent!
+                    </h2>
+                    <p className="text-gray-200">
+                      Thank you for reaching out. We'll get back to you soon.
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <XCircle className="text-red-400 w-16 h-16 mx-auto mb-4" />
+                    <h2 className="text-2xl font-bold text-red-400 mb-2">
+                      Failed to Send
+                    </h2>
+                    <p className="text-gray-200">{errorText}</p>
+                  </>
+                )}
+
+                <button
+                  onClick={() => setModal(null)}
+                  className="mt-6 bg-orange-500 hover:bg-orange-600 px-6 py-2 rounded-lg font-semibold"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Google Map */}

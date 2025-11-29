@@ -15,6 +15,7 @@ interface Appointment {
   car_year: string;
   plate_number: string;
   fuel_type: string;
+  appointment_time: string;
   appointment_date: string;
   description: string;
   status: "Pending" | "In Progress" | "Completed" | "Cancelled";
@@ -26,6 +27,9 @@ export default function AdminAppointments() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingAppointment, setEditingAppointment] = useState<Appointment | null>(null);
   const [appointmentToDelete, setAppointmentToDelete] = useState<Appointment | null>(null);
+
+  // cancel feature
+  const [appointmentToCancel, setAppointmentToCancel] = useState<Appointment | null>(null);
 
   useEffect(() => {
     fetchAppointments();
@@ -60,6 +64,30 @@ export default function AdminAppointments() {
       }
     } catch (err) {
       console.error("Error deleting appointment:", err);
+    }
+  };
+
+  // cancel feature
+  const confirmCancelAppointment = async () => {
+    if (!appointmentToCancel) return;
+    try {
+      const res = await fetch("/api/appointments", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: appointmentToCancel.id,
+          status: "Cancelled",
+        }),
+      });
+
+      if (res.ok) {
+        await fetchAppointments();
+        setAppointmentToCancel(null);
+      } else {
+        console.error("Failed to cancel appointment");
+      }
+    } catch (err) {
+      console.error("Error cancelling appointment:", err);
     }
   };
 
@@ -135,9 +163,9 @@ export default function AdminAppointments() {
           )}
 
           <div className="mb-4">
-              <h2 className="text-xl font-semibold text-orange-400">
-                List of Appointments ({filtered.length})
-              </h2>
+            <h2 className="text-xl font-semibold text-orange-400">
+              List of Appointments ({filtered.length})
+            </h2>
           </div>
 
           {/* Table */}
@@ -162,7 +190,10 @@ export default function AdminAppointments() {
                   </tr>
                 ) : (
                   filtered.map((a) => (
-                    <tr key={a.id} className="border-b border-white/10 hover:bg-white/10 transition-all">
+                    <tr
+                      key={a.id}
+                      className="border-b border-white/10 hover:bg-white/10 transition-all"
+                    >
                       <td className="px-6 py-4">
                         <div className="font-semibold text-white">{a.customer_name}</div>
                         <div className="text-sm text-gray-300">{a.email}</div>
@@ -174,7 +205,8 @@ export default function AdminAppointments() {
                         <div className="text-sm text-gray-400">{a.fuel_type}</div>
                       </td>
                       <td className="px-6 py-4 text-gray-300">
-                        {new Date(a.appointment_date).toLocaleDateString()}
+                        {new Date(a.appointment_date).toLocaleDateString()} 
+                        <div className="text-sm text-gray-400">{a.appointment_time}</div>
                       </td>
                       <td className="px-6 py-4">
                         <span
@@ -192,12 +224,27 @@ export default function AdminAppointments() {
                         </span>
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <button onClick={() => setEditingAppointment(a)} className="text-blue-400 hover:text-blue-300 mr-4">
+                        <button
+                          onClick={() => setEditingAppointment(a)}
+                          className="text-blue-400 hover:text-blue-300 mr-4"
+                        >
                           Edit
                         </button>
-                        <button onClick={() => setAppointmentToDelete(a)} className="text-red-400 hover:text-red-300">
+                        <button
+                          onClick={() => setAppointmentToDelete(a)}
+                          className="text-red-400 hover:text-red-300 mr-4"
+                        >
                           Delete
                         </button>
+                        {/* cancel feature */}
+                        {a.status !== "Cancelled" && (
+                          <button
+                            onClick={() => setAppointmentToCancel(a)}
+                            className="text-red-400 hover:text-red-300"
+                          >
+                            Cancel
+                          </button>
+                        )}
                       </td>
                     </tr>
                   ))
@@ -230,6 +277,38 @@ export default function AdminAppointments() {
                 className="bg-gray-600 hover:bg-gray-500 px-6 py-2 rounded-lg font-semibold"
               >
                 Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* cancel feature */}
+      {appointmentToCancel && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 animate-fadeIn">
+          <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-8 shadow-lg w-[90%] max-w-md text-center">
+            <h2 className="text-2xl font-semibold text-orange-400 mb-3">
+              Confirm Cancellation
+            </h2>
+            <p className="text-gray-300 mb-6">
+              Are you sure you want to cancel{" "}
+              <span className="text-white font-semibold">
+                {appointmentToCancel.customer_name}
+              </span>
+              ’s appointment?
+            </p>
+            <div className="flex justify-center gap-4">
+              <button
+                onClick={confirmCancelAppointment}
+                className="bg-red-500 hover:bg-red-600 px-6 py-2 rounded-lg font-semibold"
+              >
+                Cancel Appointment
+              </button>
+              <button
+                onClick={() => setAppointmentToCancel(null)}
+                className="bg-gray-600 hover:bg-gray-500 px-6 py-2 rounded-lg font-semibold"
+              >
+                Close
               </button>
             </div>
           </div>
@@ -280,6 +359,7 @@ const AppointmentForm = ({
     car_model: editingAppointment?.car_model || "",
     car_year: editingAppointment?.car_year || "",
     plate_number: editingAppointment?.plate_number || "",
+    appointment_time: editingAppointment?.appointment_time || "",
     appointment_date: editingAppointment?.appointment_date?.slice(0, 10) || "",
     description: editingAppointment?.description || "",
     status: editingAppointment?.status || "Pending",
@@ -304,6 +384,7 @@ const AppointmentForm = ({
     if (!formData.car_make.trim()) newErrors.car_make = "Car make is required.";
     if (!formData.car_model.trim()) newErrors.car_model = "Car model is required.";
     if (!formData.plate_number.trim()) newErrors.plate_number = "Plate number is required.";
+    if (!formData.appointment_time.trim()) newErrors.appointment_time = "Time is required.";
     if (!formData.appointment_date.trim()) newErrors.appointment_date = "Date is required.";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -348,6 +429,7 @@ const AppointmentForm = ({
     { label: "Car Model", name: "car_model" },
     { label: "Car Year", name: "car_year" },
     { label: "Plate Number", name: "plate_number" },
+    { label: "Appointment Time", name: "appointment_time", type: "time" },
     { label: "Appointment Date", name: "appointment_date", type: "date" },
   ];
 
@@ -361,7 +443,7 @@ const AppointmentForm = ({
             type={f.type || "text"}
             value={formData[f.name as keyof typeof formData]}
             onChange={handleChange}
-            className={`w-full rounded-lg px-4 py-2 bg-black/40 text-white border border-white/20 
+            className={`w-full rounded-lg px-4 py-2 bg-black/40 text.white border border-white/20 
               placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 transition-all ${
                 errors[f.name] ? "border-red-500" : ""
               }`}

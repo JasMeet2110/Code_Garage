@@ -114,6 +114,30 @@ export async function PUT(req: Request) {
       status,
     } = await req.json();
 
+    // cancel feature
+    if (
+      id &&
+      status === "Cancelled" &&
+      !customer_name &&
+      !email &&
+      !phone &&
+      !service_type &&
+      !fuel_type &&
+      !car_make &&
+      !car_model &&
+      !car_year &&
+      !plate_number &&
+      !appointment_date &&
+      !appointment_time &&
+      !description
+    ) {
+      await query(
+        "UPDATE appointments SET status = ? WHERE id = ?",
+        [status, id]
+      );
+      return NextResponse.json({ success: true });
+    }
+
     const sql = `
       UPDATE appointments 
       SET customer_name=?, email=?, phone=?, service_type=?, fuel_type=?, car_make=?, car_model=?, car_year=?, 
