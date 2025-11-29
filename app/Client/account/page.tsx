@@ -126,21 +126,25 @@ export default function AccountPage() {
       };
 
       const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0];
-      if (!file) return;
+        const file = e.target.files?.[0];
+        if (!file) return;
 
-      const form = new FormData();
-      form.append("file", file);
+        const form = new FormData();
+        form.append("file", file);
 
-      const uploadReq = await fetch("/api/upload", {
-        method: "POST",
-        body: form,
-      });
+        if (formData.carImage) {
+          form.append("oldImage", formData.carImage);
+        }
 
-      const uploadRes = await uploadReq.json();
+        const uploadReq = await fetch("/api/upload", {
+          method: "POST",
+          body: form,
+        });
 
-      setCarImage(uploadRes.url);
-      setFormData((prev) => ({ ...prev, carImage: uploadRes.url }));
+        const uploadRes = await uploadReq.json();
+
+        setCarImage(uploadRes.url);
+        setFormData((prev) => ({ ...prev, carImage: uploadRes.url }));
     };
 
   const validateForm = () => {
@@ -284,6 +288,7 @@ export default function AccountPage() {
               width={550}
               height={400}
               className="object-contain rounded-lg"
+              unoptimized
             />
 
             <label className="mt-12">
