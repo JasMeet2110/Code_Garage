@@ -88,20 +88,14 @@ const handler = NextAuth({
     return token;
   },
 
-    async session({ session, token }) {
-      if (!session.user) return session;
-
-      if (token.role) {
-        session.user.role = token.role;
-      } else if (session.user.email === "tracksidegarage0101@gmail.com") {
-        session.user.role = "admin";
-      } else {
-        session.user.role = "client";
-      }
-
-      return session;
-    },
+  async session({ session, token }) {
+    session.user.id = token.id;
+    session.user.email = token.email;
+    session.user.role = token.role;
+    session.user.name = token.name;
+    return session;
   },
+},
 });
 
 export { handler as GET, handler as POST };
