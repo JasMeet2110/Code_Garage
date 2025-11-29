@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import { query } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth";
+import { getServerSession } from "next-auth";
 
-function toNull<T>(value: T | undefined | "") {
+function toNull<T>(value: T | undefined | "" | null) {
   return value === undefined || value === "" ? null : value;
 }
 
@@ -28,7 +29,9 @@ export async function GET(req: Request) {
       );
     }
 
-    const rows = await query("SELECT * FROM customers ORDER BY created_at DESC");
+    const rows = await query(
+      "SELECT * FROM customers ORDER BY created_at DESC"
+    );
     return NextResponse.json(rows, { status: 200 });
   } catch (error) {
     console.error("Error fetching customers:", error);
@@ -97,9 +100,17 @@ export async function POST(req: Request) {
   }
 }
 
-// PUT
 export async function PUT(req: Request) {
   try {
+    const session = await getServerSession();
+
+    if (!session || !session.user?.email) {
+      return NextResponse.json(
+        { error: "Not authenticated" },
+        { status: 401 }
+      );
+    }
+
     const body = await req.json();
     let { email, name, phone, carName, carPlate, year, color, carImage } = body;
 
@@ -110,11 +121,9 @@ export async function PUT(req: Request) {
       );
     }
 
-    const sessionUser = await requireAdmin();
-    const session = sessionUser || { email: null };
-
-    if (!sessionUser) {
-      if (session?.email !== email) {
+    if (session.user.email !== email) {
+      const admin = await requireAdmin();
+      if (!admin) {
         return NextResponse.json(
           { error: "Unauthorized. You can only modify your own account." },
           { status: 403 }
@@ -122,7 +131,6 @@ export async function PUT(req: Request) {
       }
     }
 
-    
     if (!year || year === "") year = null;
     else if (typeof year === "string") {
       const parsed = parseInt(year, 10);
