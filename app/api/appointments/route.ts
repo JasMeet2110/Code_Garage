@@ -3,13 +3,14 @@ import { NextResponse } from "next/server";
 import { ResultSetHeader } from "mysql2";
 import { requireAdmin } from "@/lib/auth";
 
-
-//GET
+// GET
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
     const date = searchParams.get("date");
+    const id = searchParams.get("id");
 
+    // For availability check (client booking)
     if (date) {
       const results = await query(
         "SELECT appointment_time FROM appointments WHERE appointment_date = ?",
@@ -18,9 +19,27 @@ export async function GET(req: Request) {
       return NextResponse.json(results);
     }
 
+    // Single appointment by id (for complete page)
+    if (id) {
+      const rows = (await query(
+        `SELECT a.*, e.name AS employee_name 
+         FROM appointments a 
+         LEFT JOIN employees e ON e.id = a.assigned_employee_id
+         WHERE a.id = ?`,
+        [id]
+      )) as any[];
+
+      return NextResponse.json(rows[0] || null);
+    }
+
+    // Admin list: join employee name if assigned
     const results = await query(
-      "SELECT * FROM appointments ORDER BY appointment_date DESC"
+      `SELECT a.*, e.name AS employee_name 
+       FROM appointments a 
+       LEFT JOIN employees e ON e.id = a.assigned_employee_id
+       ORDER BY appointment_date DESC`
     );
+
     return NextResponse.json(results);
   } catch (error) {
     console.error("Error fetching appointments:", error);
@@ -31,7 +50,7 @@ export async function GET(req: Request) {
   }
 }
 
-//POST
+// POST — CREATE APPOINTMENT (client or admin)
 export async function POST(req: Request) {
   try {
     const {
@@ -96,15 +115,24 @@ export async function POST(req: Request) {
   }
 }
 
+// PUT — general update / assign employee / status change / complete job
 export async function PUT(req: Request) {
   try {
     const data = await req.json();
     const { id, status } = data;
 
+    if (!id) {
+      return NextResponse.json(
+        { error: "Missing appointment ID" },
+        { status: 400 }
+      );
+    }
+
+    // =============================
+    // 1️⃣  CANCEL ONLY
+    // =============================
     const isCancelOnly =
-      id &&
-      status === "Cancelled" &&
-      Object.keys(data).length === 2;
+      status === "Cancelled" && Object.keys(data).length === 2;
 
     if (isCancelOnly) {
       await query("UPDATE appointments SET status = ? WHERE id = ?", [
@@ -114,6 +142,25 @@ export async function PUT(req: Request) {
       return NextResponse.json({ success: true });
     }
 
+    // =============================
+    // 2️⃣  COMPLETE JOB (FROM MODAL)
+    // =============================
+    if (data.complete === true) {
+      await query(
+        `UPDATE appointments 
+         SET status = 'Completed',
+             labor_cost = ?,
+             completed_at = NOW()
+         WHERE id = ?`,
+        [data.labor_cost ?? 0, id]
+      );
+
+      return NextResponse.json({ success: true, completed: true });
+    }
+
+    // =============================
+    // 3️⃣  ADMIN UPDATE
+    // =============================
     const admin = await requireAdmin();
     if (!admin) {
       return NextResponse.json(
@@ -122,27 +169,56 @@ export async function PUT(req: Request) {
       );
     }
 
+    const {
+      customer_name,
+      email,
+      phone,
+      service_type,
+      fuel_type,
+      car_make,
+      car_model,
+      car_year,
+      plate_number,
+      appointment_date,
+      appointment_time,
+      description,
+      assigned_employee_id,
+    } = data;
+
     const sql = `
       UPDATE appointments 
-      SET customer_name=?, email=?, phone=?, service_type=?, fuel_type=?, car_make=?, car_model=?, car_year=?, 
-          plate_number=?, appointment_date=?, appointment_time=?, description=?, status=?
-      WHERE id=?
+      SET customer_name = ?,
+          email = ?,
+          phone = ?,
+          service_type = ?,
+          fuel_type = ?,
+          car_make = ?,
+          car_model = ?,
+          car_year = ?,
+          plate_number = ?,
+          appointment_date = ?,
+          appointment_time = ?,
+          description = ?,
+          status = ?,
+          assigned_employee_id = ?
+      WHERE id = ?
     `;
 
     await query(sql, [
-      data.customer_name,
-      data.email,
-      data.phone,
-      data.service_type,
-      data.fuel_type,
-      data.car_make,
-      data.car_model,
-      data.car_year,
-      data.plate_number,
-      data.appointment_date,
-      data.appointment_time,
-      data.description,
-      data.status,
+      customer_name ?? null,
+      email ?? null,
+      phone ?? null,
+      service_type ?? null,
+      fuel_type ?? null,
+      car_make ?? null,
+      car_model ?? null,
+      car_year ?? null,
+      plate_number ?? null,
+      appointment_date ?? null,
+      appointment_time ?? null,
+      description ?? null,
+      status || "Pending",
+      assigned_employee_id ?? null,
       id,
     ]);
 
@@ -156,7 +232,8 @@ export async function PUT(req: Request) {
   }
 }
 
-//DELETE
+
+// DELETE
 export async function DELETE(req: Request) {
   try {
     const admin = await requireAdmin();

@@ -1,36 +1,21 @@
--- Migration: Create unified appointments table
--- Updated: 2025-10-23
--- Description: Unified appointments table for client and admin CRUD with customer, vehicle, and appointment details
-
 CREATE TABLE IF NOT EXISTS appointments (
   id INT PRIMARY KEY AUTO_INCREMENT,
-
-  -- Customer Information
   customer_name VARCHAR(255) NOT NULL,
   email VARCHAR(255) NOT NULL,
-  phone VARCHAR(20) NOT NULL,
-
-  -- Vehicle Information
+  phone VARCHAR(50) NOT NULL,
   service_type VARCHAR(255) NOT NULL,
+  car_make VARCHAR(255) NOT NULL,
+  car_model VARCHAR(255) NOT NULL,
+  car_year VARCHAR(10),
+  plate_number VARCHAR(50),
   fuel_type VARCHAR(50),
-  car_make VARCHAR(100) NOT NULL,
-  car_model VARCHAR(100) NOT NULL,
-  car_year VARCHAR(10) NOT NULL,
-  plate_number VARCHAR(20) NOT NULL,
-
-  -- Appointment Details
   appointment_date DATE NOT NULL,
   appointment_time VARCHAR(20) NOT NULL,
-  description TEXT NOT NULL,
-
-  -- Status Tracking
-  status ENUM('Pending', 'In Progress', 'Completed', 'Cancelled') DEFAULT 'Pending',
-  completed_at DATETIME NULL,
-
-  -- Timestamps
+  description TEXT,
+  status ENUM('Pending', 'In Progress', 'Completed', 'Cancelled') NOT NULL DEFAULT 'Pending',
+  labor_cost DECIMAL(10,2) DEFAULT 0,
+  assigned_employee_id INT NULL,
+  completed_at TIMESTAMP NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  FOREIGN KEY (assigned_employee_id) REFERENCES employees(id)
 );
-
-CREATE INDEX idx_appointment_date ON appointments (appointment_date);
-CREATE INDEX idx_appointment_time ON appointments (appointment_time);
