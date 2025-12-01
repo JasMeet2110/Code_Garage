@@ -1,18 +1,13 @@
 import { NextResponse } from "next/server";
 import { query } from "@/lib/db";
+import { requireAdmin } from "@/lib/auth";
+import { getServerSession } from "next-auth";
 
-/* ---------------------------------------------
-   Helper: normalize optional fields
----------------------------------------------- */
-function toNull<T>(value: T | undefined | "") {
+function toNull<T>(value: T | undefined | "" | null) {
   return value === undefined || value === "" ? null : value;
 }
 
-/* ------------------------------------------------------
-   ✅ GET customers
-   - If ?email= is provided → return only that customer
-   - Otherwise → return all customers
------------------------------------------------------- */
+//GET
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
@@ -24,6 +19,14 @@ export async function GET(req: Request) {
         [email]
       );
       return NextResponse.json(rows[0] || null, { status: 200 });
+    }
+
+    const admin = await requireAdmin();
+    if (!admin) {
+      return NextResponse.json(
+        { error: "Unauthorized (admin only)" },
+        { status: 403 }
+      );
     }
 
     const rows = await query(
@@ -39,16 +42,12 @@ export async function GET(req: Request) {
   }
 }
 
-/* ------------------------------------------------------
-   ✅ POST — Create / upsert customer
-   Used by Admin and My Account first-time setup
------------------------------------------------------- */
+//POST
 export async function POST(req: Request) {
   try {
     const body = await req.json();
     let { name, phone, email, carName, carPlate, year, color, carImage } = body;
 
-    // Required fields
     if (!name || !email) {
       return NextResponse.json(
         { error: "Name and email are required" },
@@ -56,10 +55,8 @@ export async function POST(req: Request) {
       );
     }
 
-    // Normalize year to number or null
-    if (year === undefined || year === "") {
-      year = null;
-    } else if (typeof year === "string") {
+    if (!year || year === "") year = null;
+    else if (typeof year === "string") {
       const parsed = parseInt(year, 10);
       year = Number.isNaN(parsed) ? null : parsed;
     }
@@ -79,12 +76,12 @@ export async function POST(req: Request) {
          car_image  = VALUES(car_image),
          updated_at = NOW()`,
       [
-        name,                        // required
+        name,
         toNull(phone),
-        email,                       // required
+        email,
         toNull(carName),
         toNull(carPlate),
-        year,                        // number or null
+        year,
         toNull(color),
         toNull(carImage),
       ]
@@ -103,11 +100,17 @@ export async function POST(req: Request) {
   }
 }
 
-/* ------------------------------------------------------
-   ✅ PUT — Update customer by email (Client My Account)
------------------------------------------------------- */
 export async function PUT(req: Request) {
   try {
+    const session = await getServerSession();
+
+    if (!session || !session.user?.email) {
+      return NextResponse.json(
+        { error: "Not authenticated" },
+        { status: 401 }
+      );
+    }
+
     const body = await req.json();
     let { email, name, phone, carName, carPlate, year, color, carImage } = body;
 
@@ -118,19 +121,26 @@ export async function PUT(req: Request) {
       );
     }
 
-    // Normalize year again
-    if (year === undefined || year === "") {
-      year = null;
-    } else if (typeof year === "string") {
+    if (session.user.email !== email) {
+      const admin = await requireAdmin();
+      if (!admin) {
+        return NextResponse.json(
+          { error: "Unauthorized. You can only modify your own account." },
+          { status: 403 }
+        );
+      }
+    }
+
+    if (!year || year === "") year = null;
+    else if (typeof year === "string") {
       const parsed = parseInt(year, 10);
       year = Number.isNaN(parsed) ? null : parsed;
     }
 
     await query(
       `UPDATE customers
-       SET name = ?, phone = ?, car_name = ?, car_plate = ?, year = ?, color = ?, car_image = ?,
-           updated_at = NOW()
-       WHERE email = ?`,
+       SET name=?, phone=?, car_name=?, car_plate=?, year=?, color=?, car_image=?, updated_at=NOW()
+       WHERE email=?`,
       [
         toNull(name),
         toNull(phone),

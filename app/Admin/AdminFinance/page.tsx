@@ -45,6 +45,9 @@ const FinancePage = () => {
     outstanding: 0,
   });
 
+  const [selectedMonth, setSelectedMonth] = useState<string>("");
+  const [selectedYear, setSelectedYear] = useState<string>("");
+
   const [revenueTrend, setRevenueTrend] = useState<
     { month: string; revenue: number }[]
   >([]);
@@ -54,29 +57,42 @@ const FinancePage = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const loadFinance = async () => {
-      try {
-        const res = await fetch("/api/finance");
-        if (!res.ok) {
-          console.error("Failed to fetch /api/finance");
-          return;
-        }
-        const data = await res.json();
-
-        if (data.summary) setSummary(data.summary);
-        if (data.revenueTrend) setRevenueTrend(data.revenueTrend);
-        if (data.recentTransactions)
-          setTransactions(data.recentTransactions);
-        if (data.pendingInvoices) setInvoices(data.pendingInvoices);
-      } catch (err) {
-        console.error("Error loading finance data:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     loadFinance();
-  }, []);
+  }, [selectedMonth, selectedYear]);
+
+  const loadFinance = async () => {
+    try {
+      let queryParam = "";
+      if (selectedMonth) {
+        const [year, month] = selectedMonth.split("-");
+        queryParam = `?year=${year}&month=${month}`;
+      } else if (selectedYear) {
+        queryParam = `?year=${selectedYear}`;
+      }
+
+      const res = await fetch(`/api/finance${queryParam}`, { cache: "no-store" });
+      if (!res.ok) {
+        console.error("Failed to fetch /api/finance");
+        return;
+      }
+
+      const data = await res.json();
+
+      if (data.summary) setSummary(data.summary);
+      if (data.revenueTrend) setRevenueTrend(data.revenueTrend);
+      if (data.recentTransactions) setTransactions(data.recentTransactions);
+      if (data.pendingInvoices) setInvoices(data.pendingInvoices);
+    } catch (err) {
+      console.error("Error loading finance:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const clearFilters = () => {
+    setSelectedMonth("");
+    setSelectedYear("");
+  };
 
   const formatMoney = (n: number) =>
     `$${Number(n || 0).toLocaleString("en-CA", { maximumFractionDigits: 0 })}`;
@@ -108,9 +124,53 @@ const FinancePage = () => {
       {/* Main Content */}
       <main className="ml-72 flex-1 p-10 relative z-10">
         <div className="backdrop-blur-lg bg-white/5 rounded-2xl p-8 shadow-lg border border-white/20">
-          <h1 className="text-4xl font-bold text-orange-400 mb-8 drop-shadow-md">
-            Finance Overview
-          </h1>
+
+          {/* Title + Filters */}
+          <div className="flex flex-wrap items-end justify-between gap-6 mb-10">
+            <h1 className="text-4xl font-bold text-orange-400 drop-shadow-md">
+              Finance Overview
+            </h1>
+
+            <div className="flex items-center gap-4">
+              {/* MONTH */}
+              <div className="flex flex-col">
+                <label className="text-sm text-gray-300 mb-1">Filter by Month</label>
+                <input
+                  type="month"
+                  value={selectedMonth}
+                  onChange={(e) => {
+                    setSelectedMonth(e.target.value);
+                    setSelectedYear("");
+                  }}
+                  className="bg-black/40 text-white border border-white/20 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-400"
+                />
+              </div>
+
+              {/* YEAR */}
+              <div className="flex flex-col">
+                <label className="text-sm text-gray-300 mb-1">Filter by Year</label>
+                <input
+                  placeholder="2025"
+                  min="2000"
+                  max="2099"
+                  value={selectedYear}
+                  onChange={(e) => {
+                    setSelectedYear(e.target.value);
+                    setSelectedMonth("");
+                  }}
+                  className="bg-black/40 text-white border border-white/20 rounded-lg px-4 py-2 w-28 focus:ring-2 focus:ring-orange-400"
+                />
+              </div>
+
+              {/* CLEAR */}
+              <button
+                onClick={clearFilters}
+                className="bg-gray-600 hover:bg-gray-500 px-5 py-2 mt-6 rounded-lg text-sm font-semibold"
+              >
+                Clear
+              </button>
+            </div>
+          </div>
 
           {/* Summary Cards */}
           <div className="grid grid-cols-4 gap-6 mb-8">
@@ -120,18 +180,21 @@ const FinancePage = () => {
                 {formatMoney(summary.revenue)}
               </p>
             </div>
+
             <div className="glass-card">
               <h3 className="text-lg font-semibold">Expenses</h3>
               <p className="text-3xl font-bold text-red-400 mt-2">
                 {formatMoney(summary.expenses)}
               </p>
             </div>
+
             <div className="glass-card">
               <h3 className="text-lg font-semibold">Profit</h3>
               <p className="text-3xl font-bold text-orange-400 mt-2">
                 {formatMoney(summary.profit)}
               </p>
             </div>
+
             <div className="glass-card">
               <h3 className="text-lg font-semibold">Outstanding</h3>
               <p className="text-3xl font-bold text-yellow-400 mt-2">
@@ -140,45 +203,38 @@ const FinancePage = () => {
             </div>
           </div>
 
-          {/* Trend + (keep pie chart empty for now) */}
-          <div className="grid grid-cols-2 gap-6 mb-8">
-            {/* Revenue Trend */}
-            <div className="glass-card h-80">
-              <h2 className="text-xl font-bold text-orange-400 mb-4">
-                Monthly Revenue Trend
-              </h2>
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={revenueTrend}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#444" />
-                  <XAxis dataKey="month" stroke="#ccc" />
-                  <YAxis stroke="#ccc" />
-                  <Tooltip />
-                  <Line
-                    type="monotone"
-                    dataKey="revenue"
-                    stroke="#22c55e"
-                    strokeWidth={3}
-                    dot={{ r: 4 }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
+          {/* Revenue Trend */}
+          <div className="glass-card h-80 mb-8">
+            <h2 className="text-xl font-bold text-orange-400 mb-4">
+              Monthly Revenue Trend
+            </h2>
 
-            {/* Placeholder for Expense Breakdown (can wire later) */}
-            <div className="glass-card h-80 flex items-center justify-center">
-              <p className="text-gray-300 text-center">
-                Expense breakdown chart can be connected later.
-              </p>
-            </div>
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={revenueTrend}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#444" />
+                <XAxis dataKey="month" stroke="#ccc" />
+                <YAxis stroke="#ccc" />
+                <Tooltip />
+                <Line
+                  type="monotone"
+                  dataKey="revenue"
+                  stroke="#22c55e"
+                  strokeWidth={3}
+                  dot={{ r: 4 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
           </div>
 
           {/* Tables */}
           <div className="grid grid-cols-2 gap-6 mt-24">
+
             {/* Recent Transactions */}
             <div className="glass-card">
               <h2 className="text-2xl font-bold text-orange-400 mb-4">
                 Recent Transactions
               </h2>
+
               <table className="min-w-full text-sm text-gray-300">
                 <thead>
                   <tr className="text-orange-400 border-b border-white/10">
@@ -188,6 +244,7 @@ const FinancePage = () => {
                     <th className="px-4 py-2 text-left">Status</th>
                   </tr>
                 </thead>
+
                 <tbody>
                   {transactions.length === 0 ? (
                     <tr>
@@ -210,12 +267,8 @@ const FinancePage = () => {
                             day: "2-digit",
                           })}
                         </td>
-                        <td className="px-4 py-2 text-gray-300">
-                          {t.type}
-                        </td>
-                        <td className="px-4 py-2">
-                          {formatMoney(t.amount)}
-                        </td>
+                        <td className="px-4 py-2 text-gray-300">{t.type}</td>
+                        <td className="px-4 py-2">{formatMoney(t.amount)}</td>
                         <td
                           className={`px-4 py-2 ${
                             t.status === "Completed"
@@ -237,8 +290,9 @@ const FinancePage = () => {
             {/* Pending Invoices */}
             <div className="glass-card">
               <h2 className="text-2xl font-bold text-orange-400 mb-4">
-                Pending Invoices
+                Outstanding Invoices
               </h2>
+
               <table className="min-w-full text-sm text-gray-300">
                 <thead>
                   <tr className="text-orange-400 border-b border-white/10">
@@ -248,6 +302,7 @@ const FinancePage = () => {
                     <th className="px-4 py-2 text-left">Status</th>
                   </tr>
                 </thead>
+
                 <tbody>
                   {invoices.length === 0 ? (
                     <tr>
@@ -255,29 +310,21 @@ const FinancePage = () => {
                         colSpan={4}
                         className="px-4 py-4 text-center text-gray-400"
                       >
-                        No pending invoices.
+                        No outstanding invoices.
                       </td>
                     </tr>
                   ) : (
                     invoices.map((inv) => (
                       <tr
                         key={inv.id}
-                        className="border-b border-white/10 hover:bg白/5"
+                        className="border-b border-white/10 hover:bg-white/5"
                       >
                         <td className="px-4 py-2">#{inv.id}</td>
                         <td className="px-4 py-2 text-gray-300">
                           {inv.customer || "-"}
                         </td>
-                        <td className="px-4 py-2">
-                          {formatMoney(inv.amount)}
-                        </td>
-                        <td
-                          className={`px-4 py-2 ${
-                            inv.status === "Pending"
-                              ? "text-yellow-400"
-                              : "text-red-400"
-                          }`}
-                        >
+                        <td className="px-4 py-2">{formatMoney(inv.amount)}</td>
+                        <td className="px-4 py-2 text-yellow-400">
                           {inv.status}
                         </td>
                       </tr>
@@ -290,7 +337,6 @@ const FinancePage = () => {
         </div>
       </main>
 
-      {/* Tailwind helper class */}
       <style jsx>{`
         .glass-card {
           @apply bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-6 shadow-md;

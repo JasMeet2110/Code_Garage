@@ -1,12 +1,27 @@
 "use client";
-
 import Link from "next/link";
 import Image from "next/image";
 import { signOut } from "next-auth/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function AdminSidebar() {
   const [showConfirm, setShowConfirm] = useState(false);
+
+  const [lowStockCount, setLowStockCount] = useState(0);
+
+useEffect(() => {
+  async function fetchLowStock() {
+    try {
+      const res = await fetch("/api/inventory/low-stock", { cache: "no-store" });
+      const data = await res.json();
+      setLowStockCount(data.length);
+    } catch (err) {
+      console.error("Low stock fetch error:", err);
+    }
+  }
+
+  fetchLowStock();
+}, []);
 
   return (
     <>
@@ -44,7 +59,15 @@ export default function AdminSidebar() {
               href={item.href}
               className="px-4 py-2 rounded-xl text-lg font-medium hover:bg-white/20 transition-all duration-200"
             >
-              {item.label}
+              <span className="relative flex items-center gap-2">
+                {item.label}
+
+                {item.label === "Inventory" && lowStockCount > 0 && (
+                  <span className="bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded-full animate-pulse">
+                    {lowStockCount}
+                  </span>
+                )}
+              </span>
             </Link>
           ))}
 

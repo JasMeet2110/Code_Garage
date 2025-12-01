@@ -1,11 +1,11 @@
-import NextAuth from "next-auth";
+import NextAuth, { type NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { query } from "@/lib/db";
 import bcrypt from "bcryptjs";
 import type { ResultSetHeader } from "mysql2";
 
-const handler = NextAuth({
+export const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -53,51 +53,48 @@ const handler = NextAuth({
   },
 
   callbacks: {
-    async signIn({ user, account, profile }) {
+    async signIn({ user }) {
       return true;
     },
 
     async jwt({ token, user }) {
-      // When user logs in (first time in session)
       if (user) {
         token.email = user.email;
         token.name = user.name;
 
-        // 🔥 Load role from DB on Google login
-        const users = (await query("SELECT * FROM users WHERE email = ?", [
-          user.email,
-        ])) as any[];
+        // Load role from DB (Google or Credentials)
+        const users = (await query(
+          "SELECT * FROM users WHERE email = ?",
+          [user.email]
+        )) as any[];
 
         if (users.length > 0) {
-          // Existing user
           token.role = users[0].role;
           token.id = users[0].id.toString();
         } else {
-          // New Google user → create as client
-          const result = (await query(
+          const result = await query(
             "INSERT INTO users (name, email, role, password) VALUES (?, ?, ?, ?)",
             [user.name || "Google User", user.email, "client", ""]
-          )) as ResultSetHeader; // ← Add this
+          );
 
           token.role = "client";
           token.id = result.insertId.toString();
         }
       }
-
       return token;
     },
 
     async session({ session, token }) {
-      if (session.user) {
-        // ← Add this check
-        session.user.id = token.id as string;
-        session.user.email = token.email as string;
-        session.user.role = token.role as string;
-        session.user.name = token.name as string;
-      }
+      session.user.id = token.id;
+      session.user.email = token.email;
+      session.user.role = token.role;
+      session.user.name = token.name;
       return session;
     },
   },
-});
+};
+
+// NextAuth handler using the exported config
+const handler = NextAuth(authOptions);
 
 export { handler as GET, handler as POST };
