@@ -2,6 +2,11 @@ import { query } from "@/lib/db";
 import { NextResponse } from "next/server";
 import { ResultSetHeader } from "mysql2";
 import { requireAdmin } from "@/lib/auth";
+import { Resend } from "resend";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "tracksidegarage0101@gmail.com";
+const BUSINESS_PHONE = process.env.BUSINESS_PHONE || "5878898163";
 
 export async function GET(req: Request) {
   try {
@@ -100,6 +105,68 @@ export async function POST(req: Request) {
     ];
 
     const result = (await query(sql, values)) as ResultSetHeader;
+
+    // --- EMAILS: admin + customer ---
+    console.log("📧 Preparing emails:", {
+      adminTo: ADMIN_EMAIL,
+      customerTo: email,
+    });
+
+    try {
+      await Promise.all([
+        // Admin notification
+        resend.emails.send({
+          from: "Trackside Garage <onboarding@resend.dev>",
+          to: ADMIN_EMAIL,
+          subject: "New appointment booked",
+          html: `
+            <h2>New appointment booked</h2>
+            <p><strong>Name:</strong> ${customer_name}</p>
+            <p><strong>Email:</strong> ${email}</p>
+            <p><strong>Phone:</strong> ${phone}</p>
+            <p><strong>Service:</strong> ${service_type}</p>
+            <p><strong>Fuel type:</strong> ${fuel_type}</p>
+            <p><strong>Vehicle:</strong> ${car_year} ${car_make} ${car_model}</p>
+            <p><strong>Plate:</strong> ${plate_number}</p>
+            <p><strong>Date:</strong> ${appointment_date}</p>
+            <p><strong>Time:</strong> ${appointment_time}</p>
+            <p><strong>Description:</strong> ${description || "N/A"}</p>
+            <p><strong>Status:</strong> ${status || "Pending"}</p>
+          `,
+        }),
+
+        // Customer confirmation
+        resend.emails.send({
+          from: "Trackside Garage <onboarding@resend.dev>",
+          to: email,
+          subject: "Your Trackside Garage appointment is booked",
+          html: `
+            <p>Hi ${customer_name},</p>
+            <p>Thanks for booking with <strong>Trackside Garage</strong>!</p>
+            <p>Here are your appointment details:</p>
+            <ul>
+              <li><strong>Date:</strong> ${appointment_date}</li>
+              <li><strong>Time:</strong> ${appointment_time}</li>
+              <li><strong>Service:</strong> ${service_type}</li>
+              <li><strong>Fuel type:</strong> ${fuel_type}</li>
+              <li><strong>Vehicle:</strong> ${car_year} ${car_make} ${car_model}</li>
+              <li><strong>Plate:</strong> ${plate_number}</li>
+            </ul>
+            <p><strong>Description:</strong> ${description || "N/A"}</p>
+            <p>If you need to reschedule or cancel, reply to this email or call us at ${
+              BUSINESS_PHONE || "our shop"
+            }.</p>
+            <p>See you soon,<br/>Trackside Garage</p>
+          `,
+        }),
+      ]);
+
+      console.log("📧 Emails sent successfully");
+    } catch (emailError) {
+      console.error("Error sending appointment emails:", emailError);
+      // don't fail the booking if email fails
+    }
+
     return NextResponse.json({ success: true, id: result.insertId });
   } catch (error) {
     console.error("Error adding appointment:", error);
