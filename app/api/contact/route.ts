@@ -31,7 +31,7 @@ export async function POST(req: Request) {
     await Promise.all([
       // Admin email
       resend.emails.send({
-        from: "Trackside Garage <onboarding@resend.dev>",
+        from: "Trackside Garage <no-reply@tracksidegarage.ca>",
         to: ADMIN_EMAIL,
         subject: `New Contact Inquiry — ${subject}`,
         html: `
@@ -46,7 +46,7 @@ export async function POST(req: Request) {
 
       // Customer confirmation email
       resend.emails.send({
-        from: "Trackside Garage <onboarding@resend.dev>",
+        from: "Trackside Garage <no-reply@tracksidegarage.ca>",
         to: email,
         subject: "We received your message – Trackside Garage",
         html: `
