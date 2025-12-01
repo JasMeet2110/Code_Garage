@@ -63,19 +63,18 @@ export const authOptions: NextAuthOptions = {
         token.name = user.name;
 
         // Load role from DB (Google or Credentials)
-        const users = (await query(
-          "SELECT * FROM users WHERE email = ?",
-          [user.email]
-        )) as any[];
+        const users = (await query("SELECT * FROM users WHERE email = ?", [
+          user.email,
+        ])) as any[];
 
         if (users.length > 0) {
           token.role = users[0].role;
           token.id = users[0].id.toString();
         } else {
-          const result = await query(
+          const result = (await query(
             "INSERT INTO users (name, email, role, password) VALUES (?, ?, ?, ?)",
             [user.name || "Google User", user.email, "client", ""]
-          );
+          )) as ResultSetHeader;
 
           token.role = "client";
           token.id = result.insertId.toString();
@@ -85,10 +84,13 @@ export const authOptions: NextAuthOptions = {
     },
 
     async session({ session, token }) {
-      session.user.id = token.id;
-      session.user.email = token.email;
-      session.user.role = token.role;
-      session.user.name = token.name;
+      if (session.user) {
+        // ← Add this check
+        session.user.id = token.id as string;
+        session.user.email = token.email as string;
+        session.user.role = token.role as string;
+        session.user.name = token.name as string;
+      }
       return session;
     },
   },
