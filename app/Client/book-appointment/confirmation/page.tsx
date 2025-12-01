@@ -6,7 +6,6 @@ import Image from "next/image";
 export default function ConfirmationPage() {
   return (
     <main className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Background Image Placeholder */}
       <div className="fixed inset-0 -z-10">
         <Image
           src="/background/account.jpg" 
@@ -18,9 +17,7 @@ export default function ConfirmationPage() {
         <div className="absolute inset-0 bg-black/50" />
       </div>
 
-      {/* Center Card */}
       <div className="bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl rounded-2xl p-10 max-w-lg w-[90%] text-center text-white animate-fadeIn">
-        {/* Success Icon */}
         <div className="flex justify-center mb-6">
           <div className="h-20 w-20 bg-green-500/20 rounded-full flex items-center justify-center border border-green-500/50">
             <svg
@@ -57,7 +54,6 @@ export default function ConfirmationPage() {
         </Link>
       </div>
 
-      {/* Animation Style */}
       <style jsx>{`
         @keyframes fadeIn {
           0% { opacity: 0; transform: translateY(20px); }

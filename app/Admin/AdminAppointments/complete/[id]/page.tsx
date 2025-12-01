@@ -51,7 +51,6 @@ export default function CompleteAppointmentPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
-  // Load appointment
   useEffect(() => {
     if (!id) return;
 
@@ -63,7 +62,6 @@ export default function CompleteAppointmentPage() {
           setError("Appointment not found");
         } else {
           setAppointment(data);
-          // Optional: prefill labor cost / service charge later
         }
       } catch (err) {
         console.error(err);
@@ -76,7 +74,6 @@ export default function CompleteAppointmentPage() {
     fetchData();
   }, [id]);
 
-  // Load inventory list for parts
   useEffect(() => {
     const loadInventory = async () => {
       try {
@@ -143,7 +140,6 @@ export default function CompleteAppointmentPage() {
         setError(json.error || "Failed to complete appointment");
       } else {
         setSuccess("Appointment marked as completed and invoice data saved.");
-        // Small timeout then go back to appointments list
         setTimeout(() => {
           router.push("/Admin/AdminAppointments");
         }, 800);
@@ -202,7 +198,6 @@ export default function CompleteAppointmentPage() {
             </button>
           </div>
 
-          {/* Appointment summary */}
           <div className="grid md:grid-cols-2 gap-6 mb-8">
             <div className="bg-black/40 border border-white/15 rounded-xl p-4">
               <h2 className="text-lg font-semibold text-orange-300 mb-2">
@@ -260,9 +255,7 @@ export default function CompleteAppointmentPage() {
             </div>
           )}
 
-          {/* Completion form */}
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Row: Labor + Service */}
             <div className="grid md:grid-cols-2 gap-6">
               <div className="flex flex-col">
                 <label className="text-sm text-gray-300 mb-1">
@@ -296,7 +289,6 @@ export default function CompleteAppointmentPage() {
               </div>
             </div>
 
-            {/* Parts section */}
             <div className="bg-black/30 border border-white/15 rounded-xl p-4">
               <div className="flex items-center justify-between mb-3">
                 <h2 className="text-lg font-semibold text-orange-300">

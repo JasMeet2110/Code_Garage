@@ -1,4 +1,3 @@
-// app/api/invoice/[id]/route.ts
 import { NextResponse } from "next/server";
 import { query } from "@/lib/db";
 import { PDFDocument, StandardFonts } from "pdf-lib";
@@ -9,7 +8,6 @@ export async function GET(req: Request, context: any) {
   try {
     const { id } = context.params;
 
-    // Fetch appointment & employee
     const rows = (await query(
       `SELECT a.*, e.name AS employee_name
        FROM appointments a
@@ -27,7 +25,6 @@ export async function GET(req: Request, context: any) {
 
     const appt = rows[0];
 
-    // Load appointment items
     const itemRows = (await query(
       `SELECT * FROM appointment_items
        WHERE appointment_id = ?
@@ -46,7 +43,6 @@ export async function GET(req: Request, context: any) {
       if (i.item_type === "service") serviceTotal += total;
     }
 
-    // Fallback to labor_cost if no labor lines
     if (laborTotal === 0 && appt.labor_cost != null) {
       laborTotal = Number(appt.labor_cost) || 0;
     }
@@ -55,9 +51,6 @@ export async function GET(req: Request, context: any) {
     const tax = Number((subtotal * 0.05).toFixed(2));
     const total = subtotal + tax;
 
-    // ---------------------------
-    //   PDF SETUP
-    // ---------------------------
     const pdf = await PDFDocument.create();
     const font = await pdf.embedFont(StandardFonts.Courier);
 
@@ -65,7 +58,6 @@ export async function GET(req: Request, context: any) {
     let { width } = page.getSize();
     let y = 800;
 
-    // AUTO-PAGE-BREAK HANDLER
     const ensureSpace = (amount: number = 30) => {
       if (y - amount < 50) {
         page = pdf.addPage([595, 842]);
@@ -93,9 +85,6 @@ export async function GET(req: Request, context: any) {
       writeLine("--------------------------------------------------------------");
     };
 
-    // ---------------------------
-    //   LOGO
-    // ---------------------------
     const logoPath = path.join(process.cwd(), "public", "logo", "TrackSideGarage.png");
 
     if (fs.existsSync(logoPath)) {
@@ -115,34 +104,22 @@ export async function GET(req: Request, context: any) {
       y -= scale.height + 20;
     }
 
-    // ---------------------------
-    //   HEADER
-    // ---------------------------
     writeCenter("TRACKSIDE GARAGE", 20);
     writeCenter("OFFICIAL SERVICE INVOICE", 13);
     y -= 10;
 
-    // ---------------------------
-    //   CUSTOMER DETAILS
-    // ---------------------------
     section("CUSTOMER DETAILS");
     writeLine(`Name : ${appt.customer_name}`);
     writeLine(`Email: ${appt.email}`);
     writeLine(`Phone: ${appt.phone}`);
     y -= 10;
 
-    // ---------------------------
-    //   VEHICLE
-    // ---------------------------
     section("VEHICLE INFORMATION");
     writeLine(`Car   : ${appt.car_make} ${appt.car_model} (${appt.car_year})`);
     writeLine(`Plate : ${appt.plate_number}`);
     writeLine(`Fuel  : ${appt.fuel_type || "N/A"}`);
     y -= 10;
 
-    // ---------------------------
-    //   APPOINTMENT
-    // ---------------------------
     section("APPOINTMENT DETAILS");
     writeLine(`Service    : ${appt.service_type}`);
     writeLine(`Date       : ${appt.appointment_date}`);
@@ -151,9 +128,6 @@ export async function GET(req: Request, context: any) {
     if (appt.employee_name) writeLine(`Technician : ${appt.employee_name}`);
     y -= 10;
 
-    // ---------------------------
-    //   DESCRIPTION
-    // ---------------------------
     section("DESCRIPTION");
 
     const desc = appt.description || "No additional notes.";
@@ -171,9 +145,6 @@ export async function GET(req: Request, context: any) {
 
     y -= 10;
 
-    // ---------------------------
-    //   CHARGES
-    // ---------------------------
     section("CHARGES");
 
     writeLine(`Labor Cost         : $${laborTotal.toFixed(2)}`);
@@ -184,7 +155,6 @@ export async function GET(req: Request, context: any) {
       writeLine("Service Charge     : $0.00");
     }
 
-    // Parts
     if (itemRows.some((i) => i.item_type === "part")) {
       writeLine("");
       writeLine("Parts Used:");

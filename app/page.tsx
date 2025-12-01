@@ -6,7 +6,6 @@ import Link from "next/link";
 import ServicesCarousel from "@/components/ServicesCarousel";
 import ReviewsCarousel from "@/components/ReviewsCarousel";
 
-/* ---------------------- SERVICES DATA ---------------------- */
 const SERVICES = [
   {
     img: "/services/oilchange.png",
@@ -74,7 +73,6 @@ export default function Home() {
 
   return (
     <div className="relative text-white min-h-screen">
-      {/* BACKGROUND */}
       <div className="fixed inset-0 -z-10">
         <Image
           src="/background/mustangrtr.png"
@@ -90,7 +88,6 @@ export default function Home() {
         </div>
       </div>
 
-      {/* HERO SECTION */}
       <section className="relative h-[850px] flex items-center justify-center text-center">
         <div className="relative z-10 px-6 max-w-5xl mx-auto">
           <p className="tracking-[0.3em] uppercase text-xs md:text-sm text-gray-300 mb-4">
@@ -128,7 +125,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ABOUT SECTION */}
       <section className="py-16 px-6 md:px-10 bg-black/40 backdrop-blur-sm border-y border-white/10">
         <div className="max-w-7xl mx-auto grid md:grid-cols-[3fr,2fr] gap-10 items-center">
           <div className="space-y-4">
@@ -166,7 +162,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SERVICES CAROUSEL */}
       <section className="py-16 px-6 md:px-10 bg-black/40 backdrop-blur-sm border-y border-white/10">
       <div className="max-w-7xl mx-auto text-center">
 
@@ -196,7 +191,6 @@ export default function Home() {
       </div>
     </section>
 
-      {/* REVIEWS */}
       <section className="py-16 px-6 md:px-10 bg-black/40 backdrop-blur-sm border-y border-white/10">
         <div className="max-w-7xl mx-auto text-center">
           <p className="text-xs uppercase tracking-[0.25em] text-gray-400 mb-2">
@@ -211,7 +205,6 @@ export default function Home() {
             These are the top-rated experiences from our customers.
           </p>
 
-          {/* IF NO REVIEWS */}
           {reviews.length === 0 ? (
             <p className="opacity-70 text-gray-400">No reviews yet.</p>
           ) : (

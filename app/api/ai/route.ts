@@ -6,14 +6,6 @@ const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY!,
 });
 
-/**
- * We store short-term memory inside the request body:
- * The frontend sends: { message, history }
- *
- * history = [{ role:"user"/"assistant", content:"..." }]
- *
- * This keeps context so the AI doesn’t forget previous fields.
- */
 export async function POST(req: Request) {
   try {
     const { message, history = [], appointments = [] } = await req.json();
@@ -25,7 +17,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // Prepare full conversation for OpenAI
     const messages: any[] = [
       { role: "system", content: systemPrompt },
       ...history.map((m: any) => ({
@@ -41,7 +32,6 @@ export async function POST(req: Request) {
       },
     ];
 
-    // ---- AI CALL ----
     const completion = await client.chat.completions.create({
       model: "gpt-4o-mini",
       temperature: 0.3,
@@ -59,7 +49,6 @@ export async function POST(req: Request) {
       parsed = {};
     }
 
-    // Ensure schema ALWAYS exists
     const safe = {
       replyText: parsed.replyText ?? "I couldn't fully understand that.",
       intent: parsed.intent ?? "general",

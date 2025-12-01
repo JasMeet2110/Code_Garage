@@ -3,14 +3,12 @@ import { NextResponse } from "next/server";
 import { ResultSetHeader } from "mysql2";
 import { requireAdmin } from "@/lib/auth";
 
-// GET
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
     const date = searchParams.get("date");
     const id = searchParams.get("id");
 
-    // For availability check (client booking)
     if (date) {
       const results = await query(
         "SELECT appointment_time FROM appointments WHERE appointment_date = ?",
@@ -19,7 +17,6 @@ export async function GET(req: Request) {
       return NextResponse.json(results);
     }
 
-    // Single appointment by id (for complete page)
     if (id) {
       const rows = (await query(
         `SELECT a.*, e.name AS employee_name 
@@ -32,7 +29,6 @@ export async function GET(req: Request) {
       return NextResponse.json(rows[0] || null);
     }
 
-    // Admin list: join employee name if assigned
     const results = await query(
       `SELECT a.*, e.name AS employee_name 
        FROM appointments a 
@@ -50,7 +46,6 @@ export async function GET(req: Request) {
   }
 }
 
-// POST — CREATE APPOINTMENT (client or admin)
 export async function POST(req: Request) {
   try {
     const {
@@ -115,7 +110,6 @@ export async function POST(req: Request) {
   }
 }
 
-// PUT — general update / assign employee / status change / complete job
 export async function PUT(req: Request) {
   try {
     const data = await req.json();
@@ -128,9 +122,6 @@ export async function PUT(req: Request) {
       );
     }
 
-    // =============================
-    // 1️⃣  CANCEL ONLY
-    // =============================
     const isCancelOnly =
       status === "Cancelled" && Object.keys(data).length === 2;
 
@@ -142,9 +133,6 @@ export async function PUT(req: Request) {
       return NextResponse.json({ success: true });
     }
 
-    // =============================
-    // 2️⃣  COMPLETE JOB (FROM MODAL)
-    // =============================
     if (data.complete === true) {
       await query(
         `UPDATE appointments 
@@ -158,9 +146,6 @@ export async function PUT(req: Request) {
       return NextResponse.json({ success: true, completed: true });
     }
 
-    // =============================
-    // 3️⃣  ADMIN UPDATE
-    // =============================
     const admin = await requireAdmin();
     if (!admin) {
       return NextResponse.json(
@@ -232,8 +217,6 @@ export async function PUT(req: Request) {
   }
 }
 
-
-// DELETE
 export async function DELETE(req: Request) {
   try {
     const admin = await requireAdmin();

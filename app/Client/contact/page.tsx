@@ -87,7 +87,6 @@ export default function Contact() {
 
   return (
     <div className="relative min-h-screen text-white">
-      {/* Fixed Background */}
       <div className="fixed inset-0 z-0">
         <Image
           src="/background/mustanggt.jpg"
@@ -99,9 +98,7 @@ export default function Contact() {
         <div className="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
       </div>
 
-      {/* Scrollable Foreground Content */}
       <div className="relative z-10 flex flex-col items-center px-6 py-16 space-y-20">
-        {/* Header */}
         <div className="text-center max-w-3xl">
           <h1 className="text-5xl font-bold mb-3 text-orange-400 drop-shadow-lg">
             Contact Us & Location
@@ -111,9 +108,7 @@ export default function Contact() {
           </p>
         </div>
 
-        {/* Contact Info + Form */}
         <div className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 gap-10">
-          {/* Contact Info */}
           <div className="space-y-5">
             {[
               {
@@ -147,7 +142,6 @@ export default function Contact() {
                 key={i}
                 className="group relative bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-5 flex gap-4 items-start shadow-[0_0_20px_rgba(0,0,0,0.4)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_35px_rgba(255,165,0,0.3)] hover:border-orange-400/60"
               >
-                {/* Subtle gradient glow animation */}
                 <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 bg-gradient-to-br from-orange-500/20 to-transparent blur-lg transition-opacity duration-500"></div>
 
                 <div className="relative z-10 flex gap-4">
@@ -165,7 +159,6 @@ export default function Contact() {
             ))}
           </div>
 
-          {/* Glassy Form */}
           <form 
             onSubmit={submitForm}
             className="bg-white/10 backdrop-blur-xl border border-white/20 hover:border-orange-400/40 shadow-[0_0_25px_rgba(0,0,0,0.4)] rounded-2xl p-8 space-y-5 transition-all duration-300"
@@ -174,7 +167,6 @@ export default function Contact() {
               Send Us a Message
             </h3>
 
-            {/* FULL NAME (merged first + last) */}
             <input
               type="text"
               placeholder="Full Name"
@@ -183,7 +175,6 @@ export default function Contact() {
               className="w-full bg-white/20 border border-white/30 rounded-lg px-4 py-3 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400"
             />
 
-            {/* Email */}
             <input
               type="email"
               placeholder="Email"
@@ -192,7 +183,6 @@ export default function Contact() {
               className="w-full bg-white/20 border border-white/30 rounded-lg px-4 py-3 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400"
             />
 
-            {/* Phone */}
             <input
               type="text"
               placeholder="Phone"
@@ -201,7 +191,6 @@ export default function Contact() {
               className="w-full bg-white/20 border border-white/30 rounded-lg px-4 py-3 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400"
             />
 
-            {/* Subject */}
             <input
               type="text"
               placeholder="Subject"
@@ -210,7 +199,6 @@ export default function Contact() {
               className="w-full bg-white/20 border border-white/30 rounded-lg px-4 py-3 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400"
             />
 
-            {/* Message with word count */}
             <div>
               <textarea
                 placeholder="Message"
@@ -227,7 +215,6 @@ export default function Contact() {
               </p>
             </div>
 
-            {/* Submit button */}
             <button
               type="submit"
               disabled={loading}
@@ -236,7 +223,6 @@ export default function Contact() {
               {loading ? "Sending..." : "Send Message"}
             </button>
           </form>
-          {/* Success / Error Modal */}
           {modal && (
             <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 animate-fadeIn">
               <div className="bg-white/10 border border-white/20 backdrop-blur-xl p-8 rounded-2xl w-[90%] max-w-md text-center">
@@ -271,7 +257,6 @@ export default function Contact() {
           )}
         </div>
 
-        {/* Google Map */}
         <div className="w-full max-w-6xl">
           <h2 className="text-3xl font-semibold text-center mb-6 text-orange-400">
             Find Us Here

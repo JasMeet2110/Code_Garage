@@ -35,20 +35,15 @@ export default function AccountPage() {
   const [editMode, setEditMode] = useState(true);
   const [loading, setLoading] = useState(true);
 
-  // Redirect if not authenticated
   useEffect(() => {
     if (status === "unauthenticated") router.replace("/AuthScreen");
   }, [status, router]);
 
-  /* -----------------------------------------------------
-     ⭐ FIXED — LOAD + CREATE customer on first login
-  ------------------------------------------------------ */
   useEffect(() => {
     async function fetchProfile() {
       if (!session?.user?.email) return;
 
       try {
-        // 1️⃣ Try to load existing customer
         const res = await fetch(
           `/api/customers?email=${encodeURIComponent(session.user.email)}`,
           { cache: "no-store" }
@@ -56,7 +51,6 @@ export default function AccountPage() {
 
         const customer = await res.json();
 
-        // 2️⃣ If customer exists → load profile
         if (customer) {
           setFormData({
             fullName: customer.name || session.user.name || "",
@@ -73,7 +67,6 @@ export default function AccountPage() {
           setEditMode(false);
         }
 
-        // 3️⃣ If customer does NOT exist → create them
         else {
           const createRes = await fetch("/api/customers", {
             method: "POST",
@@ -91,7 +84,6 @@ export default function AccountPage() {
           });
 
           if (createRes.ok) {
-            // Load the newly created row
             const newCust = await fetch(
               `/api/customers?email=${encodeURIComponent(session.user.email)}`
             ).then((r) => r.json());
@@ -165,9 +157,6 @@ export default function AccountPage() {
     return true;
   };
 
-  /* -----------------------------------------------------
-     ⭐ SAVE → PUT
-  ------------------------------------------------------ */
   const saveChanges = async () => {
     if (!validateForm()) return;
 
@@ -198,9 +187,6 @@ export default function AccountPage() {
     }
   };
 
-  /* -----------------------------------------------------
-     UI
-  ------------------------------------------------------ */
   if (loading || status === "loading") {
     return (
       <div className="flex justify-center items-center h-screen text-white text-2xl">
@@ -228,7 +214,6 @@ export default function AccountPage() {
 
   return (
     <div className="relative min-h-screen text-white overflow-y-auto">
-      {/* Background */}
       <div className="fixed inset-0 -z-10">
         <Image
           src="/background/mustang.jpg"
@@ -251,7 +236,6 @@ export default function AccountPage() {
         </header>
 
         <section className="bg-white/10 border border-white/20 backdrop-blur-2xl rounded-2xl p-10 w-full max-w-5xl flex flex-col md:flex-row gap-10">
-          {/* Left */}
           <div className="flex-1 flex flex-col space-y-4">
             {renderField("Full Name", "fullName")}
             {renderField("Phone", "phone")}
@@ -280,7 +264,6 @@ export default function AccountPage() {
             </div>
           </div>
 
-          {/* Right */}
           <div className="flex flex-col items-center justify-center w-full md:w-[45%]">
             <Image
               src={carImage || "/logo/car.png"}

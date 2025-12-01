@@ -47,7 +47,6 @@ export default function AdminReviews() {
     r.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Average reviews section
   const totalReviews = reviews.length;
 
   const averageRating =
@@ -68,11 +67,9 @@ export default function AdminReviews() {
       ratingCounts[r.rating] = ratingCounts[r.rating] + 1;
     }
   });
-  // ==============================================
 
   return (
     <div className="flex min-h-screen relative text-white overflow-hidden">
-      {/* Background */}
       <div className="fixed inset-0 -z-10">
         <Image
           src="/background/admin.png"
@@ -86,14 +83,12 @@ export default function AdminReviews() {
 
       <AdminSidebar />
 
-      {/* MAIN CONTENT */}
       <main className="ml-72 flex-1 p-10 relative z-10">
         <div className="backdrop-blur-lg bg-white/5 rounded-2xl p-8 shadow-lg border border-white/20">
           <h1 className="text-4xl font-bold text-orange-400 mb-8">
             Reviews Management
           </h1>
 
-          {/* Search */}
           <div className="flex justify-between items-center mb-6">
             <input
               type="text"
@@ -104,7 +99,6 @@ export default function AdminReviews() {
             />
           </div>
 
-          {/* Average Reviews Summary */}
           {!loading && totalReviews > 0 && (
             <div className="mb-8 p-4 rounded-xl bg-black/40 border border-white/10 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
               <div>
@@ -139,12 +133,10 @@ export default function AdminReviews() {
             </div>
           )}
 
-          {/* Loading */}
           {loading && (
             <p className="text-center text-gray-400 mb-6">Loading reviews...</p>
           )}
 
-          {/* Table */}
           <div className="overflow-x-auto rounded-xl bg.white/10 backdrop-blur-md border border-white/20 shadow-lg bg-white/10">
             <table className="min-w-full text-left">
               <thead className="bg-white/10 border-b border-white/20 text-orange-400">
@@ -174,14 +166,12 @@ export default function AdminReviews() {
                     >
                       <td className="px-6 py-4">{rev.name}</td>
 
-                      {/* Stars */}
                       <td className="px-6 py-4 text-yellow-400">
                         {Array.from({ length: rev.rating }, (_, i) => (
                           <Star key={i} filled />
                         ))}
                       </td>
 
-                      {/* COMMENT FIXED WRAPPING */}
                       <td className="px-6 py-4 text-gray-300 break-all whitespace-normal">
                         {rev.comment}
                       </td>
@@ -207,7 +197,6 @@ export default function AdminReviews() {
         </div>
       </main>
 
-      {/* DELETE MODAL */}
       {reviewToDelete && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 animate-fadeIn">
           <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-8 shadow-lg w-[90%] max-w-md text-center">
@@ -239,7 +228,6 @@ export default function AdminReviews() {
         </div>
       )}
 
-      {/* Animations */}
       <style jsx>{`
         @keyframes fadeIn {
           from {

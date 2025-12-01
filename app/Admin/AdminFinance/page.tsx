@@ -107,7 +107,6 @@ const FinancePage = () => {
 
   return (
     <div className="flex min-h-screen relative text-white overflow-hidden">
-      {/* Background */}
       <div className="fixed inset-0 -z-10">
         <Image
           src="/background/admin.png"
@@ -121,18 +120,15 @@ const FinancePage = () => {
 
       <AdminSidebar />
 
-      {/* Main Content */}
       <main className="ml-72 flex-1 p-10 relative z-10">
         <div className="backdrop-blur-lg bg-white/5 rounded-2xl p-8 shadow-lg border border-white/20">
 
-          {/* Title + Filters */}
           <div className="flex flex-wrap items-end justify-between gap-6 mb-10">
             <h1 className="text-4xl font-bold text-orange-400 drop-shadow-md">
               Finance Overview
             </h1>
 
             <div className="flex items-center gap-4">
-              {/* MONTH */}
               <div className="flex flex-col">
                 <label className="text-sm text-gray-300 mb-1">Filter by Month</label>
                 <input
@@ -146,7 +142,6 @@ const FinancePage = () => {
                 />
               </div>
 
-              {/* YEAR */}
               <div className="flex flex-col">
                 <label className="text-sm text-gray-300 mb-1">Filter by Year</label>
                 <input
@@ -162,7 +157,6 @@ const FinancePage = () => {
                 />
               </div>
 
-              {/* CLEAR */}
               <button
                 onClick={clearFilters}
                 className="bg-gray-600 hover:bg-gray-500 px-5 py-2 mt-6 rounded-lg text-sm font-semibold"
@@ -172,7 +166,6 @@ const FinancePage = () => {
             </div>
           </div>
 
-          {/* Summary Cards */}
           <div className="grid grid-cols-4 gap-6 mb-8">
             <div className="glass-card">
               <h3 className="text-lg font-semibold">Revenue</h3>
@@ -203,7 +196,6 @@ const FinancePage = () => {
             </div>
           </div>
 
-          {/* Revenue Trend */}
           <div className="glass-card h-80 mb-8">
             <h2 className="text-xl font-bold text-orange-400 mb-4">
               Monthly Revenue Trend
@@ -226,10 +218,8 @@ const FinancePage = () => {
             </ResponsiveContainer>
           </div>
 
-          {/* Tables */}
           <div className="grid grid-cols-2 gap-6 mt-24">
 
-            {/* Recent Transactions */}
             <div className="glass-card">
               <h2 className="text-2xl font-bold text-orange-400 mb-4">
                 Recent Transactions
@@ -287,7 +277,6 @@ const FinancePage = () => {
               </table>
             </div>
 
-            {/* Pending Invoices */}
             <div className="glass-card">
               <h2 className="text-2xl font-bold text-orange-400 mb-4">
                 Outstanding Invoices

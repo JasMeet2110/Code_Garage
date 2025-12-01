@@ -23,7 +23,6 @@ const InventoryPage = () => {
   const [itemToDelete, setItemToDelete] = useState<InventoryItem | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Fetch inventory from DB
   const fetchData = async () => {
     try {
       const res = await fetch("/api/inventory", { cache: "no-store" });
@@ -40,7 +39,6 @@ const InventoryPage = () => {
     fetchData();
   }, []);
 
-  // Delete item (DELETE)
   const confirmDeleteItem = async () => {
     if (!itemToDelete) return;
     try {
@@ -61,7 +59,6 @@ const InventoryPage = () => {
     }
   };
 
-  // Search filter
   const filteredItems = inventoryItems.filter(
     (item) =>
       item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -98,7 +95,6 @@ const InventoryPage = () => {
 
   return (
     <div className="flex min-h-screen relative text-white overflow-hidden">
-      {/* Background Image */}
       <div className="fixed inset-0 -z-10">
         <Image
           src="/background/admin.png"
@@ -110,17 +106,14 @@ const InventoryPage = () => {
         <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px]" />
       </div>
 
-      {/* Sidebar */}
       <AdminSidebar />
 
-      {/* Main Content */}
       <main className="ml-72 flex-1 p-10 relative z-10">
         <div className="backdrop-blur-lg bg-white/5 rounded-2xl p-8 shadow-lg border border-white/20">
           <h1 className="text-4xl font-bold text-orange-400 mb-8 drop-shadow-md">
             Inventory Management
           </h1>
 
-          {/* Search and Add */}
           <div className="flex justify-between items-center mb-8">
             <input
               type="text"
@@ -142,14 +135,12 @@ const InventoryPage = () => {
             </div>
           )}
 
-          {/* Loading */}
           {loading && (
             <p className="text-center text-gray-400 mb-4">
               Loading inventory...
             </p>
           )}
 
-          {/* Add Form */}
           {showAddForm && (
             <div className="mb-8 p-6 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 shadow-md animate-fadeIn">
               <h2 className="text-2xl font-bold text-orange-400 mb-4">
@@ -163,7 +154,6 @@ const InventoryPage = () => {
             </div>
           )}
 
-          {/* Edit Form */}
           {showEditForm && editingItem && (
             <div className="mb-8 p-6 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 shadow-md animate-fadeIn">
               <h2 className="text-2xl font-bold text-orange-400 mb-4">
@@ -187,7 +177,6 @@ const InventoryPage = () => {
             </h2>
           </div>
 
-          {/* Inventory Table */}
           <div className="overflow-x-auto rounded-xl bg-white/10 backdrop-blur-md border border-white/20 shadow-lg">
             <table className="min-w-full text-left">
               <thead className="bg-white/10 border-b border-white/20 text-orange-400 select-none">
@@ -286,7 +275,6 @@ const InventoryPage = () => {
         </div>
       </main>
 
-      {/* Delete Confirmation Modal */}
       {itemToDelete && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 animate-fadeIn">
           <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-8 shadow-lg w-[90%] max-w-md text-center">
@@ -318,7 +306,6 @@ const InventoryPage = () => {
         </div>
       )}
 
-      {/* Custom Styles */}
       <style jsx>{`
         .glass-input {
           @apply px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 transition-all;
@@ -341,7 +328,6 @@ const InventoryPage = () => {
   );
 };
 
-/* Inline Validation */
 const FormFields = ({
   mode,
   editingItem,

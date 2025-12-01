@@ -122,7 +122,6 @@ export default function AdminAppointments() {
   
   const toggleSort = (field: "date" | "status") => {
     if (sortField === field) {
-      // flip asc <-> desc
       setSortOrder(sortOrder === "asc" ? "desc" : "asc");
     } else {
       setSortField(field);
@@ -130,7 +129,6 @@ export default function AdminAppointments() {
     }
   };
 
-  // Apply sorting
     const sorted = [...filtered].sort((a, b) => {
       if (sortField === "date") {
         const d1 = new Date(a.appointment_date).getTime();
@@ -156,7 +154,6 @@ export default function AdminAppointments() {
 
   return (
     <div className="flex min-h-screen relative text-white overflow-hidden">
-      {/* Background */}
       <div className="fixed inset-0 -z-10">
         <Image
           src="/background/admin.png"
@@ -176,10 +173,8 @@ export default function AdminAppointments() {
             Appointments Management
           </h1>
 
-          {/* Top bar */}
           <div className="flex flex-wrap gap-4 justify-between items-center mb-8">
 
-            {/* SEARCH BAR */}
             <input
               type="text"
               placeholder="Search by name, service, or vehicle..."
@@ -188,10 +183,8 @@ export default function AdminAppointments() {
               className="w-full max-w-md px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400"
             />
 
-            {/* FILTERS */}
             <div className="flex gap-4">
 
-              {/* MONTH */}
               <select
                 value={filterMonth}
                 onChange={(e) => setFilterMonth(e.target.value)}
@@ -205,7 +198,6 @@ export default function AdminAppointments() {
                 ))}
               </select>
 
-              {/* YEAR */}
               <select
                 value={filterYear}
                 onChange={(e) => setFilterYear(e.target.value)}
@@ -219,7 +211,6 @@ export default function AdminAppointments() {
                 ))}
               </select>
 
-              {/* STATUS */}
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
@@ -233,7 +224,6 @@ export default function AdminAppointments() {
               </select>
             </div>
 
-            {/* Add Button */}
             <button
               onClick={() => setShowAddForm(true)}
               className="bg-orange-500 hover:bg-orange-600 px-6 py-2 rounded-lg font-semibold"
@@ -242,7 +232,6 @@ export default function AdminAppointments() {
             </button>
           </div>
 
-          {/* ADD FORM */}
           {showAddForm && (
             <div className="mb-8 p-6 rounded-xl bg-white/10 border border-white/20 backdrop-blur-md shadow-md animate-fadeIn">
               <h2 className="text-2xl font-bold text-orange-400 mb-4">
@@ -256,7 +245,6 @@ export default function AdminAppointments() {
             </div>
           )}
 
-          {/* EDIT FORM */}
           {editingAppointment && (
             <div className="mb-8 p-6 rounded-xl bg-white/10 border border-white/20 backdrop-blur-md shadow-md animate-fadeIn">
               <h2 className="text-2xl font-bold text-orange-400 mb-4">
@@ -271,14 +259,12 @@ export default function AdminAppointments() {
             </div>
           )}
 
-          {/* List header */}
           <div className="mb-4">
             <h2 className="text-xl font-semibold text-orange-400">
               List of Appointments ({sorted.length})
             </h2>
           </div>
 
-          {/* Table */}
           <div className="overflow-x-auto rounded-xl bg-white/10 backdrop-blur-md border border-white/20 shadow-lg">
             <table className="min-w-full text-left">
               <thead className="bg-white/10 border-b border-white/20 text-orange-400">
@@ -321,7 +307,6 @@ export default function AdminAppointments() {
                       key={a.id}
                       className="border-b border-white/10 hover:bg-white/10 transition-all"
                     >
-                      {/* Customer */}
                       <td className="px-6 py-4">
                         <div className="font-semibold text-white">
                           {a.customer_name}
@@ -330,7 +315,6 @@ export default function AdminAppointments() {
                         <div className="text-sm text-gray-400">{a.phone}</div>
                       </td>
 
-                      {/* Service */}
                       <td className="px-6 py-4 text-gray-300">
                         {a.service_type}
                         {a.employee_name && (
@@ -340,7 +324,6 @@ export default function AdminAppointments() {
                         )}
                       </td>
 
-                      {/* Vehicle */}
                       <td className="px-6 py-4 text-gray-300">
                         {a.car_make} {a.car_model} {a.car_year} (
                         {a.plate_number})
@@ -349,7 +332,6 @@ export default function AdminAppointments() {
                         </div>
                       </td>
 
-                      {/* Date */}
                       <td className="px-6 py-4 text-gray-300">
                         {new Date(a.appointment_date).toLocaleDateString()}
                         <div className="text-sm text-gray-400">
@@ -357,7 +339,6 @@ export default function AdminAppointments() {
                         </div>
                       </td>
 
-                      {/* Status pill */}
                       <td className="px-6 py-4">
                         <span
                           className={`px-3 py-1 rounded-full text-sm ${
@@ -374,9 +355,7 @@ export default function AdminAppointments() {
                         </span>
                       </td>
 
-                      {/* Actions */}
                       <td className="px-6 py-4 text-right space-x-4">
-                        {/* EDIT - always visible */}
                         <button
                           onClick={() => setEditingAppointment(a)}
                           className="text-blue-400 hover:text-blue-300"
@@ -384,7 +363,6 @@ export default function AdminAppointments() {
                           Edit
                         </button>
 
-                        {/* STATUS: PENDING */}
                         {a.status === "Pending" && (
                           <>
                             <button
@@ -402,7 +380,6 @@ export default function AdminAppointments() {
                           </>
                         )}
 
-                        {/* STATUS: IN PROGRESS */}
                         {a.status === "In Progress" && (
                           <>
                             <button
@@ -428,7 +405,6 @@ export default function AdminAppointments() {
                           </>
                         )}
 
-                        {/* STATUS: COMPLETED */}
                         {a.status === "Completed" && (
                           <>
                             <button
@@ -442,7 +418,6 @@ export default function AdminAppointments() {
                           </>
                         )}
 
-                        {/* STATUS: CANCELLED */}
                         {a.status === "Cancelled" && (
                           <>
                             <button
@@ -463,7 +438,6 @@ export default function AdminAppointments() {
         </div>
       </main>
 
-      {/* DELETE MODAL */}
       {appointmentToDelete && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 animate-fadeIn">
           <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-8 shadow-lg w-[90%] max-w-md text-center">
@@ -495,7 +469,6 @@ export default function AdminAppointments() {
         </div>
       )}
 
-      {/* CANCEL MODAL */}
       {appointmentToCancel && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 animate-fadeIn">
           <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-8 shadow-lg w-[90%] max-w-md text-center">
@@ -556,10 +529,6 @@ export default function AdminAppointments() {
   );
 }
 
-/* ----------------------------
-   Appointment Form Component
------------------------------ */
-
 type AppointmentFormProps = {
   mode: "add" | "edit";
   editingAppointment?: Appointment | null;
@@ -596,7 +565,6 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [employees, setEmployees] = useState<any[]>([]);
 
-  // Reset form when editing target changes
   useEffect(() => {
     if (mode === "edit" && editingAppointment) {
       setFormData({
@@ -660,18 +628,15 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
       let payload: any;
 
       if (mode === "add") {
-        // New appointments always start as Pending, no employee assigned
         payload = {
           ...formData,
           status: "Pending",
           assigned_employee_id: null,
         };
       } else {
-        // EDIT MODE
         const hasEmployee = !!formData.assigned_employee_id;
         let finalStatus = formData.status;
 
-        // If an employee is assigned and not cancelled, force In Progress
         if (hasEmployee && formData.status !== "Cancelled") {
           finalStatus = "In Progress";
         }
@@ -733,7 +698,6 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
         </div>
       ))}
 
-      {/* ASSIGNED EMPLOYEE - only when editing */}
       {mode === "edit" && (
         <div className="flex flex-col">
           <label className="text-sm text-gray-300 mb-1">
@@ -755,7 +719,6 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
         </div>
       )}
 
-      {/* STATUS - only editable on EDIT, no Completed option */}
       {mode === "edit" && (
         <div className="flex flex-col">
           <label className="text-sm text-gray-300 mb-1">Status</label>
@@ -768,13 +731,10 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
             <option value="Pending">Pending</option>
             <option value="In Progress">In Progress</option>
             <option value="Cancelled">Cancelled</option>
-            {/* Completed is intentionally not here;
-                completion is done via the Complete page */}
           </select>
         </div>
       )}
 
-      {/* DESCRIPTION */}
       <div className="flex flex-col">
         <label className="text-sm text-gray-300 mb-1">Description</label>
         <textarea

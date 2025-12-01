@@ -33,7 +33,6 @@ export default function AdminHome() {
   outstanding: number;
 } | null>(null);
 
-  // Restrict Access
   useEffect(() => {
     if (status === "loading") return;
     if (session?.user?.email !== "tracksidegarage0101@gmail.com") {
@@ -41,36 +40,29 @@ export default function AdminHome() {
     }
   }, [session, status, router]);
 
-  // Fetch dashboard data
   useEffect(() => {
     const fetchDashboard = async () => {
       try {
-        // Inventory Count
         const invRes = await fetch("/api/inventory");
         const invData = await invRes.json();
         setInventoryCount(invData.length);
 
-        // Appointments Count (today only)
         const apptRes = await fetch("/api/appointments");
         const apptData = await apptRes.json();
         setAppointmentsToday(apptData.length);
 
-        // Employees Count
         const empRes = await fetch("/api/employees");
         const empData = await empRes.json();
         setEmployeesCount(empData.length);
 
-        // Customers Count
         const custRes = await fetch("/api/customers");
         const custData = await custRes.json();
         setCustomersCount(custData.length);
 
-        // Reports Data (Top Services)
         const reportRes = await fetch("/api/reports");
         const reportData = await reportRes.json();
         setTopServices(reportData.topServices || []);
 
-        // Finance Summary
         const finRes = await fetch("/api/finance");
         const finData = await finRes.json();
         if (finData?.summary) setSummary(finData.summary);
@@ -98,7 +90,6 @@ export default function AdminHome() {
 
   return (
     <div className="flex min-h-screen relative text-white overflow-hidden">
-      {/* Background */}
       <div className="fixed inset-0 -z-10">
         <Image
           src="/background/admin.png"
@@ -110,10 +101,8 @@ export default function AdminHome() {
         <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px]" />
       </div>
 
-      {/* Sidebar */}
       <AdminSidebar />
 
-      {/* Main Dashboard */}
       <main className="ml-72 flex-1 p-10 relative z-10">
         <div className="backdrop-blur-lg bg-white/5 rounded-2xl p-8 shadow-lg border border-white/20">
           <h1 className="text-4xl font-bold text-orange-400 mb-2 drop-shadow-md">
@@ -123,9 +112,7 @@ export default function AdminHome() {
             Trackside Garage — Manage operations, analyze performance, and stay ahead.
           </p>
 
-          {/* Dashboard Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* Inventory */}
             <DashboardCard
               icon={<FaBoxOpen className="text-orange-400 text-4xl" />}
               title="Inventory"
@@ -134,7 +121,6 @@ export default function AdminHome() {
               onClick={() => router.push("/Admin/AdminInventory")}
             />
 
-            {/* Appointments */}
             <DashboardCard
               icon={<FaCalendarAlt className="text-green-400 text-4xl" />}
               title="Appointments"
@@ -143,7 +129,6 @@ export default function AdminHome() {
               onClick={() => router.push("/Admin/AdminAppointments")}
             />
 
-            {/* Employees */}
             <DashboardCard
               icon={<FaUserTie className="text-blue-400 text-4xl" />}
               title="Employees"
@@ -152,7 +137,6 @@ export default function AdminHome() {
               onClick={() => router.push("/Admin/AdminEmployees")}
             />
 
-            {/* Customers */}
             <DashboardCard
               icon={<FaUsers className="text-yellow-400 text-4xl" />}
               title="Customers"
@@ -161,7 +145,6 @@ export default function AdminHome() {
               onClick={() => router.push("/Admin/AdminCustomers")}
             />
 
-            {/* Reports */}
             <div
               onClick={() => router.push("/Admin/AdminReports")}
               className="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-6 hover:scale-105 hover:bg-white/20 transition-all cursor-pointer shadow-lg col-span-1 md:col-span-2 lg:col-span-1"
@@ -199,7 +182,6 @@ export default function AdminHome() {
               </div>
             </div>
 
-            {/* Finance */}
             <DashboardCard
             icon={<FaMoneyBillWave className="text-green-500 text-4xl" />}
             title="Finance"
@@ -220,7 +202,6 @@ export default function AdminHome() {
   );
 }
 
-/* 🔧 Reusable Dashboard Card Component */
 const DashboardCard = ({
   icon,
   title,

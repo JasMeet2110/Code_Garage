@@ -17,7 +17,6 @@ interface ReviewsCarouselProps {
 export default function ReviewsCarousel({ reviews }: ReviewsCarouselProps) {
   const [startIndex, setStartIndex] = useState(0);
 
-  // Auto rotate
   useEffect(() => {
     if (!reviews || reviews.length === 0) return;
 

@@ -125,7 +125,6 @@ export default function ServicesCarousel() {
                 w-full
               "
             >
-              {/* Image */}
               <div className="h-48 w-full relative">
                 <Image
                   src={service.img}
@@ -135,7 +134,6 @@ export default function ServicesCarousel() {
                 />
               </div>
 
-              {/* Text Area */}
               <div className="p-6 flex-1 flex flex-col">
                 <h3 className="text-xl font-semibold mb-2 text-orange-400">
                   {service.title}

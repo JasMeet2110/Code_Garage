@@ -19,7 +19,6 @@ export default function ServicePage({ params }: Props) {
   return (
     <div className="relative min-h-screen flex flex-col justify-center items-center text-white">
 
-      {/* Background Image */}
       <div className="fixed inset-0 -z-10">
         <Image
           src="/background/garage.png"
@@ -30,10 +29,8 @@ export default function ServicePage({ params }: Props) {
         />
       </div>
 
-      {/* Dark + Blur Overlay */}
       <div className="absolute inset-0 -z-10 bg-black/70 backdrop-blur-sm"></div>
 
-      {/* Glass Card */}
       <div className="relative z-10 max-w-3xl my-36 px-8 py-16 bg-black/40 border border-orange-500/40 rounded-2xl shadow-2xl backdrop-blur-xl transition-all duration-300 hover:border-orange-500/80 hover:shadow-[0_0_25px_rgba(255,165,0,0.3)]">
 
         <Image

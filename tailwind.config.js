@@ -1,6 +1,5 @@
 /** @type {import('tailwindcss').Config} */
 
-// Assign Tailwind config to a variable first (ESLint requirement)
 const config = {
   content: [
     "./app/**/*.{js,ts,jsx,tsx}",
@@ -39,5 +38,4 @@ const config = {
   plugins: [],
 };
 
-// Proper ESM export for Next.js + ESLint Flat Config
 export default config;
