@@ -11,7 +11,6 @@ export async function GET(req: Request) {
     let params: string[] = [];
 
     if (year && month) {
-      // Filter for selected month in a specific year
       const startDate = `${year}-${month}-01`;
       const nextMonth = Number(month) === 12 ? 1 : Number(month) + 1;
       const nextYear = Number(month) === 12 ? Number(year) + 1 : Number(year);
@@ -19,14 +18,12 @@ export async function GET(req: Request) {
       dateCondition = `AND appointment_date >= ? AND appointment_date < ?`;
       params = [startDate, endDate];
     } else if (year && !month) {
-      // Filter for full year
       const startDate = `${year}-01-01`;
       const endDate = `${Number(year) + 1}-01-01`;
       dateCondition = `AND appointment_date >= ? AND appointment_date < ?`;
       params = [startDate, endDate];
     }
 
-    // ✅ Summary now respects selected time period
     const summaryResult = (await query(
       `
   SELECT
@@ -39,7 +36,6 @@ export async function GET(req: Request) {
     )) as any[];
     const summary = summaryResult[0];
 
-    // ✅ Appointments Trend (safe under ONLY_FULL_GROUP_BY)
     const appointmentsTrend = (await query(
       `
       SELECT 
@@ -54,7 +50,6 @@ export async function GET(req: Request) {
       params
     )) as any[];
 
-    // ✅ Top Services (filtered by same date range)
     const topServices = (await query(
       `
       SELECT service_type AS name, COUNT(*) AS count

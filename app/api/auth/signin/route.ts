@@ -22,7 +22,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Query database for user
     const [rows] = await pool.query(
       "SELECT * FROM users WHERE email = ?",
       [email]
@@ -37,7 +36,6 @@ export async function POST(request: NextRequest) {
 
     const user = rows[0];
 
-    // Check password (NOTE: In production, use bcrypt to compare hashed passwords!)
     if (user.password !== password) {
       return NextResponse.json(
         { error: "Invalid email or password" },
@@ -45,7 +43,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Return user data (excluding password)
     return NextResponse.json({
       success: true,
       user: {

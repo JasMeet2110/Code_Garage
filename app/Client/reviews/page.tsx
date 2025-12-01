@@ -26,20 +26,15 @@ export default function ReviewsPage() {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Form fields
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
 
-  // Errors
   const [errors, setErrors] = useState<{ rating?: string; comment?: string }>({});
 
-  // Success modal
   const [showSuccess, setShowSuccess] = useState(false);
 
-  // Show more
   const [showMore, setShowMore] = useState(false);
 
-  // Load from DB
   useEffect(() => {
     async function loadReviews() {
       const res = await fetch("/api/reviews");
@@ -50,7 +45,6 @@ export default function ReviewsPage() {
     loadReviews();
   }, []);
 
-  // Validation
   const validate = () => {
     const newErrors: typeof errors = {};
 
@@ -62,12 +56,11 @@ export default function ReviewsPage() {
     return Object.keys(newErrors).length === 0;
   };
 
-  // Submit review
   const submitReview = async () => {
     if (!validate()) return;
 
     const payload = {
-      name: userName, // IMPORTANT — user cannot change
+      name: userName,
       rating,
       comment,
       email: session?.user?.email,
@@ -82,21 +75,18 @@ export default function ReviewsPage() {
     const saved = await res.json();
     setReviews((prev) => [saved, ...prev]);
 
-    // Reset
     setRating(0);
     setComment("");
     setErrors({});
     setShowSuccess(true);
   };
 
-  // SORT reviews by rating (top 5 first)
   const sorted = [...reviews].sort((a, b) => b.rating - a.rating);
   const topFive = sorted.slice(0, 5);
   const remaining = sorted.slice(5);
 
   return (
     <div className="relative min-h-screen text-white">
-      {/* Background */}
       <div className="fixed inset-0 -z-10">
         <Image
           src="/background/reviews.jpg"
@@ -110,7 +100,6 @@ export default function ReviewsPage() {
 
       <div className="relative z-10 flex flex-col items-center min-h-screen py-16 px-6">
         
-        {/* HEADER */}
         <header className="text-center mb-12">
           <h1 className="text-5xl font-bold text-orange-400 mb-4">Customer Reviews</h1>
           <p className="text-lg text-gray-200 max-w-2xl mx-auto">
@@ -120,14 +109,12 @@ export default function ReviewsPage() {
 
         <div className="w-full max-w-5xl space-y-10">
 
-          {/* IF NOT LOGGED IN */}
           {!isLoggedIn && (
             <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6 text-center text-gray-300">
               Please <span className="text-orange-400 font-semibold">sign in</span> to leave a review.
             </div>
           )}
 
-          {/* WRITE REVIEW */}
           <section className={`bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-8 shadow-lg ${!isLoggedIn && "opacity-40 pointer-events-none"}`}>
             
             <h2 className="text-2xl font-extrabold text-orange-400 mb-6 text-center">
@@ -136,7 +123,6 @@ export default function ReviewsPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-              {/* NAME (READ ONLY) */}
               <div>
                 <p className="font-semibold mb-1 text-gray-200">Your Name</p>
                 <input
@@ -148,7 +134,6 @@ export default function ReviewsPage() {
                 <p className="text-xs text-gray-400 mt-1">Cannot be edited</p>
               </div>
 
-              {/* RATING */}
               <div>
                 <p className="font-semibold mb-1 text-gray-200">Rating</p>
                 <div className="flex items-center gap-2">
@@ -168,7 +153,6 @@ export default function ReviewsPage() {
                 {errors.rating && <p className="text-red-400 text-sm">{errors.rating}</p>}
               </div>
 
-              {/* COMMENT */}
               <div className="md:col-span-2">
                 <p className="font-semibold mb-1 text-gray-200">Comment</p>
                 <textarea
@@ -188,7 +172,6 @@ export default function ReviewsPage() {
               </div>
             </div>
 
-            {/* ACTIONS */}
             <div className="mt-6 flex justify-end gap-3">
               <button
                 onClick={() => {
@@ -210,7 +193,6 @@ export default function ReviewsPage() {
             </div>
           </section>
 
-          {/* RECENT REVIEWS */}
           <section className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-8 shadow-lg">
             <h2 className="text-2xl font-extrabold text-orange-400 mb-6 text-center">
               Recent Reviews

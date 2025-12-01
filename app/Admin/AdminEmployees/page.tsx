@@ -22,7 +22,6 @@ export default function AdminEmployees() {
   const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
   const [employeeToDelete, setEmployeeToDelete] = useState<Employee | null>(null);
 
-  // Fetch employees
   const fetchEmployees = async () => {
     try {
       const res = await fetch("/api/employees", { cache: "no-store" });
@@ -39,7 +38,6 @@ export default function AdminEmployees() {
     fetchEmployees();
   }, []);
 
-  // Delete
   const confirmDeleteEmployee = async () => {
     if (!employeeToDelete) return;
     try {
@@ -66,7 +64,6 @@ export default function AdminEmployees() {
 
   return (
     <div className="flex min-h-screen relative text-white overflow-hidden">
-      {/* Background */}
       <div className="fixed inset-0 -z-10">
         <Image
           src="/background/admin.png"
@@ -84,7 +81,6 @@ export default function AdminEmployees() {
         <div className="backdrop-blur-lg bg-white/5 rounded-2xl p-8 shadow-lg border border-white/20">
           <h1 className="text-4xl font-bold text-orange-400 mb-8">Employee Management</h1>
 
-          {/* Search + Add */}
           <div className="flex justify-between items-center mb-8">
             <input
               type="text"
@@ -101,12 +97,10 @@ export default function AdminEmployees() {
             </button>
           </div>
 
-          {/* Loading */}
           {loading && (
             <p className="text-center text-gray-400 mb-6">Loading employees...</p>
           )}
 
-          {/* Add Form */}
           {showAddForm && (
             <div className="mb-8 p-6 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 shadow-md animate-fadeIn">
               <h2 className="text-2xl font-bold text-orange-400 mb-4">
@@ -120,7 +114,6 @@ export default function AdminEmployees() {
             </div>
           )}
 
-          {/* Edit Form */}
           {editingEmployee && (
             <div className="mb-8 p-6 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 shadow-md animate-fadeIn">
               <h2 className="text-2xl font-bold text-orange-400 mb-4">
@@ -135,7 +128,6 @@ export default function AdminEmployees() {
             </div>
           )}
 
-          {/* Table */}
           <div className="overflow-x-auto rounded-xl bg-white/10 backdrop-blur-md border border-white/20 shadow-lg">
             <table className="min-w-full text-left">
               <thead className="bg-white/10 border-b border-white/20 text-orange-400">
@@ -190,7 +182,6 @@ export default function AdminEmployees() {
         </div>
       </main>
 
-      {/* Delete Modal */}
       {employeeToDelete && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 animate-fadeIn">
           <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-8 shadow-lg w-[90%] max-w-md text-center">
@@ -241,7 +232,6 @@ export default function AdminEmployees() {
   );
 }
 
-/* Inline Validation */
 const EmployeeForm = ({
   mode,
   editingEmployee,

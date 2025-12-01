@@ -20,7 +20,6 @@ function normalizeDate(input: string | null | undefined) {
   return null;
 }
 
-//GET
 export async function GET() {
   const admin = await requireAdmin();
   if (!admin) {
@@ -39,7 +38,6 @@ export async function GET() {
   }
 }
 
-//POST
 export async function POST(req: NextRequest) {
   const admin = await requireAdmin();
   if (!admin) {
@@ -77,7 +75,6 @@ export async function POST(req: NextRequest) {
   }
 }
 
-//PUT
 export async function PUT(req: NextRequest) {
   const admin = await requireAdmin();
   if (!admin) {
@@ -106,7 +103,6 @@ export async function PUT(req: NextRequest) {
   }
 }
 
-//DELETE
 export async function DELETE(req: NextRequest) {
   const admin = await requireAdmin();
   if (!admin) {

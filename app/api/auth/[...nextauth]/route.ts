@@ -63,7 +63,6 @@ export const authOptions: NextAuthOptions = {
         token.email = user.email;
         token.name = user.name;
 
-        // Load role from DB (Google or Credentials)
         const users = (await query(
           "SELECT * FROM users WHERE email = ?",
           [user.email]
@@ -95,7 +94,6 @@ export const authOptions: NextAuthOptions = {
   },
 };
 
-// NextAuth handler using the exported config
 const handler = NextAuth(authOptions);
 
 export { handler as GET, handler as POST };

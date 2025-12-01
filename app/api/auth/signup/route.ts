@@ -6,7 +6,6 @@ export async function POST(req: Request) {
   try {
     const { name, email, password } = await req.json();
 
-    // 1. Check if user already exists
     const existingUsers = await query(
       "SELECT * FROM users WHERE email = ?",
       [email]
@@ -19,10 +18,8 @@ export async function POST(req: Request) {
       );
     }
 
-    // 2. Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // 3. Create user in the 'users' table
     await query(
       "INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)",
       [name, email, hashedPassword, "client"]

@@ -8,7 +8,6 @@ export default function TermsConditions() {
 
   return (
     <div className="relative min-h-screen text-white">
-      {/* ✅ Fixed background image */}
       <div className="fixed inset-0 -z-10">
         <Image
           src="/background/zr1.png"
@@ -20,7 +19,6 @@ export default function TermsConditions() {
         <div className="absolute inset-0 bg-black/70" />
       </div>
 
-      {/* ✅ Scrollable Terms Container */}
       <div className="relative z-10 flex justify-center items-center min-h-screen py-16 px-6">
         <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl shadow-2xl max-w-4xl w-full text-white p-8 md:p-10">
           <h1 className="text-4xl font-bold text-orange-400 text-center mb-8 drop-shadow-lg">
@@ -117,7 +115,6 @@ export default function TermsConditions() {
             </section>
           </div>
 
-          {/* ✅ Back Button */}
           <div className="flex justify-center mt-8">
             <button
               onClick={() => router.back()}

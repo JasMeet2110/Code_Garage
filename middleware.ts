@@ -10,7 +10,6 @@ export async function middleware(req: NextRequest) {
 
   const { pathname } = req.nextUrl;
 
-  // If user is NOT logged in
   if (!token) {
     if (pathname.startsWith("/Admin")) {
       return NextResponse.redirect(new URL("/AuthScreen", req.url));
@@ -18,7 +17,6 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  // If user IS logged in but not admin
   if (pathname.startsWith("/Admin") && token.role !== "admin") {
     return NextResponse.redirect(new URL("/Client/account", req.url));
   }
