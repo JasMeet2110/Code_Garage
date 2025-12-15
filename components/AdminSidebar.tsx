@@ -9,19 +9,23 @@ export default function AdminSidebar() {
 
   const [lowStockCount, setLowStockCount] = useState(0);
 
-useEffect(() => {
-  async function fetchLowStock() {
-    try {
-      const res = await fetch("/api/inventory/low-stock", { cache: "no-store" });
-      const data = await res.json();
-      setLowStockCount(data.length);
-    } catch (err) {
-      console.error("Low stock fetch error:", err);
+  useEffect(() => {
+    async function fetchLowStock() {
+      try {
+        const res = await fetch("/api/inventory/low-stock", {
+          cache: "no-store",
+        });
+        const data = await res.json();
+        setLowStockCount(data.length);
+      } catch (err) {
+        console.error("Low stock fetch error:", err);
+      }
     }
-  }
 
-  fetchLowStock();
-}, []);
+    fetchLowStock();
+  }, []);
+
+  
 
   return (
     <>
@@ -46,11 +50,12 @@ useEffect(() => {
             { href: "/Admin/AdminInventory", label: "Inventory" },
             { href: "/Admin/AdminAppointments", label: "Appointments" },
             { href: "/Admin/AdminEmployees", label: "Employees" },
+            { href: "/Admin/AdminShifts", label: "Shifts" }, // ← ADD THIS LINE
             { href: "/Admin/AdminCustomers", label: "Customers" },
             { href: "/Admin/AdminReviews", label: "Reviews" },
             { href: "/Admin/AdminReports", label: "Reports" },
             { href: "/Admin/AdminFinance", label: "Finance" },
-            { href: "/Admin/AdminAIAssistant", label: "AI Assistant" }
+            { href: "/Admin/AdminAIAssistant", label: "AI Assistant" },
           ].map((item) => (
             <Link
               key={item.href}

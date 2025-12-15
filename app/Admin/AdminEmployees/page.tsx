@@ -20,7 +20,9 @@ export default function AdminEmployees() {
   const [searchTerm, setSearchTerm] = useState("");
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
-  const [employeeToDelete, setEmployeeToDelete] = useState<Employee | null>(null);
+  const [employeeToDelete, setEmployeeToDelete] = useState<Employee | null>(
+    null
+  );
 
   const fetchEmployees = async () => {
     try {
@@ -79,7 +81,9 @@ export default function AdminEmployees() {
 
       <main className="ml-72 flex-1 p-10 relative z-10">
         <div className="backdrop-blur-lg bg-white/5 rounded-2xl p-8 shadow-lg border border-white/20">
-          <h1 className="text-4xl font-bold text-orange-400 mb-8">Employee Management</h1>
+          <h1 className="text-4xl font-bold text-orange-400 mb-8">
+            Employee Management
+          </h1>
 
           <div className="flex justify-between items-center mb-8">
             <input
@@ -98,7 +102,9 @@ export default function AdminEmployees() {
           </div>
 
           {loading && (
-            <p className="text-center text-gray-400 mb-6">Loading employees...</p>
+            <p className="text-center text-gray-400 mb-6">
+              Loading employees...
+            </p>
           )}
 
           {showAddForm && (
@@ -132,30 +138,46 @@ export default function AdminEmployees() {
             <table className="min-w-full text-left">
               <thead className="bg-white/10 border-b border-white/20 text-orange-400">
                 <tr>
+                  <th className="px-6 py-3">ID</th>
                   <th className="px-6 py-3">Name</th>
                   <th className="px-6 py-3">Position</th>
                   <th className="px-6 py-3">Phone</th>
                   <th className="px-6 py-3">Email</th>
-                  <th className="px-6 py-3">Salary</th>
+                  <th className="px-6 py-3">Hourly Wage ($/hr)</th>
                   <th className="px-6 py-3">Start Date</th>
                   <th className="px-6 py-3 text-right">Actions</th>
                 </tr>
               </thead>
+
               <tbody>
                 {filtered.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="px-6 py-6 text-center text-gray-400">
+                    <td
+                      colSpan={8}
+                      className="px-6 py-6 text-center text-gray-400"
+                    >
                       No employees found.
                     </td>
                   </tr>
                 ) : (
                   filtered.map((emp) => (
-                    <tr key={emp.id} className="border-b border-white/10 hover:bg-white/10 transition-all">
+                    <tr
+                      key={emp.id}
+                      className="border-b border-white/10 hover:bg-white/10 transition-all"
+                    >
+                      <td className="px-6 py-4 text-gray-400 font-mono text-sm">
+                        #{emp.id}
+                      </td>
+                      {/* ← ADD THIS LINE */}
                       <td className="px-6 py-4">{emp.name}</td>
-                      <td className="px-6 py-4 text-gray-300">{emp.position}</td>
+                      <td className="px-6 py-4 text-gray-300">
+                        {emp.position}
+                      </td>
                       <td className="px-6 py-4 text-gray-300">{emp.phone}</td>
                       <td className="px-6 py-4 text-gray-300">{emp.email}</td>
-                      <td className="px-6 py-4 text-gray-300">${emp.salary}</td>
+                      <td className="px-6 py-4 text-gray-300">
+                        ${Number(emp.salary).toFixed(2)}/hr
+                      </td>
                       <td className="px-6 py-4 text-gray-300">
                         {new Date(emp.start_date).toISOString().split("T")[0]}
                       </td>
@@ -267,8 +289,9 @@ const EmployeeForm = ({
     if (!formData.phone.trim()) newErrors.phone = "Phone is required.";
     if (!formData.email.trim()) newErrors.email = "Email is required.";
     if (!formData.salary || Number(formData.salary) <= 0)
-      newErrors.salary = "Enter a valid salary.";
-    if (!formData.startDate.trim()) newErrors.startDate = "Start date is required.";
+      newErrors.salary = "Enter a valid hourly wage (e.g., 18, 20, 25).";
+    if (!formData.startDate.trim())
+      newErrors.startDate = "Start date is required.";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -306,7 +329,7 @@ const EmployeeForm = ({
     { label: "Position", name: "position", type: "text" },
     { label: "Phone", name: "phone", type: "text" },
     { label: "Email", name: "email", type: "email" },
-    { label: "Salary", name: "salary", type: "number" },
+    { label: "Hourly Wage ($/hr)", name: "salary", type: "number" },
     { label: "Start Date", name: "startDate", type: "date" },
   ];
 
@@ -326,7 +349,9 @@ const EmployeeForm = ({
             }`}
           />
           {errors[f.name] && (
-            <span className="text-red-400 text-xs mt-1 animate-fadeIn">{errors[f.name]}</span>
+            <span className="text-red-400 text-xs mt-1 animate-fadeIn">
+              {errors[f.name]}
+            </span>
           )}
         </div>
       ))}

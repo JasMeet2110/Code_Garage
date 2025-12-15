@@ -34,6 +34,23 @@ export async function GET(req: Request) {
       return NextResponse.json(rows[0] || null);
     }
 
+<<<<<<< HEAD
+    const email = searchParams.get("email");
+
+    if (email) {
+      const rows = await query(
+        `SELECT id, service_type, appointment_date, appointment_time, status
+        FROM appointments
+        WHERE email = ?
+        ORDER BY appointment_date DESC`,
+        [email]
+      );
+
+      return NextResponse.json(rows);
+    }
+
+=======
+>>>>>>> origin/master
     const results = await query(
       `SELECT a.*, e.name AS employee_name 
        FROM appointments a 
