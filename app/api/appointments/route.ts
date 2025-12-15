@@ -34,6 +34,7 @@ export async function GET(req: Request) {
       return NextResponse.json(rows[0] || null);
     }
 
+<<<<<<< HEAD
     const email = searchParams.get("email");
 
     if (email) {
@@ -48,6 +49,8 @@ export async function GET(req: Request) {
       return NextResponse.json(rows);
     }
 
+=======
+>>>>>>> origin/master
     const results = await query(
       `SELECT a.*, e.name AS employee_name 
        FROM appointments a 

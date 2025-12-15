@@ -1,4 +1,3 @@
-// app/api/appointments/complete/route.ts
 import { NextResponse } from "next/server";
 import { query } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth";
@@ -35,7 +34,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // 1) Load appointment
     const apptRows = (await query(
       "SELECT * FROM appointments WHERE id = ?",
       [appointmentId]
@@ -50,7 +48,6 @@ export async function POST(req: Request) {
 
     const appt = apptRows[0];
 
-    // 2) PARTS
     let partsTotal = 0;
 
     for (const p of parts) {
@@ -106,7 +103,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // 3) LABOR
     const labor = Number(laborCost) || 0;
 
     if (labor > 0) {
@@ -123,7 +119,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // 4) SERVICE CHARGE (treated as labor)
     const service = Number(serviceCharge) || 0;
     let serviceTotal = 0;
 
@@ -142,12 +137,10 @@ export async function POST(req: Request) {
       );
     }
 
-    // 5) TOTALS + TAX
     const subtotal = labor + partsTotal + serviceTotal;
     const tax = Number((subtotal * 0.05).toFixed(2));
     const total = subtotal + tax;
 
-    // 6) Update appointment
     await query(
       `UPDATE appointments 
        SET status = 'Completed', completed_at = NOW(), labor_cost = ?
@@ -155,7 +148,6 @@ export async function POST(req: Request) {
       [labor, appointmentId]
     );
 
-    // 7) Create FINANCE TRANSACTION (REAL)
     await query(
       `INSERT INTO transactions (appointment_id, amount, type, category, notes, status, created_at)
        VALUES (?, ?, 'income', 'service', ?, 'Completed', NOW())`,

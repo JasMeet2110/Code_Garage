@@ -30,7 +30,7 @@ const SERVICES = [
 //defines fuel types
 const FUEL_TYPES = ["Petrol", "Diesel", "Hybrid", "Electric"];
 
-//defines time slots (we will later mark some as booked)
+//defines time slots
 const TIME_SLOTS = [
   "09:00 AM",
   "10:00 AM",
@@ -185,7 +185,7 @@ export default function BookAppointmentPage() {
     if (errors[key]) setErrors((prev) => ({ ...prev, [key]: "" }));
   };
 
-  //ui output to the page
+  //ui of the page
   return (
     <div className="relative min-h-screen text-white">
       {/* background */}

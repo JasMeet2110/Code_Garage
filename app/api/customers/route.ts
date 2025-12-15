@@ -7,7 +7,6 @@ function toNull<T>(value: T | undefined | "" | null) {
   return value === undefined || value === "" ? null : value;
 }
 
-//GET
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
@@ -42,7 +41,6 @@ export async function GET(req: Request) {
   }
 }
 
-//POST
 export async function POST(req: Request) {
   try {
     const body = await req.json();

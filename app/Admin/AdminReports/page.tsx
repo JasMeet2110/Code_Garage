@@ -54,7 +54,6 @@ export default function ReportsAnalyticsPage() {
 
   return (
     <div className="flex min-h-screen relative text-white overflow-hidden">
-      {/* Background */}
       <div className="fixed inset-0 -z-10">
         <Image
           src="/background/admin.png"
@@ -70,14 +69,12 @@ export default function ReportsAnalyticsPage() {
 
       <main className="ml-72 flex-1 p-10 relative z-10">
         <div className="backdrop-blur-lg bg-white/5 rounded-2xl p-8 shadow-lg border border-white/20">
-          {/* Header + Filters */}
           <div className="flex flex-wrap items-end justify-between gap-6 mb-10">
             <h1 className="text-4xl font-bold text-orange-400 drop-shadow-md">
               Reports & Analytics
             </h1>
 
             <div className="flex items-center gap-4">
-              {/* Month Selector */}
               <div className="flex flex-col">
                 <label className="text-sm text-gray-300 mb-1">Show report for a Month</label>
                 <input
@@ -91,7 +88,6 @@ export default function ReportsAnalyticsPage() {
                 />
               </div>
 
-              {/* Year Selector */}
               <div className="flex flex-col">
                 <label className="text-sm text-gray-300 mb-1">Show full report for Year</label>
                 <input
@@ -107,7 +103,6 @@ export default function ReportsAnalyticsPage() {
                 />
               </div>
 
-              {/* Clear Filters */}
               <button
                 onClick={clearFilters}
                 className="bg-gray-600 hover:bg-gray-500 px-5 py-2 mt-6 rounded-lg text-sm font-semibold"
@@ -117,7 +112,6 @@ export default function ReportsAnalyticsPage() {
             </div>
           </div>
 
-          {/* Summary Cards */}
           {summary && (
             <div className="grid grid-cols-4 gap-6 mb-8">
               <div className="glass-card">
@@ -150,7 +144,6 @@ export default function ReportsAnalyticsPage() {
             </div>
           )}
 
-          {/* Appointments Trend */}
           <div className="glass-card h-80 mb-10">
             <h2 className="text-xl font-bold text-orange-400 mb-4">
               Appointments Trend{" "}
@@ -191,9 +184,7 @@ export default function ReportsAnalyticsPage() {
             )}
           </div>
 
-          {/* Top Services Section */}
           <div className="grid grid-cols-2 gap-8">
-            {/* Pie Chart */}
             <div className="glass-card">
               <h2 className="text-2xl font-bold text-orange-400 mb-4">
                 Top Services
@@ -231,7 +222,6 @@ export default function ReportsAnalyticsPage() {
               )}
             </div>
 
-            {/* Table next to Pie */}
             <div className="glass-card">
               <h2 className="text-2xl font-bold text-orange-400 mb-4">
                 Service Breakdown

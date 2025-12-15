@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import { query } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth";
 
-// UPDATE
 export async function PUT(req: Request, context: { params: { id: string } }) {
   const admin = await requireAdmin();
   if (!admin) {
@@ -25,7 +24,6 @@ export async function PUT(req: Request, context: { params: { id: string } }) {
   }
 }
 
-// DELETE
 export async function DELETE(req: Request, context: { params: { id: string } }) {
   const admin = await requireAdmin();
   if (!admin) {

@@ -30,7 +30,6 @@ export async function POST(req: Request) {
 
     const adminEmail = "tracksidegarage0101@gmail.com";
 
-    // SEND ONLY ADMIN EMAIL
     const adminRes = await resend.emails.send({
       from: "Trackside Garage <onboarding@resend.dev>",
       to: adminEmail,

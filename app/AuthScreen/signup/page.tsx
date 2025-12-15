@@ -24,7 +24,6 @@ export default function SignUpPage() {
     e.preventDefault();
     setError("");
 
-    // 🔥 Check if passwords match
     if (password !== confirmPassword) {
       setError("Passwords do not match.");
       return;
@@ -63,8 +62,6 @@ export default function SignUpPage() {
 
   return (
     <div className="relative h-[900px] flex flex-col items-center justify-center p-4">
-
-      {/* Background */}
       <div className="fixed inset-0 -z-10">
         <Image
           src="/background/login.png"
@@ -75,7 +72,6 @@ export default function SignUpPage() {
         />
       </div>
 
-      {/* Logo */}
       <div className="flex flex-col items-center mb-16 z-10">
         <div className="w-70 h-25 relative mb-3">
           <Image
@@ -95,7 +91,6 @@ export default function SignUpPage() {
         </p>
       </div>
 
-      {/* Card */}
       <div className="relative z-10 w-full max-w-md bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-8 shadow-2xl">
         <h1 className="text-3xl font-bold text-center text-orange-400 mb-6">
           Create Account
@@ -109,7 +104,6 @@ export default function SignUpPage() {
 
         <form onSubmit={handleSignUp} className="space-y-4">
 
-          {/* Name */}
           <div className="relative">
             <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
             <input
@@ -123,7 +117,6 @@ export default function SignUpPage() {
             />
           </div>
 
-          {/* Email */}
           <div className="relative">
             <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
             <input
@@ -137,7 +130,6 @@ export default function SignUpPage() {
             />
           </div>
 
-          {/* Password */}
           <div className="relative">
             <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
             <input
@@ -150,7 +142,6 @@ export default function SignUpPage() {
               className="w-full pl-10 pr-12 py-3 bg-white/10 border border-white/30 rounded-lg 
               text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400"
             />
-            {/* Show/Hide Icon */}
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
@@ -160,7 +151,6 @@ export default function SignUpPage() {
             </button>
           </div>
 
-          {/* Confirm Password */}
           <div className="relative">
             <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
             <input
@@ -195,7 +185,6 @@ export default function SignUpPage() {
               minLength={6}
               className="w-full pl-10 pr-12 py-3 bg-white/10 border border-white/30 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400"
             />
-            {/* Show/Hide Icon */}
             <button
               type="button"
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
@@ -205,7 +194,6 @@ export default function SignUpPage() {
             </button>
           </div>
 
-          {/* Submit Button */}
           <button
             type="submit"
             disabled={loading}

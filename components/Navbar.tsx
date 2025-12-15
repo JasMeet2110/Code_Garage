@@ -12,8 +12,7 @@ export default function Navbar() {
   return (
     <>
       <nav className="fixed top-0 left-0 w-full h-28 backdrop-blur-xl bg-gradient-to-b from-black/70 to-gray-900/50 border-b border-white/10 shadow-[0_0_25px_rgba(0,0,0,0.5)] text-white flex justify-between items-center px-16 z-50">
-        {/* Logo + Brand */}
-        <Link href="/" className="flex items-center gap-4"> {/* added homepage link to the logo */}
+        <Link href="/" className="flex items-center gap-4">
           <Image
             src="/logo/tracksidegarage.png"
             alt="Trackside Garage Logo"
@@ -32,7 +31,6 @@ export default function Navbar() {
           </div>
         </Link>
 
-        {/* Navigation Links */}
         <div className="flex gap-6 text-lg font-medium items-center">
           {[
             { href: "/", label: "Home" },
@@ -51,7 +49,6 @@ export default function Navbar() {
             </Link>
           ))}
 
-          {/* Auth Button */}
           {status === "loading" ? (
             <button
               disabled
@@ -81,7 +78,6 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {/* Subtle Fade-In Animation */}
       <style jsx>{`
         nav {
           animation: fadeIn 0.4s ease-out;

@@ -30,13 +30,7 @@ export default function AdminSidebar() {
   return (
     <>
       <aside className="fixed top-0 left-0 h-screen w-72 backdrop-blur-lg bg-white/10 border-r border-white/20 shadow-lg text-white flex flex-col items-center py-8 z-50">
-        {/* Logo Section */}
-        <Link
-          href="/Admin/AdminHome"
-          className="flex flex-col items-center mb-10"
-        >
-          {" "}
-          {/* added homepage link to the logo */}
+        <Link href="/Admin/AdminHome" className="flex flex-col items-center mb-10">
           <Image
             src="/logo/tracksidegarage.png"
             alt="Logo"
@@ -50,7 +44,6 @@ export default function AdminSidebar() {
           </p>
         </Link>
 
-        {/* Navigation Links */}
         <nav className="flex flex-col w-full px-6 space-y-4">
           {[
             { href: "/Admin/AdminHome", label: "Home" },
@@ -81,7 +74,6 @@ export default function AdminSidebar() {
             </Link>
           ))}
 
-          {/* Sign Out */}
           <button
             onClick={() => setShowConfirm(true)}
             className="mt-8 bg-red-600 hover:bg-red-700 text-white text-center px-4 py-2 rounded-xl font-semibold transition-all duration-200 shadow-sm"
@@ -91,7 +83,6 @@ export default function AdminSidebar() {
         </nav>
       </aside>
 
-      {/* Confirmation Modal */}
       {showConfirm && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/70 backdrop-blur-sm z-[999]">
           <div className="bg-white/10 border border-white/20 rounded-2xl p-8 shadow-xl backdrop-blur-md text-center w-80 animate-fadeIn">
@@ -119,8 +110,7 @@ export default function AdminSidebar() {
           </div>
         </div>
       )}
-
-      {/* Animation */}
+      
       <style jsx>{`
         @keyframes fadeIn {
           from {

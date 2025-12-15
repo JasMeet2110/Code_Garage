@@ -1,7 +1,6 @@
 import { query } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth";
 
-// GET 
 export async function GET() {
   const admin = await requireAdmin();
   if (!admin) {
@@ -32,7 +31,6 @@ export async function GET() {
   }
 }
 
-// POST 
 export async function POST(req) {
   const admin = await requireAdmin();
   if (!admin) {
@@ -67,7 +65,6 @@ export async function POST(req) {
   }
 }
 
-// PUT 
 export async function PUT(req) {
   const admin = await requireAdmin();
   if (!admin) {
@@ -102,7 +99,6 @@ export async function PUT(req) {
   }
 }
 
-// DELETE 
 export async function DELETE(req) {
   const admin = await requireAdmin();
   if (!admin) {

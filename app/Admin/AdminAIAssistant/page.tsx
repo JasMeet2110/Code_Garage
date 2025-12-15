@@ -39,9 +39,6 @@ export default function AdminAIAssistantPage() {
     return confirmWords.some((w) => lower === w || lower.includes(w));
   }
 
-  /* ---------------------------------------------------------
-     EMPLOYEES
-  --------------------------------------------------------- */
   async function applyEmployeeAction(ai: AiResponse) {
     const data = ai.employeeData;
     if (!data) return;
@@ -107,9 +104,6 @@ export default function AdminAIAssistantPage() {
     }
   }
 
-  /* ---------------------------------------------------------
-     INVENTORY
-  --------------------------------------------------------- */
   async function applyInventoryAction(ai: AiResponse) {
     const data = ai.inventoryData;
     if (!data) return;
@@ -172,9 +166,6 @@ export default function AdminAIAssistantPage() {
     }
   }
 
-  /* ---------------------------------------------------------
-     CUSTOMERS
-  --------------------------------------------------------- */
   async function applyCustomerAction(ai: AiResponse) {
     const data = ai.customerData;
     if (!data) return;
@@ -207,9 +198,6 @@ export default function AdminAIAssistantPage() {
     }
   }
 
-  /* ---------------------------------------------------------
-     APPOINTMENTS
-  --------------------------------------------------------- */
   async function applyAppointmentAction(ai: AiResponse) {
     const data = ai.appointmentData;
     if (!data) return;
@@ -258,9 +246,6 @@ export default function AdminAIAssistantPage() {
     }
   }
 
-  /* ---------------------------------------------------------
-     MAIN SEND HANDLER (NOW WITH FULL CHAT HISTORY)
-  --------------------------------------------------------- */
   const handleSend = async () => {
     if (!input.trim() || loading) return;
 
@@ -277,7 +262,7 @@ export default function AdminAIAssistantPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           message: userContent,
-          history: messages, // 🔥 SEND FULL CHAT HISTORY
+          history: messages,
         }),
       });
 

@@ -21,7 +21,6 @@ const CustomerPage = () => {
   const [showEditForm, setShowEditForm] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
 
-  // ✅ Fetch all customers
   const fetchCustomers = async () => {
     try {
       const res = await fetch("/api/customers", { cache: "no-store" });
@@ -47,7 +46,6 @@ const CustomerPage = () => {
     fetchCustomers();
   }, []);
 
-  // ✅ Add Customer
   const handleAddCustomer = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
@@ -77,7 +75,6 @@ const CustomerPage = () => {
     }
   };
 
-  // ✅ Edit Customer
   const handleEditCustomer = (customer: Customer) => {
     setEditingCustomer(customer);
     setShowEditForm(true);
@@ -113,7 +110,6 @@ const CustomerPage = () => {
     }
   };
 
-  // ✅ Delete Customer
   const handleDeleteCustomer = async (id: number) => {
     if (!confirm("Are you sure you want to delete this customer?")) return;
     const res = await fetch(`/api/customers/${id}`, { method: "DELETE" });
@@ -124,7 +120,6 @@ const CustomerPage = () => {
     }
   };
 
-  // ✅ Search
   const filteredCustomers = customers.filter(
     (c) =>
       c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -170,7 +165,6 @@ const CustomerPage = () => {
             </button>
           </div>
 
-          {/* Add Form */}
           {showAddForm && (
             <div className="mb-8 p-6 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 shadow-md animate-fadeIn">
               <h2 className="text-2xl font-bold text-orange-400 mb-4">
@@ -233,7 +227,6 @@ const CustomerPage = () => {
             </div>
           )}
 
-          {/* Edit Form */}
           {showEditForm && editingCustomer && (
             <div className="mb-8 p-6 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 shadow-md animate-fadeIn">
               <h2 className="text-2xl font-bold text-orange-400 mb-4">
@@ -320,7 +313,6 @@ const CustomerPage = () => {
             </div>
           )}
 
-          {/* Customer Table */}
           <div className="overflow-x-auto rounded-xl bg-white/10 border border-white/20 shadow-lg">
             <table className="min-w-full text-left">
               <thead className="bg-white/10 border-b border-white/20 text-orange-400">

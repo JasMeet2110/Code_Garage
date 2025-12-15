@@ -14,5 +14,4 @@ CREATE TABLE IF NOT EXISTS employees (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
--- Index (ignore duplicate key warning on re-runs)
 CREATE INDEX idx_employee_email ON employees (email);

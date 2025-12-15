@@ -65,7 +65,6 @@ const handleLogin = async (e: FormEvent) => {
 
   return (
     <div className="relative h-[900px] flex flex-col items-center justify-center">
-      {/* Background */}
       <div className="fixed inset-0 -z-10">
         <Image
           src="/background/login.png"
@@ -76,7 +75,6 @@ const handleLogin = async (e: FormEvent) => {
         />
       </div>
 
-      {/* 🔥 Logo + Name Block */}
       <div className="flex flex-col items-center mb-16 z-10">
         <div className="w-70 h-25 relative mb-3">
           <Image
@@ -96,7 +94,6 @@ const handleLogin = async (e: FormEvent) => {
         </p>
       </div>
 
-      {/* 🔥 Sign In Card */}
       <div className="relative z-10 w-full max-w-md bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-8 shadow-2xl">
         <h1 className="text-3xl font-bold text-center text-orange-400 mb-6">
           Welcome Back

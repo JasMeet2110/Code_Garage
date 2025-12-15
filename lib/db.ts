@@ -12,12 +12,10 @@ const dbConfig = {
   timezone: "Z",
 };
 
-// Extend global type for TypeScript
 declare global {
   var _pool: mysql.Pool | undefined;
 }
 
-// Prevent multiple pool instances in Next.js hot reload (dev mode)
 if (!global._pool) {
   global._pool = mysql.createPool(dbConfig);
 }

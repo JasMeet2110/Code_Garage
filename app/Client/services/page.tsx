@@ -7,7 +7,6 @@ import { SERVICES } from "@/data/services";
 export default function ServicesPage() {
   return (
     <div className="relative min-h-screen text-white">
-      {/* Fixed Background */}
       <div className="fixed inset-0 -z-10">
         <Image
           src="/background/service.png"
@@ -18,7 +17,6 @@ export default function ServicesPage() {
         />
       </div>
 
-      {/* Page Content */}
       <div className="relative z-10 flex flex-col items-center text-center px-6 py-20 backdrop-blur-sm">
         <h1 className="text-5xl font-bold text-orange-400 drop-shadow-lg mb-4">
           Our Services
@@ -27,7 +25,6 @@ export default function ServicesPage() {
           Professional car care solutions tailored for you.
         </p>
 
-        {/* Glassy Cards Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl">
           {SERVICES.map((service) => (
             <div
