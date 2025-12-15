@@ -1,8 +1,14 @@
-"use client";
+"use client"; 
+// this makes the page run on the client side
 
 import React, { useEffect, useState } from "react";
+// importing react and hooks we need for the page
+
 import Image from "next/image";
+// for using next image
+
 import { useSession } from "next-auth/react";
+// used to get the logged in user session info
 
 type Review = {
   id: number;
@@ -11,31 +17,48 @@ type Review = {
   comment: string;
   date: string;
 };
+// this is the shape of each review object
 
 const Star = ({ filled }: { filled: boolean }) => (
+  // this component shows one star and if it is filled or empty
   <span className={`text-xl ${filled ? "text-orange-500" : "text-gray-400/60"}`}>★</span>
 );
 
 export default function ReviewsPage() {
+  // this is the main page component
+
   const { data: session } = useSession();
+  // get the session data for the user
 
   const isLoggedIn = Boolean(session?.user);
+  // check if user is logged in
 
   const userName = session?.user?.name || "";
+  // get the user name or empty if not logged in
 
   const [reviews, setReviews] = useState<Review[]>([]);
+  // store all reviews from the database
+
   const [loading, setLoading] = useState(true);
+  // show loading until data comes
 
   const [rating, setRating] = useState(0);
+  // store rating selected by user
+
   const [comment, setComment] = useState("");
+  // store the comment typed by user
 
   const [errors, setErrors] = useState<{ rating?: string; comment?: string }>({});
+  // store validation errors
 
   const [showSuccess, setShowSuccess] = useState(false);
+  // show success message after submitting
 
   const [showMore, setShowMore] = useState(false);
+  // control showing more reviews
 
   useEffect(() => {
+    // load reviews when the page opens
     async function loadReviews() {
       const res = await fetch("/api/reviews");
       const data = await res.json();
@@ -46,6 +69,7 @@ export default function ReviewsPage() {
   }, []);
 
   const validate = () => {
+    // check if rating and comment are valid
     const newErrors: typeof errors = {};
 
     if (rating === 0) newErrors.rating = "Select a rating.";
@@ -54,16 +78,20 @@ export default function ReviewsPage() {
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
+    // if no errors return true
   };
 
   const submitReview = async () => {
+    // this runs when user clicks submit button
     if (!validate()) return;
+    // if validation fails stop here
 
     const payload = {
       name: userName,
       rating,
       comment,
       email: session?.user?.email,
+      // this is the data we send to the api
     };
 
     const res = await fetch("/api/reviews", {
@@ -73,20 +101,30 @@ export default function ReviewsPage() {
     });
 
     const saved = await res.json();
+    // get the new saved review from the api
+
     setReviews((prev) => [saved, ...prev]);
+    // add the new review to the top of the list
 
     setRating(0);
     setComment("");
     setErrors({});
     setShowSuccess(true);
+    // reset form and show success
   };
 
   const sorted = [...reviews].sort((a, b) => b.rating - a.rating);
+  // sorting reviews from highest rating to lowest
+
   const topFive = sorted.slice(0, 5);
+  // show only first five reviews at the top
+
   const remaining = sorted.slice(5);
+  // the rest of the reviews go here
 
   return (
     <div className="relative min-h-screen text-white">
+      {/* background image and blur effect */}
       <div className="fixed inset-0 -z-10">
         <Image
           src="/background/reviews.jpg"
@@ -100,6 +138,7 @@ export default function ReviewsPage() {
 
       <div className="relative z-10 flex flex-col items-center min-h-screen py-16 px-6">
         
+        {/* page header */}
         <header className="text-center mb-12">
           <h1 className="text-5xl font-bold text-orange-400 mb-4">Customer Reviews</h1>
           <p className="text-lg text-gray-200 max-w-2xl mx-auto">
@@ -110,11 +149,13 @@ export default function ReviewsPage() {
         <div className="w-full max-w-5xl space-y-10">
 
           {!isLoggedIn && (
+            // message telling user to sign in
             <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6 text-center text-gray-300">
               Please <span className="text-orange-400 font-semibold">sign in</span> to leave a review.
             </div>
           )}
 
+          {/* write review section */}
           <section className={`bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-8 shadow-lg ${!isLoggedIn && "opacity-40 pointer-events-none"}`}>
             
             <h2 className="text-2xl font-extrabold text-orange-400 mb-6 text-center">
@@ -123,6 +164,7 @@ export default function ReviewsPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
+              {/* user name input */}
               <div>
                 <p className="font-semibold mb-1 text-gray-200">Your Name</p>
                 <input
@@ -134,6 +176,7 @@ export default function ReviewsPage() {
                 <p className="text-xs text-gray-400 mt-1">Cannot be edited</p>
               </div>
 
+              {/* rating stars */}
               <div>
                 <p className="font-semibold mb-1 text-gray-200">Rating</p>
                 <div className="flex items-center gap-2">
@@ -153,6 +196,7 @@ export default function ReviewsPage() {
                 {errors.rating && <p className="text-red-400 text-sm">{errors.rating}</p>}
               </div>
 
+              {/* comment box */}
               <div className="md:col-span-2">
                 <p className="font-semibold mb-1 text-gray-200">Comment</p>
                 <textarea
@@ -172,6 +216,7 @@ export default function ReviewsPage() {
               </div>
             </div>
 
+            {/* buttons */}
             <div className="mt-6 flex justify-end gap-3">
               <button
                 onClick={() => {
@@ -193,17 +238,21 @@ export default function ReviewsPage() {
             </div>
           </section>
 
+          {/* recent reviews */}
           <section className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-8 shadow-lg">
             <h2 className="text-2xl font-extrabold text-orange-400 mb-6 text-center">
               Recent Reviews
             </h2>
 
             {loading ? (
+              // show loading message
               <p className="text-center opacity-70">Loading...</p>
             ) : reviews.length === 0 ? (
+              // no reviews yet
               <p className="text-center opacity-70">No reviews yet.</p>
             ) : (
               <>
+                {/* top five reviews */}
                 <div className="flex flex-col gap-5">
                   {topFive.map((r) => (
                     <div
@@ -230,6 +279,7 @@ export default function ReviewsPage() {
                   ))}
                 </div>
 
+                {/* show more button */}
                 {remaining.length > 0 && (
                   <button
                     onClick={() => setShowMore(!showMore)}
@@ -239,6 +289,7 @@ export default function ReviewsPage() {
                   </button>
                 )}
 
+                {/* show extra reviews */}
                 {showMore && (
                   <div className="mt-4 flex flex-col gap-5">
                     {remaining.map((r) => (
