@@ -23,11 +23,23 @@ const InventoryPage = () => {
   const [itemToDelete, setItemToDelete] = useState<InventoryItem | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const [lastUpdatedAt, setLastUpdatedAt] = useState<Date | null>(null);
+
+  const formatLastUpdated = (d: Date | null) => {
+    if (!d) return "Last updated: -";
+
+    return `Last updated: ${d.toLocaleDateString()} at ${d.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    })}`;
+  };
+
   const fetchData = async () => {
     try {
       const res = await fetch("/api/inventory", { cache: "no-store" });
       const data = await res.json();
       setInventoryItems(data);
+      setLastUpdatedAt(new Date());
     } catch (err) {
       console.error("Error fetching inventory:", err);
     } finally {
@@ -65,32 +77,35 @@ const InventoryPage = () => {
       item.partNumber.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const [sortConfig, setSortConfig] = useState<{ key: keyof InventoryItem | null, direction: "asc" | "desc" | null }>({
-  key: null,
-  direction: null,
+  const [sortConfig, setSortConfig] = useState<{
+    key: keyof InventoryItem | null;
+    direction: "asc" | "desc" | null;
+  }>({
+    key: null,
+    direction: null,
   });
 
   const sortedItems = [...filteredItems].sort((a, b) => {
-  if (!sortConfig.key) return 0;
+    if (!sortConfig.key) return 0;
 
-  const key = sortConfig.key;
-  const direction = sortConfig.direction === "asc" ? 1 : -1;
+    const key = sortConfig.key;
+    const direction = sortConfig.direction === "asc" ? 1 : -1;
 
-  if (typeof a[key] === "number") {
-    return (a[key] as number - (b[key] as number)) * direction;
-  }
+    if (typeof a[key] === "number") {
+      return ((a[key] as number) - (b[key] as number)) * direction;
+    }
 
-  return (a[key] as string).localeCompare(b[key] as string) * direction;
+    return (a[key] as string).localeCompare(b[key] as string) * direction;
   });
 
   const toggleSort = (key: keyof InventoryItem) => {
-  setSortConfig((prev) => {
-    if (prev.key === key) {
-      if (prev.direction === "asc") return { key, direction: "desc" };
-      if (prev.direction === "desc") return { key: null, direction: null };
-    }
-    return { key, direction: "asc" };
-  });
+    setSortConfig((prev) => {
+      if (prev.key === key) {
+        if (prev.direction === "asc") return { key, direction: "desc" };
+        if (prev.direction === "desc") return { key: null, direction: null };
+      }
+      return { key, direction: "asc" };
+    });
   };
 
   return (
@@ -110,9 +125,13 @@ const InventoryPage = () => {
 
       <main className="ml-72 flex-1 p-10 relative z-10">
         <div className="backdrop-blur-lg bg-white/5 rounded-2xl p-8 shadow-lg border border-white/20">
-          <h1 className="text-4xl font-bold text-orange-400 mb-8 drop-shadow-md">
+          <h1 className="text-4xl font-bold text-orange-400 mb-2 drop-shadow-md">
             Inventory Management
           </h1>
+
+          <p className="text-sm text-gray-300 mb-8">
+            {formatLastUpdated(lastUpdatedAt)}
+          </p>
 
           <div className="flex justify-between items-center mb-8">
             <input
@@ -129,16 +148,15 @@ const InventoryPage = () => {
               + Add New Item
             </button>
           </div>
-          {inventoryItems.some(item => item.quantity < 5) && (
+
+          {inventoryItems.some((item) => item.quantity < 5) && (
             <div className="mb-6 w-[600px] bg-red-500/20 border border-red-600 text-red-300 px-4 py-3 rounded-xl">
               <b>Low Stock Alert:</b> Some parts are running low. Restock recommended.
             </div>
           )}
 
           {loading && (
-            <p className="text-center text-gray-400 mb-4">
-              Loading inventory...
-            </p>
+            <p className="text-center text-gray-400 mb-4">Loading inventory...</p>
           )}
 
           {showAddForm && (
@@ -181,32 +199,26 @@ const InventoryPage = () => {
             <table className="min-w-full text-left">
               <thead className="bg-white/10 border-b border-white/20 text-orange-400 select-none">
                 <tr>
-                  <th 
-                    className="px-6 py-3 cursor-pointer"
-                    onClick={() => toggleSort("name")}
-                  >
-                    Part Name {sortConfig.key === "name" && (sortConfig.direction === "asc" ? "▲" : "▼")}
+                  <th className="px-6 py-3 cursor-pointer" onClick={() => toggleSort("name")}>
+                    Part Name{" "}
+                    {sortConfig.key === "name" && (sortConfig.direction === "asc" ? "▲" : "▼")}
                   </th>
 
-                  <th 
-                    className="px-6 py-3 cursor-pointer"
-                    onClick={() => toggleSort("partNumber")}
-                  >
-                    Part Number {sortConfig.key === "partNumber" && (sortConfig.direction === "asc" ? "▲" : "▼")}
+                  <th className="px-6 py-3 cursor-pointer" onClick={() => toggleSort("partNumber")}>
+                    Part Number{" "}
+                    {sortConfig.key === "partNumber" &&
+                      (sortConfig.direction === "asc" ? "▲" : "▼")}
                   </th>
 
-                  <th 
-                    className="px-6 py-3 cursor-pointer"
-                    onClick={() => toggleSort("quantity")}
-                  >
-                    Quantity {sortConfig.key === "quantity" && (sortConfig.direction === "asc" ? "▲" : "▼")}
+                  <th className="px-6 py-3 cursor-pointer" onClick={() => toggleSort("quantity")}>
+                    Quantity{" "}
+                    {sortConfig.key === "quantity" &&
+                      (sortConfig.direction === "asc" ? "▲" : "▼")}
                   </th>
 
-                  <th 
-                    className="px-6 py-3 cursor-pointer"
-                    onClick={() => toggleSort("price")}
-                  >
-                    Price {sortConfig.key === "price" && (sortConfig.direction === "asc" ? "▲" : "▼")}
+                  <th className="px-6 py-3 cursor-pointer" onClick={() => toggleSort("price")}>
+                    Price{" "}
+                    {sortConfig.key === "price" && (sortConfig.direction === "asc" ? "▲" : "▼")}
                   </th>
 
                   <th className="px-6 py-3 text-right">Actions</th>
@@ -215,10 +227,7 @@ const InventoryPage = () => {
               <tbody>
                 {filteredItems.length === 0 ? (
                   <tr>
-                    <td
-                      colSpan={5}
-                      className="px-6 py-6 text-center text-gray-400"
-                    >
+                    <td colSpan={5} className="px-6 py-6 text-center text-gray-400">
                       No items found.
                     </td>
                   </tr>
@@ -229,15 +238,14 @@ const InventoryPage = () => {
                       className="border-b border-white/10 hover:bg-white/10 transition-all"
                     >
                       <td className="px-6 py-4">{item.name}</td>
-                      <td className="px-6 py-4 text-gray-300">
-                        {item.partNumber}
-                      </td>
+                      <td className="px-6 py-4 text-gray-300">{item.partNumber}</td>
                       <td className="px-6 py-4">
                         <span
                           className={`px-3 py-1 rounded-lg text-sm font-semibold 
-                            ${item.quantity < 5 
-                              ? "bg-red-600/40 text-red-300 border border-red-600" 
-                              : "bg-white/10 text-gray-300"
+                            ${
+                              item.quantity < 5
+                                ? "bg-red-600/40 text-red-300 border border-red-600"
+                                : "bg-white/10 text-gray-300"
                             }`}
                         >
                           {item.quantity}
@@ -246,9 +254,7 @@ const InventoryPage = () => {
                           )}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-gray-300">
-                        ${item.price}
-                      </td>
+                      <td className="px-6 py-4 text-gray-300">${item.price}</td>
                       <td className="px-6 py-4 text-right">
                         <button
                           onClick={() => {
@@ -283,10 +289,7 @@ const InventoryPage = () => {
             </h2>
             <p className="text-gray-300 mb-6">
               Are you sure you want to delete the item{" "}
-              <span className="text-white font-semibold">
-                {itemToDelete.name}
-              </span>
-              ?
+              <span className="text-white font-semibold">{itemToDelete.name}</span>?
             </p>
             <div className="flex justify-center gap-4">
               <button

@@ -1,20 +1,30 @@
 "use client";
+// this component runs on the client side
+
 import Link from "next/link";
+// used for navigation between admin pages
+
 import Image from "next/image";
+// used to display the logo image
+
 import { signOut } from "next-auth/react";
+// used to sign the admin out
+
 import { useState, useEffect } from "react";
+// react hooks for state and side effects
 
 export default function AdminSidebar() {
+  // controls showing the sign out confirmation popup
   const [showConfirm, setShowConfirm] = useState(false);
 
+  // stores how many inventory items are low in stock
   const [lowStockCount, setLowStockCount] = useState(0);
 
   useEffect(() => {
+    // fetch low stock inventory count when sidebar loads
     async function fetchLowStock() {
       try {
-        const res = await fetch("/api/inventory/low-stock", {
-          cache: "no-store",
-        });
+        const res = await fetch("/api/inventory/low-stock", { cache: "no-store" });
         const data = await res.json();
         setLowStockCount(data.length);
       } catch (err) {
@@ -25,11 +35,12 @@ export default function AdminSidebar() {
     fetchLowStock();
   }, []);
 
-  
-
   return (
     <>
+      {/* main admin sidebar */}
       <aside className="fixed top-0 left-0 h-screen w-72 backdrop-blur-lg bg-white/10 border-r border-white/20 shadow-lg text-white flex flex-col items-center py-8 z-50">
+        
+        {/* logo and title */}
         <Link href="/Admin/AdminHome" className="flex flex-col items-center mb-10">
           <Image
             src="/logo/tracksidegarage.png"
@@ -44,6 +55,7 @@ export default function AdminSidebar() {
           </p>
         </Link>
 
+        {/* admin navigation links */}
         <nav className="flex flex-col w-full px-6 space-y-4">
           {[
             { href: "/Admin/AdminHome", label: "Home" },
@@ -65,6 +77,7 @@ export default function AdminSidebar() {
               <span className="relative flex items-center gap-2">
                 {item.label}
 
+                {/* show low stock badge only for inventory */}
                 {item.label === "Inventory" && lowStockCount > 0 && (
                   <span className="bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded-full animate-pulse">
                     {lowStockCount}
@@ -74,6 +87,7 @@ export default function AdminSidebar() {
             </Link>
           ))}
 
+          {/* sign out button */}
           <button
             onClick={() => setShowConfirm(true)}
             className="mt-8 bg-red-600 hover:bg-red-700 text-white text-center px-4 py-2 rounded-xl font-semibold transition-all duration-200 shadow-sm"
@@ -83,6 +97,7 @@ export default function AdminSidebar() {
         </nav>
       </aside>
 
+      {/* sign out confirmation modal */}
       {showConfirm && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/70 backdrop-blur-sm z-[999]">
           <div className="bg-white/10 border border-white/20 rounded-2xl p-8 shadow-xl backdrop-blur-md text-center w-80 animate-fadeIn">
@@ -111,6 +126,7 @@ export default function AdminSidebar() {
         </div>
       )}
       
+      {/* animation for modal fade in */}
       <style jsx>{`
         @keyframes fadeIn {
           from {
