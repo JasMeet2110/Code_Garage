@@ -146,12 +146,12 @@ export default function AdminEmployees() {
             <table className="min-w-full text-left">
               <thead className="bg-white/10 border-b border-white/20 text-orange-400">
                 <tr>
-                  <th className="px-6 py-3">ID</th> {/* ← ADD THIS LINE */}
+                  <th className="px-6 py-3">ID</th>
                   <th className="px-6 py-3">Name</th>
                   <th className="px-6 py-3">Position</th>
                   <th className="px-6 py-3">Phone</th>
                   <th className="px-6 py-3">Email</th>
-                  <th className="px-6 py-3">Salary</th>
+                  <th className="px-6 py-3">Hourly Wage ($/hr)</th>
                   <th className="px-6 py-3">Start Date</th>
                   <th className="px-6 py-3 text-right">Actions</th>
                 </tr>
@@ -183,7 +183,9 @@ export default function AdminEmployees() {
                       </td>
                       <td className="px-6 py-4 text-gray-300">{emp.phone}</td>
                       <td className="px-6 py-4 text-gray-300">{emp.email}</td>
-                      <td className="px-6 py-4 text-gray-300">${emp.salary}</td>
+                      <td className="px-6 py-4 text-gray-300">
+                        ${Number(emp.salary).toFixed(2)}/hr
+                      </td>
                       <td className="px-6 py-4 text-gray-300">
                         {new Date(emp.start_date).toISOString().split("T")[0]}
                       </td>
@@ -297,7 +299,7 @@ const EmployeeForm = ({
     if (!formData.phone.trim()) newErrors.phone = "Phone is required.";
     if (!formData.email.trim()) newErrors.email = "Email is required.";
     if (!formData.salary || Number(formData.salary) <= 0)
-      newErrors.salary = "Enter a valid salary.";
+      newErrors.salary = "Enter a valid hourly wage (e.g., 18, 20, 25).";
     if (!formData.startDate.trim())
       newErrors.startDate = "Start date is required.";
     setErrors(newErrors);
@@ -337,7 +339,7 @@ const EmployeeForm = ({
     { label: "Position", name: "position", type: "text" },
     { label: "Phone", name: "phone", type: "text" },
     { label: "Email", name: "email", type: "email" },
-    { label: "Salary", name: "salary", type: "number" },
+    { label: "Hourly Wage ($/hr)", name: "salary", type: "number" },
     { label: "Start Date", name: "startDate", type: "date" },
   ];
 
