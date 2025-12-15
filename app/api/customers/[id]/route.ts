@@ -2,39 +2,46 @@ import { NextResponse } from "next/server";
 import { query } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth";
 
-export async function PUT(req: Request, context: { params: { id: string } }) {
+export async function PUT(
+  req: Request,
+  { params }: { params: { id: string } }
+) {
   const admin = await requireAdmin();
   if (!admin) {
-    return NextResponse.json({ error: "Unauthorized (admin only)" }, { status: 403 });
+    return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
   }
 
   try {
+    const id = Number(params.id);
+    if (!id) {
+      return NextResponse.json({ error: "Invalid customer ID" }, { status: 400 });
+    }
+
     const body = await req.json();
-    const { name, phone, email, carName, carPlate, startDate } = body;
+    const { name, phone, carName, carPlate, year, color, carImage } = body;
 
     await query(
-      "UPDATE customers SET name=?, phone=?, email=?, car_name=?, car_plate=?, start_date=? WHERE id=?",
-      [name, phone, email, carName, carPlate, startDate, context.params.id]
+      `UPDATE customers
+       SET name = ?, phone = ?, car_name = ?, car_plate = ?, year = ?, color = ?, car_image = ?, updated_at = NOW()
+       WHERE id = ?`,
+      [
+        name ?? null,
+        phone ?? null,
+        carName ?? null,
+        carPlate ?? null,
+        year ?? null,
+        color ?? null,
+        carImage ?? null,
+        id,
+      ]
     );
 
-    return NextResponse.json({ message: "Customer updated successfully" }, { status: 200 });
-  } catch (error) {
-    console.error("Error updating customer:", error);
-    return NextResponse.json({ error: "Failed to update customer" }, { status: 500 });
-  }
-}
-
-export async function DELETE(req: Request, context: { params: { id: string } }) {
-  const admin = await requireAdmin();
-  if (!admin) {
-    return NextResponse.json({ error: "Unauthorized (admin only)" }, { status: 403 });
-  }
-
-  try {
-    await query("DELETE FROM customers WHERE id=?", [context.params.id]);
-    return NextResponse.json({ message: "Customer deleted successfully" }, { status: 200 });
-  } catch (error) {
-    console.error("Error deleting customer:", error);
-    return NextResponse.json({ error: "Failed to delete customer" }, { status: 500 });
+    return NextResponse.json({ success: true });
+  } catch (err) {
+    console.error("Update customer error:", err);
+    return NextResponse.json(
+      { error: "Failed to update customer" },
+      { status: 500 }
+    );
   }
 }

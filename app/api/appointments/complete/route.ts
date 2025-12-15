@@ -149,8 +149,8 @@ export async function POST(req: Request) {
     );
 
     await query(
-      `INSERT INTO transactions (appointment_id, amount, type, category, notes, status, created_at)
-       VALUES (?, ?, 'income', 'service', ?, 'Completed', NOW())`,
+      `INSERT INTO transactions (appointment_id, amount, type, category, notes, created_at)
+       VALUES (?, ?, 'income', 'service', ?,  NOW())`,
       [
         appointmentId,
         total,
