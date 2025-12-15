@@ -90,9 +90,24 @@ APPOINTMENT:
 - description
 
 CUSTOMER:
+REQUIRED:
 - name
 - email
-(optional: phone, carName, carPlate, year, color, carImage)
+
+OPTIONAL (collect and include if mentioned by the user):
+- phone
+- carName
+- carPlate
+- year
+- color
+- carImage
+
+RULES:
+- ONLY name and email are required to proceed.
+- Optional fields MUST NOT be added to missingFields.
+- If optional fields are provided by the user, they MUST be included in customerData.
+- If optional fields are not mentioned, omit them or set them to null.
+
 
 ────────────────────────────────────────
 DATE RULE

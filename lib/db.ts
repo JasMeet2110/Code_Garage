@@ -22,6 +22,10 @@ if (!global._pool) {
 
 const pool: mysql.Pool = global._pool;
 
+/**
+ * Normal query (non-transactional)
+ * Used everywhere else in the app
+ */
 export async function query(sql: string, params: unknown[] = []) {
   try {
     const [results] = await pool.execute(sql, params);
@@ -31,6 +35,36 @@ export async function query(sql: string, params: unknown[] = []) {
       console.error("Database query error:", error.message);
     }
     throw error;
+  }
+}
+
+/**
+ * Transaction helper
+ * Guarantees ALL queries succeed or NONE do
+ */
+export async function withTransaction<T>(
+  fn: (tx: (sql: string, params?: unknown[]) => Promise<any>) => Promise<T>
+): Promise<T> {
+  const connection = await pool.getConnection();
+
+  try {
+    await connection.beginTransaction();
+
+    const tx = async (sql: string, params: unknown[] = []) => {
+      const [results] = await connection.execute(sql, params);
+      return results;
+    };
+
+    const result = await fn(tx);
+
+    await connection.commit();
+    return result;
+  } catch (error) {
+    await connection.rollback();
+    console.error("Transaction rolled back:", error);
+    throw error;
+  } finally {
+    connection.release();
   }
 }
 

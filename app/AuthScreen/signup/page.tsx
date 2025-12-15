@@ -31,6 +31,13 @@ export default function SignUpPage() {
 
     setLoading(true);
 
+    // CRITICAL FIX: Check if passwords match
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
+      setLoading(false);
+      return;
+    }
+
     try {
       const response = await fetch("/api/auth/signup", {
         method: "POST",
@@ -42,6 +49,7 @@ export default function SignUpPage() {
       setLoading(false);
 
       if (response.ok) {
+        // Successful sign-up, redirect to sign-in page
         router.push("/AuthScreen?success=true");
       } else {
         setError(data.error || "Failed to create account. Please try again.");
@@ -153,6 +161,29 @@ export default function SignUpPage() {
               onChange={(e) => setConfirmPassword(e.target.value)}
               className="w-full pl-10 pr-12 py-3 bg-white/10 border border-white/30 rounded-lg 
               text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400"
+              minLength={6}
+              className="w-full pl-10 pr-12 py-3 bg-white/10 border border-white/30 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)} // NEW: Toggle button
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
+            >
+              {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+            </button>
+          </div>
+
+          {/* Confirm Password Input (NEW) */}
+          <div className="relative">
+            <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+            <input
+              type={showPassword ? "text" : "password"} // NEW: Toggle type
+              placeholder="Confirm Password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+              minLength={6}
+              className="w-full pl-10 pr-12 py-3 bg-white/10 border border-white/30 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400"
             />
             <button
               type="button"

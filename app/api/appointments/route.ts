@@ -2,18 +2,15 @@ import { query } from "@/lib/db";
 import { NextResponse } from "next/server";
 import { ResultSetHeader } from "mysql2";
 import { requireAdmin } from "@/lib/auth";
-import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "tracksidegarage0101@gmail.com";
-const BUSINESS_PHONE = process.env.BUSINESS_PHONE || "5878898163";
-
+// GET
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
     const date = searchParams.get("date");
     const id = searchParams.get("id");
 
+    // For availability check (client booking)
     if (date) {
       const results = await query(
         "SELECT appointment_time FROM appointments WHERE appointment_date = ?",
@@ -22,6 +19,7 @@ export async function GET(req: Request) {
       return NextResponse.json(results);
     }
 
+    // Single appointment by id (for complete page)
     if (id) {
       const rows = (await query(
         `SELECT a.*, e.name AS employee_name 
@@ -32,6 +30,20 @@ export async function GET(req: Request) {
       )) as any[];
 
       return NextResponse.json(rows[0] || null);
+    }
+
+    const email = searchParams.get("email");
+
+    if (email) {
+      const rows = await query(
+        `SELECT id, service_type, appointment_date, appointment_time, status
+        FROM appointments
+        WHERE email = ?
+        ORDER BY appointment_date DESC`,
+        [email]
+      );
+
+      return NextResponse.json(rows);
     }
 
     const results = await query(
@@ -51,6 +63,7 @@ export async function GET(req: Request) {
   }
 }
 
+// POST — CREATE APPOINTMENT (client or admin)
 export async function POST(req: Request) {
   try {
     const {
@@ -105,68 +118,6 @@ export async function POST(req: Request) {
     ];
 
     const result = (await query(sql, values)) as ResultSetHeader;
-
-    // --- EMAILS: admin + customer ---
-    console.log("📧 Preparing emails:", {
-      adminTo: ADMIN_EMAIL,
-      customerTo: email,
-    });
-
-    try {
-      await Promise.all([
-        // Admin notification
-        resend.emails.send({
-          from: "Trackside Garage <no-reply@tracksidegarage.ca>",
-          to: ADMIN_EMAIL,
-          subject: "New appointment booked",
-          html: `
-            <h2>New appointment booked</h2>
-            <p><strong>Name:</strong> ${customer_name}</p>
-            <p><strong>Email:</strong> ${email}</p>
-            <p><strong>Phone:</strong> ${phone}</p>
-            <p><strong>Service:</strong> ${service_type}</p>
-            <p><strong>Fuel type:</strong> ${fuel_type}</p>
-            <p><strong>Vehicle:</strong> ${car_year} ${car_make} ${car_model}</p>
-            <p><strong>Plate:</strong> ${plate_number}</p>
-            <p><strong>Date:</strong> ${appointment_date}</p>
-            <p><strong>Time:</strong> ${appointment_time}</p>
-            <p><strong>Description:</strong> ${description || "N/A"}</p>
-            <p><strong>Status:</strong> ${status || "Pending"}</p>
-          `,
-        }),
-
-        // Customer confirmation
-        resend.emails.send({
-          from: "Trackside Garage <no-reply@tracksidegarage.ca>",
-          to: email,
-          subject: "Your Trackside Garage appointment is booked",
-          html: `
-            <p>Hi ${customer_name},</p>
-            <p>Thanks for booking with <strong>Trackside Garage</strong>!</p>
-            <p>Here are your appointment details:</p>
-            <ul>
-              <li><strong>Date:</strong> ${appointment_date}</li>
-              <li><strong>Time:</strong> ${appointment_time}</li>
-              <li><strong>Service:</strong> ${service_type}</li>
-              <li><strong>Fuel type:</strong> ${fuel_type}</li>
-              <li><strong>Vehicle:</strong> ${car_year} ${car_make} ${car_model}</li>
-              <li><strong>Plate:</strong> ${plate_number}</li>
-            </ul>
-            <p><strong>Description:</strong> ${description || "N/A"}</p>
-            <p>If you need to reschedule or cancel, reply to this email or call us at ${
-              BUSINESS_PHONE || "our shop"
-            }.</p>
-            <p>See you soon,<br/>Trackside Garage</p>
-          `,
-        }),
-      ]);
-
-      console.log("📧 Emails sent successfully");
-    } catch (emailError) {
-      console.error("Error sending appointment emails:", emailError);
-      // don't fail the booking if email fails
-    }
-
     return NextResponse.json({ success: true, id: result.insertId });
   } catch (error) {
     console.error("Error adding appointment:", error);
@@ -177,6 +128,7 @@ export async function POST(req: Request) {
   }
 }
 
+// PUT — general update / assign employee / status change / complete job
 export async function PUT(req: Request) {
   try {
     const data = await req.json();
@@ -189,6 +141,9 @@ export async function PUT(req: Request) {
       );
     }
 
+    // =============================
+    // 1️⃣  CANCEL ONLY
+    // =============================
     const isCancelOnly =
       status === "Cancelled" && Object.keys(data).length === 2;
 
@@ -200,6 +155,9 @@ export async function PUT(req: Request) {
       return NextResponse.json({ success: true });
     }
 
+    // =============================
+    // 2️⃣  COMPLETE JOB (FROM MODAL)
+    // =============================
     if (data.complete === true) {
       await query(
         `UPDATE appointments 
@@ -213,6 +171,9 @@ export async function PUT(req: Request) {
       return NextResponse.json({ success: true, completed: true });
     }
 
+    // =============================
+    // 3️⃣  ADMIN UPDATE
+    // =============================
     const admin = await requireAdmin();
     if (!admin) {
       return NextResponse.json(
@@ -284,6 +245,8 @@ export async function PUT(req: Request) {
   }
 }
 
+
+// DELETE
 export async function DELETE(req: Request) {
   try {
     const admin = await requireAdmin();

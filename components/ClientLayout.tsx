@@ -18,6 +18,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     "/Admin/AdminFinance",
     "/Admin/AdminReviews",
     "/Admin/AdminAIAssistant",
+    "/Admin/AdminShifts"
   ];
 
   const hideForAdminComplete =

@@ -3,6 +3,7 @@ import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { query } from "@/lib/db";
 import bcrypt from "bcryptjs";
+import type { ResultSetHeader } from "mysql2";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -17,13 +18,12 @@ export const authOptions: NextAuthOptions = {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials) {
+      async authorize(credentials: Record<string, string> | undefined) {
         if (!credentials?.email || !credentials?.password) return null;
 
-        const users = (await query(
-          "SELECT * FROM users WHERE email = ?",
-          [credentials.email]
-        )) as any[];
+        const users = (await query("SELECT * FROM users WHERE email = ?", [
+          credentials.email,
+        ])) as any[];
 
         const user = users[0];
         if (!user) return null;
@@ -32,7 +32,6 @@ export const authOptions: NextAuthOptions = {
           credentials.password,
           user.password
         );
-
         if (!isValidPassword) return null;
 
         return {
@@ -40,7 +39,7 @@ export const authOptions: NextAuthOptions = {
           email: user.email,
           name: user.name,
           role: user.role,
-        };
+        } as any;
       },
     }),
   ],
@@ -63,19 +62,19 @@ export const authOptions: NextAuthOptions = {
         token.email = user.email;
         token.name = user.name;
 
-        const users = (await query(
-          "SELECT * FROM users WHERE email = ?",
-          [user.email]
-        )) as any[];
+        // Load role from DB (Google or Credentials)
+        const users = (await query("SELECT * FROM users WHERE email = ?", [
+          user.email,
+        ])) as any[];
 
         if (users.length > 0) {
           token.role = users[0].role;
           token.id = users[0].id.toString();
         } else {
-          const result = await query(
+          const result = (await query(
             "INSERT INTO users (name, email, role, password) VALUES (?, ?, ?, ?)",
             [user.name || "Google User", user.email, "client", ""]
-          );
+          )) as ResultSetHeader;
 
           token.role = "client";
           token.id = result.insertId.toString();
@@ -85,10 +84,13 @@ export const authOptions: NextAuthOptions = {
     },
 
     async session({ session, token }) {
-      session.user.id = token.id;
-      session.user.email = token.email;
-      session.user.role = token.role;
-      session.user.name = token.name;
+      if (session.user) {
+        // ← Add this check
+        session.user.id = token.id as string;
+        session.user.email = token.email as string;
+        session.user.role = token.role as string;
+        session.user.name = token.name as string;
+      }
       return session;
     },
   },

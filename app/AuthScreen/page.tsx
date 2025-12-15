@@ -1,6 +1,7 @@
+// app/AuthScreen/page.tsx
 "use client";
-
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import { FormEvent } from "react";
 import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -9,8 +10,11 @@ import { Mail, Lock, LogIn, Chrome, UserPlus, ChromeIcon } from "lucide-react";
 import Google from "next-auth/providers/google";
 
 export default function AuthScreen() {
-  const { data: session, status } = useSession();
   const router = useRouter();
+  const { data: session, status } = useSession();
+  
+
+ 
 
   useEffect(() => {
     if (status === "loading") return;
@@ -26,26 +30,26 @@ export default function AuthScreen() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const handleCredentialsSignIn = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
+const handleLogin = async (e: FormEvent) => {
+  e.preventDefault();
+  setLoading(true);
+  setErrorMsg("");
 
-    const result = await signIn("credentials", {
-      redirect: false,
-      email,
-      password,
-    });
+  const result = await signIn("credentials", {
+    redirect: false,
+    email: email,
+    password: password,
+  });
 
-    setLoading(false);
+  setLoading(false);
 
-    if (result?.error) {
-      setError("Invalid email or password. Please try again.");
-    }
-  };
+  if (result?.error) {
+    setErrorMsg("Invalid email or password. Please try again.");
+  }
+};
 
   const handleGoogleSignIn = () => {
     signIn("google");
@@ -95,13 +99,13 @@ export default function AuthScreen() {
           Welcome Back
         </h1>
 
-        {error && (
+        {errorMsg && (
           <div className="bg-red-500/20 text-red-400 border border-red-500/50 p-3 rounded-lg mb-4 text-sm">
-            {error}
+            {errorMsg}
           </div>
         )}
 
-        <form onSubmit={handleCredentialsSignIn} className="space-y-4">
+        <form onSubmit={handleLogin} className="space-y-4">
           <div className="relative">
             <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
             <input
@@ -156,7 +160,10 @@ export default function AuthScreen() {
 
         <p className="text-center text-gray-300 mt-6 text-sm">
           Don't have an account?{" "}
-          <Link href="/AuthScreen/signup" className="text-orange-400 hover:underline font-medium">
+          <Link
+            href="/AuthScreen/signup"
+            className="text-orange-400 hover:underline font-medium"
+          >
             Sign Up
           </Link>
         </p>

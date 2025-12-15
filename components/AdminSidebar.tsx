@@ -62,11 +62,12 @@ export default function AdminSidebar() {
             { href: "/Admin/AdminInventory", label: "Inventory" },
             { href: "/Admin/AdminAppointments", label: "Appointments" },
             { href: "/Admin/AdminEmployees", label: "Employees" },
+            { href: "/Admin/AdminShifts", label: "Shifts" }, // ← ADD THIS LINE
             { href: "/Admin/AdminCustomers", label: "Customers" },
             { href: "/Admin/AdminReviews", label: "Reviews" },
             { href: "/Admin/AdminReports", label: "Reports" },
             { href: "/Admin/AdminFinance", label: "Finance" },
-            { href: "/Admin/AdminAIAssistant", label: "AI Assistant" }
+            { href: "/Admin/AdminAIAssistant", label: "AI Assistant" },
           ].map((item) => (
             <Link
               key={item.href}
