@@ -45,6 +45,13 @@ const FinancePage = () => {
     outstanding: 0,
   });
 
+  const safeDate = (d?: string | null) => {
+    if (!d) return "—";
+    const parsed = new Date(d);
+    if (isNaN(parsed.getTime()) || parsed.getFullYear() < 2000) return "—";
+    return parsed.toLocaleDateString("en-CA",{month:"short",day:"2-digit"});
+  };
+
   const [selectedMonth, setSelectedMonth] = useState<string>("");
   const [selectedYear, setSelectedYear] = useState<string>("");
 
@@ -251,12 +258,7 @@ const FinancePage = () => {
                         key={t.id}
                         className="border-b border-white/10 hover:bg-white/5"
                       >
-                        <td className="px-4 py-2">
-                          {new Date(t.date).toLocaleDateString("en-CA", {
-                            month: "short",
-                            day: "2-digit",
-                          })}
-                        </td>
+                        <td>{safeDate(t.date)}</td>
                         <td className="px-4 py-2 text-gray-300">{t.type}</td>
                         <td className="px-4 py-2">{formatMoney(t.amount)}</td>
                         <td
